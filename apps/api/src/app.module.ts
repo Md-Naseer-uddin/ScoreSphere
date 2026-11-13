@@ -14,6 +14,10 @@ import type { Env } from './config/env';
 import { DatabaseModule } from './database/database.module';
 import { HealthController } from './health/health.controller';
 import { MediaModule } from './media/media.module';
+import { PeopleModule } from './people/people.module';
+import { PersonsModule } from './people/persons.service';
+import { SyncModule } from './sync/sync.module';
+import { TeamsModule } from './teams/teams.module';
 import { UsersModule } from './users/users.module';
 import { WorkspacesModule } from './workspaces/workspaces.module';
 
@@ -31,10 +35,14 @@ import { WorkspacesModule } from './workspaces/workspaces.module';
     }),
     DatabaseModule,
     AuditModule,
+    PersonsModule,
     AuthModule,
     UsersModule,
     WorkspacesModule,
     MediaModule,
+    PeopleModule,
+    TeamsModule,
+    SyncModule,
   ],
   controllers: [HealthController],
   providers: [

@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm';
 import { ApiError } from '../common/api-error';
 import { generateRecoveryCode, normalizeRecoveryCode } from '../common/crypto';
 import { AuditService } from '../audit/audit.service';
+import { PersonsService } from '../people/persons.service';
 import { DB, type Database } from '../database/database.module';
 import { phoneIdentities, users, workspaceMemberships, workspaces } from '../database/schema';
 import { isUniqueViolation } from '../database/types';
@@ -39,6 +40,7 @@ export class AuthService {
     private readonly passwords: PasswordService,
     private readonly sessions: SessionService,
     private readonly audit: AuditService,
+    private readonly persons: PersonsService,
   ) {}
 
   /**
@@ -96,6 +98,9 @@ export class AuthService {
             adultConfirmedAt: new Date(),
           })
           .returning({ id: users.id, displayName: users.displayName });
+
+        // Claims the pending person if someone added this number before sign-up (ADR 0013).
+        await this.persons.ensureForUser(user!.id, tx);
 
         const [workspace] = await tx
           .insert(workspaces)

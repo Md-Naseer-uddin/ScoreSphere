@@ -11,6 +11,6 @@ import { WorkspacesService } from './workspaces.service';
 @Module({
   controllers: [WorkspacesController, OrganizationsController, InvitationsController],
   providers: [WorkspacesService, InvitationsService, WorkspaceAccessGuard],
-  exports: [WorkspaceAccessGuard],
+  exports: [WorkspaceAccessGuard, WorkspacesService],
 })
 export class WorkspacesModule {}
