@@ -1,6 +1,7 @@
 import type { SideIndex } from '@scoresphere/contracts';
 import { undoTarget } from '@scoresphere/engine-kit';
 import { ArrowLeft, MoreVertical, Pause, Play, Undo2 } from 'lucide-react';
+import { KeepAwake } from '@capacitor-community/keep-awake';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router';
@@ -24,6 +25,7 @@ import {
 import { FullScreenSpinner } from '@/features/auth/RequireAuth';
 import { ApiClientError } from '@/lib/api';
 import { db } from '@/lib/db';
+import { isNative } from '@/lib/platform';
 import { sportUi } from '@/sports/registry';
 import { useLocalMatch, useMatchSyncStatus, useProjection } from './hooks';
 import { recordEvent, type NewEvent } from './local-store';
@@ -34,10 +36,15 @@ import { Timeline } from './Timeline';
 
 const HEARTBEAT_MS = 30_000;
 
-/** Keeps the screen on while scoring, where the browser allows it. */
+/** Keeps the screen on while scoring: natively on Android, else where the browser allows it. */
 function useWakeLock(active: boolean) {
   useEffect(() => {
-    if (!active || !('wakeLock' in navigator)) return;
+    if (!active) return;
+    if (isNative()) {
+      void KeepAwake.keepAwake().catch(() => undefined);
+      return () => void KeepAwake.allowSleep().catch(() => undefined);
+    }
+    if (!('wakeLock' in navigator)) return;
     let sentinel: WakeLockSentinel | null = null;
     let released = false;
     void navigator.wakeLock
@@ -125,6 +132,18 @@ export function ScoreMatchPage() {
     }
   };
 
+  /** Frees the match for another device; only once everything here has synced (ADR 0007). */
+  const handOver = async () => {
+    try {
+      await lease(matchId, 'RELEASE');
+      await db.matches.update(matchId, { holdsLease: false });
+      toast.success(t('matches.handedOver'));
+      navigate(`/app/matches/${matchId}`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t('errors.generic'));
+    }
+  };
+
   const undoSeq = undoTarget(projection.timeline);
   const canScore = match.holdsLease;
   const status = projection.status;
@@ -156,6 +175,11 @@ export function ScoreMatchPage() {
             {status !== 'completed' && status !== 'abandoned' && (
               <DropdownMenuItem disabled={!canScore} onSelect={() => setDialog('abandon')}>
                 {t('matches.abandon')}
+              </DropdownMenuItem>
+            )}
+            {canScore && match.serverKnown && status !== 'completed' && status !== 'abandoned' && (
+              <DropdownMenuItem disabled={sync.state !== 'synced'} onSelect={() => void handOver()}>
+                {t('matches.handOver')}
               </DropdownMenuItem>
             )}
             <DropdownMenuItem onSelect={() => navigate(`/app/matches/${matchId}`)}>

@@ -316,6 +316,8 @@
     "shareAndDetails": "Share and details",
     "continueScoring": "Continue scoring",
     "scoreHere": "Score on this device",
+    "handOver": "Hand over scoring",
+    "handedOver": "This device has stopped scoring. Another device can now take over.",
     "lostLease": "Another device is now scoring this match. Events you record here are kept on this device but not counted.",
     "needsReview": "Needs review",
     "takeover": {

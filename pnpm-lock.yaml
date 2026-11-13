@@ -329,6 +329,9 @@ importers:
       '@aparajita/capacitor-secure-storage':
         specifier: 8.0.1
         version: 8.0.1
+      '@capacitor-community/keep-awake':
+        specifier: 8.0.1
+        version: 8.0.1(@capacitor/core@8.6.2)
       '@capacitor/android':
         specifier: 8.6.2
         version: 8.6.2(@capacitor/core@8.6.2)
@@ -1125,6 +1128,11 @@ packages:
 
   '@canvas/image-data@1.1.0':
     resolution: {integrity: sha512-QdObRRjRbcXGmM1tmJ+MrHcaz1MftF2+W7YI+MsphnsCrmtyfS0d5qJbk0MeSbUeyM/jCb0hmnkXPsy026L7dA==}
+
+  '@capacitor-community/keep-awake@8.0.1':
+    resolution: {integrity: sha512-wTI5A6FWl5gWoMduzJ5euuJ1P73SO+rea0jV6vNdmz5TLbwIDhufelFe/GowNvU9gog6kDYbFhJ2pOp9ua1f3w==}
+    peerDependencies:
+      '@capacitor/core': '>=8.0.0'
 
   '@capacitor/android@8.6.2':
     resolution: {integrity: sha512-dWXnXmOVTtxU91n5h11MzoQ7PAMjyzU1qguw0mBJZiwSuhGvLKTG/IlsQ75H8qeE0a1acV2f573x15wYvyzuVA==}
@@ -8148,6 +8156,10 @@ snapshots:
       keyv: 5.6.0
 
   '@canvas/image-data@1.1.0': {}
+
+  '@capacitor-community/keep-awake@8.0.1(@capacitor/core@8.6.2)':
+    dependencies:
+      '@capacitor/core': 8.6.2
 
   '@capacitor/android@8.6.2(@capacitor/core@8.6.2)':
     dependencies:
