@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "e2e": "pnpm --dir .. exec turbo run build --filter=@scoresphere/api --filter=@scoresphere/client && node prepare-db.mjs && playwright test",
-    "e2e:only": "node prepare-db.mjs && playwright test",
+    "e2e": "pnpm --dir .. exec turbo run build --filter=@scoresphere/api --filter=@scoresphere/client && node prepare-db.mjs && playwright test && node scan-logs.mjs",
+    "e2e:only": "node prepare-db.mjs && playwright test && node scan-logs.mjs",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

@@ -44,3 +44,4 @@ blob-report/
 .storage/
 e2e/.storage-e2e/
 apps/api/.storage-e2e/
+e2e/logs/

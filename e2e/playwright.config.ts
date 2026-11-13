@@ -1,6 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const API_PORT = 3310;
+/** API output is captured here and scanned for personal data after the run (plan §4). */
+const API_LOG = new URL('./logs/api.log', import.meta.url).pathname;
 const WEB_PORT = 4173;
 const adminUrl = new URL(
   process.env.E2E_DATABASE_ADMIN_URL ??
@@ -24,7 +26,7 @@ export default defineConfig({
   projects: [{ name: 'mobile', use: { ...devices['Pixel 7'] } }],
   webServer: [
     {
-      command: 'node dist/main.js',
+      command: `mkdir -p "$(dirname '${API_LOG}')" && node dist/main.js > '${API_LOG}' 2>&1`,
       cwd: '../apps/api',
       url: `http://localhost:${API_PORT}/api/v1/health`,
       reuseExistingServer: false,
@@ -34,7 +36,7 @@ export default defineConfig({
         DATABASE_URL: adminUrl.toString(),
         JWT_SECRET: 'e2e-secret-e2e-secret-e2e-secret-e2e',
         RATE_LIMIT_ENABLED: 'false',
-        LOG_LEVEL: 'warn',
+        LOG_LEVEL: 'info',
         STORAGE_DIR: '.storage-e2e',
         PUBLIC_APP_URL: `http://localhost:${WEB_PORT}`,
         CORS_ORIGINS: `http://localhost:${WEB_PORT}`,
