@@ -1,4 +1,4 @@
-import type { MatchResult, MatchRoster, SportKey } from '@scoresphere/contracts';
+import type { LifecycleAction, MatchResult, MatchRoster, SportKey } from '@scoresphere/contracts';
 import type { z } from 'zod';
 import type { Result } from './result.js';
 
@@ -63,8 +63,14 @@ export interface SportEngine<State, Config, Command extends { type: string }> {
   validateSetup(config: Config, roster: MatchRoster): Result<void, EngineError>;
   init(config: Config, roster: MatchRoster): State;
   commands(state: State): CommandDescriptor[];
-  validate(state: State, command: Command): Result<void, EngineError>;
+  /** `ctx` carries the device time of the command; the ledger always passes it. */
+  validate(state: State, command: Command, ctx?: ApplyContext): Result<void, EngineError>;
   apply(state: State, command: Command, ctx: ApplyContext): { state: State; facts: DomainFact[] };
+  /**
+   * Lets engines with clocks react to the match starting, pausing, resuming or being
+   * abandoned (ADR 0006). Engines without clocks leave it out.
+   */
+  onLifecycle?(state: State, action: LifecycleAction, ctx: ApplyContext): State;
   isComplete(state: State): boolean;
   result(state: State): MatchResult;
   stats(state: State): MetricRecord[];

@@ -181,6 +181,8 @@ function step<S, C, Cmd extends { type: string }>(
         p.endedAt = event.occurredAt;
         break;
     }
+    if (engine.onLifecycle)
+      p.state = engine.onLifecycle(p.state, action, { occurredAt: event.occurredAt });
     return { seq: event.seq, kind: 'LIFECYCLE', occurredAt: event.occurredAt, action, facts: [] };
   }
 
@@ -190,7 +192,7 @@ function step<S, C, Cmd extends { type: string }>(
   if (p.status !== 'live') {
     return failure('NOT_LIVE', event.seq, `Scoring needs a live match; this one is ${p.status}.`);
   }
-  const valid = engine.validate(p.state, command);
+  const valid = engine.validate(p.state, command, { occurredAt: event.occurredAt });
   if (!valid.ok) return engineRejected(event.seq, valid.error);
   const next = engine.apply(p.state, command, { occurredAt: event.occurredAt });
   p.state = next.state;
