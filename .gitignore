@@ -41,3 +41,4 @@ blob-report/
 # local Claude Code state
 .claude/*.lock
 .claude/settings.local.json
+.storage/
