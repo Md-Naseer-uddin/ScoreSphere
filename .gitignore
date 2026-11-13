@@ -1,0 +1,43 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build output
+dist/
+build/
+*.tsbuildinfo
+.turbo/
+coverage/
+dev-dist/
+
+# env / secrets
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+keystore.properties
+
+# android build artifacts (the android/ project itself is committed)
+apps/client/android/app/build/
+apps/client/android/build/
+apps/client/android/.gradle/
+apps/client/android/local.properties
+apps/client/android/app/src/main/assets/public/
+apps/client/android/capacitor-cordova-android-plugins/
+
+# test output
+playwright-report/
+test-results/
+blob-report/
+
+# OS / editor
+.DS_Store
+*.log
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# local Claude Code state
+.claude/*.lock
+.claude/settings.local.json
