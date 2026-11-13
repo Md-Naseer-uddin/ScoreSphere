@@ -1,6 +1,7 @@
 import type { SportKey } from '@scoresphere/contracts';
 import type { SportEngine } from '@scoresphere/engine-kit';
 import { badmintonEngine } from './badminton/engine.js';
+import { cricketEngine } from './cricket/engine.js';
 
 /**
  * Engines are frozen once released: a new rule changes the version (`badminton@2`) and
@@ -11,7 +12,7 @@ import { badmintonEngine } from './badminton/engine.js';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnySportEngine = SportEngine<any, any, any>;
 
-const registry: readonly AnySportEngine[] = [badmintonEngine];
+const registry: readonly AnySportEngine[] = [badmintonEngine, cricketEngine];
 
 export function getEngine(sport: SportKey, version: number): AnySportEngine | undefined {
   return registry.find((e) => e.sport === sport && e.version === version);
