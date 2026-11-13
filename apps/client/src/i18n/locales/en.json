@@ -184,7 +184,8 @@
     "goHome": "Go home",
     "error": "Something went wrong",
     "errorBody": "Reload the page to try again. Matches saved on this device are safe.",
-    "reload": "Reload"
+    "reload": "Reload",
+    "back": "Back"
   },
   "update": {
     "available": "A new version is ready.",
@@ -276,5 +277,181 @@
     "promote": "Add to roster",
     "delete": "Delete",
     "promoted": "{{name}} added to the roster"
+  },
+  "matches": {
+    "title": "Matches",
+    "empty": "No matches yet. Start one: it works offline too.",
+    "vs": " vs ",
+    "menu": "Match options",
+    "score": "Score",
+    "side": "Side",
+    "scorecard": "Scorecard",
+    "stats": "Statistics",
+    "awardAuto": "Automatic",
+    "unknownEvent": "Event",
+    "notOnDevice": "This match isn't on this device.",
+    "viewMatch": "View match",
+    "notFound": "Match not found.",
+    "unavailableOffline": "This match isn't on this device. Connect to the internet to open it.",
+    "backToMatches": "Back to matches",
+    "startMatch": "Start match",
+    "resume": "Resume",
+    "pause": "Pause",
+    "undo": "Undo",
+    "endEarly": "End match early",
+    "endEarlyBody": "Use this when a side retires, doesn't turn up or is disqualified. The other side wins.",
+    "whoStops": "Which side stops?",
+    "reason": "Reason",
+    "confirmEnd": "End match",
+    "concede": {
+      "retired": "Retired",
+      "walkover": "Walkover (didn't play)",
+      "disqualified": "Disqualified"
+    },
+    "abandon": "Abandon match",
+    "abandonBody": "The match ends with no result. You can undo this straight afterwards.",
+    "abandoned": "Match abandoned",
+    "wonBy": "{{name}} won",
+    "viewScorecard": "View scorecard",
+    "shareAndDetails": "Share and details",
+    "continueScoring": "Continue scoring",
+    "scoreHere": "Score on this device",
+    "lostLease": "Another device is now scoring this match. Events you record here are kept on this device but not counted.",
+    "needsReview": "Needs review",
+    "takeover": {
+      "title": "Take over scoring?",
+      "body": "Another device is scoring this match. If you take over, anything it hasn't synced yet will be kept for review but not counted.",
+      "confirm": "Take over"
+    },
+    "kept": {
+      "title_one": "{{count}} event kept on this device",
+      "title_other": "{{count}} events kept on this device",
+      "body": "The server didn't accept these, usually because another device took over scoring. They aren't counted, but nothing is lost.",
+      "download": "Download events"
+    },
+    "status": {
+      "scheduled": "Not started",
+      "live": "Live",
+      "paused": "Paused",
+      "completed": "Completed",
+      "abandoned": "Abandoned"
+    },
+    "lifecycle": {
+      "START": "Match started",
+      "PAUSE": "Paused",
+      "RESUME": "Resumed",
+      "ABANDON": "Match abandoned"
+    },
+    "presetCategory": {
+      "official": "Official rules",
+      "casual": "Casual",
+      "local": "Local variant"
+    },
+    "sync": {
+      "synced": "Synced",
+      "offline": "Offline — saving on this device",
+      "pending_one": "{{count}} to sync",
+      "pending_other": "{{count}} to sync",
+      "syncing": "Syncing",
+      "failed": "Sync failed — action required",
+      "conflict": "Conflict — local events kept"
+    },
+    "timeline": {
+      "title": "Recent events",
+      "corrected": "corrected",
+      "undone": "undone",
+      "flagged": "flagged for review"
+    },
+    "new": {
+      "title": "New match",
+      "sport": "Sport",
+      "format": "Format",
+      "sideLabel": "Side {{side}}",
+      "player": "Side {{side}} player {{n}}",
+      "typeName": "Type a name…",
+      "guest": "guest",
+      "nameFor": "Name for {{player}}",
+      "namePlaceholder": "Name",
+      "titleLabel": "Match name (optional)",
+      "titlePlaceholder": "e.g. Club final",
+      "duplicate": "A player can only appear once.",
+      "start": "Start match"
+    },
+    "share": {
+      "title": "Live link",
+      "body": "Anyone with the link can follow the score. They can't change anything.",
+      "create": "Create link",
+      "create24h": "Link for 24 hours",
+      "copied": "Link copied",
+      "message": "Follow the match live on ScoreSphere",
+      "onlyOnce": "Copy it now: for safety the full link is shown only once.",
+      "expires": "Expires {{date}}",
+      "noExpiry": "No expiry",
+      "revoke": "Revoke",
+      "revoked": "Link revoked",
+      "failed": "Couldn't create the link.",
+      "needsSync": "Live links are available once the match has synced."
+    }
+  },
+  "live": {
+    "brand": "ScoreSphere Live",
+    "unavailableTitle": "This live link isn't available",
+    "unavailableBody": "It may have been revoked or expired. Ask the scorer for a new link.",
+    "connection": {
+      "live": "Live",
+      "reconnecting": "Reconnecting"
+    },
+    "stale": "Scorer offline — last synced score",
+    "lastUpdated": "Last update {{time}}",
+    "cantShow": "This app version can't show this match. Reload to update."
+  },
+  "badminton": {
+    "discipline": "Singles or doubles",
+    "singles": "Singles",
+    "doubles": "Doubles",
+    "rules": "Rules",
+    "pointsToWin": "Points to win",
+    "cap": "Cap",
+    "gamesToWin": "Games to win",
+    "serving": "Serving",
+    "gamesWon": "Games won",
+    "matchOver": "Match over",
+    "serviceLine": "Game {{game}}: {{server}} serves to {{receiver}} from the {{court}} court",
+    "court": {
+      "right": "right",
+      "left": "left"
+    },
+    "gameNotStarted": "Game {{game}} hasn't started",
+    "gameScore": "Game {{game}}: {{score}}",
+    "gameShort": "G{{game}}",
+    "startGame": "Start game {{game}}",
+    "winnerServes": "{{name}} won the last game and serves first.",
+    "whoServes": "Who serves first?",
+    "firstServer": "First server",
+    "firstReceiver": "First receiver",
+    "pointTo": "Point {{name}}",
+    "correctWinner": "Give to other side",
+    "metric": {
+      "points_won": "Points won",
+      "service_points_won": "Points won on serve",
+      "receiving_points_won": "Points won receiving",
+      "longest_streak": "Longest run of points"
+    },
+    "timeline": {
+      "rally": "Point {{name}} · {{score}}",
+      "rallyUndone": "Point {{name}}",
+      "startGame": "Game {{game}}: {{name}} serves",
+      "concede": {
+        "retired": "{{name}} retired",
+        "walkover": "{{name}} gave a walkover",
+        "disqualified": "{{name}} disqualified"
+      }
+    },
+    "announce": {
+      "interval": "Interval: up to 60 seconds",
+      "changeEnds": "Change ends",
+      "gameWon": "Game to {{name}}, {{score}}",
+      "matchWon": "Match to {{name}}"
+    }
   }
 }

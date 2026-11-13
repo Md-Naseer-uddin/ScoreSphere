@@ -5,9 +5,13 @@ import { LoginPage } from '@/features/auth/LoginPage';
 import { RecoveryCodePage } from '@/features/auth/RecoveryCodePage';
 import { RegisterPage } from '@/features/auth/RegisterPage';
 import { RequireAuth } from '@/features/auth/RequireAuth';
-import { ComingSoon } from '@/features/common/ComingSoon';
 import { NotFoundPage } from '@/features/common/NotFoundPage';
 import { HomePage } from '@/features/home/HomePage';
+import { LivePage } from '@/features/live/LivePage';
+import { MatchesPage } from '@/features/matches/MatchesPage';
+import { MatchPage } from '@/features/matches/MatchPage';
+import { NewMatchPage } from '@/features/matches/NewMatchPage';
+import { ScoreMatchPage } from '@/features/matches/ScoreMatchPage';
 import { ProfilePage } from '@/features/profile/ProfilePage';
 import { SportsPage } from '@/features/sports/SportsPage';
 import { RosterPage } from '@/features/teams/RosterPage';
@@ -18,6 +22,7 @@ import { JoinPage } from '@/features/workspaces/JoinPage';
 import { WorkspaceSettingsPage } from '@/features/workspaces/WorkspaceSettingsPage';
 import { AppShell } from './AppShell';
 import { RouteError } from './RouteError';
+import { SignedInRoot } from './SignedInRoot';
 
 /** Route table, kept separate from the router instance so tests can mount it in memory. */
 export const routes: RouteObject[] = [
@@ -35,24 +40,34 @@ export const routes: RouteObject[] = [
     ],
   },
   { path: '/join', element: <JoinPage />, errorElement: <RouteError /> },
+  { path: '/live', element: <LivePage />, errorElement: <RouteError /> },
   {
     path: '/app',
     element: (
       <RequireAuth>
-        <AppShell />
+        <SignedInRoot />
       </RequireAuth>
     ),
     errorElement: <RouteError />,
     children: [
-      { index: true, element: <HomePage /> },
-      { path: 'sports', element: <SportsPage /> },
-      { path: 'matches', element: <ComingSoon /> },
-      { path: 'teams', element: <TeamsPage /> },
-      { path: 'teams/roster', element: <RosterPage /> },
-      { path: 'teams/:teamId', element: <TeamDetailPage /> },
-      { path: 'profile', element: <ProfilePage /> },
-      { path: 'workspaces/new', element: <CreateOrganizationPage /> },
-      { path: 'workspaces/:workspaceId', element: <WorkspaceSettingsPage /> },
+      {
+        element: <AppShell />,
+        children: [
+          { index: true, element: <HomePage /> },
+          { path: 'sports', element: <SportsPage /> },
+          { path: 'matches', element: <MatchesPage /> },
+          { path: 'matches/new', element: <NewMatchPage /> },
+          { path: 'matches/:matchId', element: <MatchPage /> },
+          { path: 'teams', element: <TeamsPage /> },
+          { path: 'teams/roster', element: <RosterPage /> },
+          { path: 'teams/:teamId', element: <TeamDetailPage /> },
+          { path: 'profile', element: <ProfilePage /> },
+          { path: 'workspaces/new', element: <CreateOrganizationPage /> },
+          { path: 'workspaces/:workspaceId', element: <WorkspaceSettingsPage /> },
+        ],
+      },
+      // Scoring uses a focused layout without the tab bar (spec frontend §3).
+      { path: 'matches/:matchId/score', element: <ScoreMatchPage /> },
     ],
   },
   { path: '*', element: <NotFoundPage /> },

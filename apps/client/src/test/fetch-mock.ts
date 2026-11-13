@@ -15,7 +15,12 @@ export function mockApi(routes: Record<string, Handler | { status?: number; body
     const path = url.replace(/^.*\/api\/v1/, '');
     const method = (init.method ?? 'GET').toUpperCase();
     calls.push({ method, path, init });
-    const route = routes[`${method} ${path}`];
+    const key = `${method} ${path.split('?')[0]}`;
+    // Keys ending in `*` match any path with that prefix, e.g. "POST /matches/*".
+    const route =
+      routes[`${method} ${path}`] ??
+      routes[key] ??
+      Object.entries(routes).find(([k]) => k.endsWith('*') && key.startsWith(k.slice(0, -1)))?.[1];
     const result = typeof route === 'function' ? route({ ...init, url }) : route;
     if (!result) throw new Error(`Unmocked request: ${method} ${path}`);
     const status = result.status ?? 200;

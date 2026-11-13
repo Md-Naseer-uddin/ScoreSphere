@@ -11,8 +11,8 @@ export function HomePage() {
         <p className="text-muted-foreground">{t('app.tagline')}</p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
-        <Button size="lg" disabled>
-          {t('home.startMatch')}
+        <Button size="lg" asChild>
+          <Link to="/app/matches/new">{t('home.startMatch')}</Link>
         </Button>
         <Button size="lg" variant="outline" asChild>
           <Link to="/app/sports">{t('home.browseSports')}</Link>

@@ -344,6 +344,9 @@ importers:
       '@scoresphere/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@scoresphere/engine-kit':
+        specifier: workspace:*
+        version: link:../../packages/engine-kit
       '@scoresphere/sports':
         specifier: workspace:*
         version: link:../../packages/sports
@@ -468,6 +471,9 @@ importers:
       '@types/node':
         specifier: 24.19.2
         version: 24.19.2
+      '@types/pg':
+        specifier: 8.23.1
+        version: 8.23.1
       drizzle-orm:
         specifier: 0.45.4
         version: 0.45.4(@types/pg@8.23.1)(pg@8.23.1)

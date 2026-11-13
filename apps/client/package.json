@@ -20,6 +20,7 @@
     "@capacitor/share": "8.0.3",
     "@hookform/resolvers": "7.0.6",
     "@scoresphere/contracts": "workspace:*",
+    "@scoresphere/engine-kit": "workspace:*",
     "@scoresphere/sports": "workspace:*",
     "@tanstack/react-query": "5.107.1",
     "class-variance-authority": "0.7.1",
