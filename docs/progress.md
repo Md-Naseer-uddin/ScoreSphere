@@ -10,8 +10,8 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
 | M1 — Identity and workspaces | done |
 | M2 — People and rosters | done |
 | M3 — Walking skeleton: Badminton, offline-first | done (on-device check pending) |
-| M4 — Cricket | next |
-| M5 — Rally family + Chess | not started |
+| M4 — Cricket | built; exit pending owner (real scoresheets, field test) |
+| M5 — Rally family + Chess | next |
 | M6 — Pilot release | not started |
 | M7 — Tournaments, statistics, profiles | not started |
 | M8 — Rules builder | not started |
@@ -72,25 +72,48 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
   - A spectator who joins mid-match catches up; a revoked link stops working.
   - A takeover fences the old device off and keeps its events.
 
-## Next — M4: Cricket
+**M4**
+- **Cricket engine (limited overs, one innings a side), following the MCC Laws:**
+  - Batters are tracked by end, so run-outs at either end and the 2022 caught rule work.
+  - Explicit delivery kinds: wides, no-balls (off the bat, byes or leg-byes), byes and leg-byes.
+  - Free hits that carry over wides and no-balls.
+  - All dismissals, with the right ones credited to the bowler.
+  - Retired hurt (can return) and retired out.
+  - Mid-over bowler changes (a split over is never a maiden).
+  - Consecutive-over and per-bowler limits.
+  - Declarations and concessions.
+  - Super overs: once, or until decided.
+- **Presets:** T20, one-day (official); T10 and box (casual); gully (local).
+  - Local variants are typed settings: last man stands, six and out (runs count or not), one tip one hand, consecutive-wide penalty, consecutive overs allowed.
+- **Stats:** batting, bowling and fielding, plus Player of the Match, Best Batter and Best Bowler with stated tie-breaks.
+- **Tests:** 7 constructed golden logs with hand-worked scorecards and property tests (runs reconcile across batters, extras and bowlers). They run against the package, the server build and the client build.
+- **Client:**
+  - Match setup with named sides and saved teams, cricket settings and toggles.
+  - Phase-driven scoring: toss, openers, bowler (invalid choices disabled with the reason), run pad with extras panels, wicket form, retire, swap strike, change bowler, declare.
+  - Full scorecard (batting, extras, did not bat, fall of wickets, bowling, awards) on the summary and live pages.
+  - Taps extend a cached projection instead of replaying the ledger.
+- **Playwright:** a cricket chase finished offline through a reload, then synced with each event stored once.
 
-1. **Engine:**
-   - Deliveries and extras (wide, no-ball, bye, leg-bye).
-   - All dismissal types, including run-outs at either end.
-   - Strike rotation, overs and innings, free hit, retired hurt/out, super over when configured.
-   - Playing XI and substitutions as roster events (ADR 0006): add the `ROSTER` event kind.
-2. **Settings and presets:**
-   - Formats: T20, ODI, T10, box, gully.
-   - Local variants as typed settings: six-and-out, last-man-stands, one-tip-one-hand, consecutive-wide penalty with explicit threshold semantics.
-3. **Scorecards:** batting, bowling, fall of wickets, extras.
-4. **Stats:** runs, balls, strike rate, 4s/6s, wickets, overs, economy, maidens.
-5. **Match awards:** Player of the Match, Best Batter and Best Bowler, with proposed tie-breaks for the owner to sign off.
-6. **Match setup:** teams and playing XI from the roster.
-7. **Scoring UI:** fast ball-by-ball entry, plus the scorecard on the summary and live pages.
-8. **Exit:**
-   - Golden logs reproduce scorecards exactly, including a gully game.
-   - Property tests pass.
-   - The offline e2e passes for cricket.
+**Still open in M4:**
+- Real scoresheet golden logs and a field test (owner, below).
+- Concussion replacements as `ROSTER` events: deferred. They need a way to add a participant snapshot after creation without putting names in events (ADR 0024). The playing XI is the roster chosen at setup.
+
+## Next — M5: Rally family + Chess (timer foundation)
+
+1. **Tennis:**
+   - Point → game → set → match.
+   - Advantage or no-ad, tie-breaks and final-set rules.
+   - Service order.
+2. **Volleyball:** sets, rotation, timeouts and substitutions.
+3. **Shared helpers:** rally/set helpers in engine-kit, shared with badminton where they fit.
+4. **Timers in engine-kit:**
+   - `CLOCK` events with device-owned elapsed time and a derived display.
+   - A server-time offset for spectators.
+   - Recovery after backgrounding, screen lock and process kill.
+5. **Chess clock:** base time, increment, delay, stages, flag fall, and results by resignation, draw, agreement or time.
+6. **Exit:**
+   - Displayed drift within ±1 s after background/kill recovery, with chess increments exact.
+   - Timer tests for screen lock, app kill and offline.
 
 ## Needs the owner
 
@@ -104,3 +127,7 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
   - The 3×15 interval and change-of-ends points. The preset leaves those prompts off until they're confirmed from the 2027 Laws.
   - Player of the Match goes to the winning side (partners share it) and isn't awarded automatically for a walkover.
 - **Golden logs from real scoresheets:** the current badminton logs are constructed (except the Law 11 example), and M4 needs real cricket scoresheets, including a gully match. Please share photos or PDFs of a few local scoresheets.
+- **Cricket sign-off:**
+  - Proposed award criteria (impact points; most runs, then fewest balls; most wickets, then fewest runs).
+  - Super-over stats are left out of player totals.
+  - One tip one hand is credited to the bowler like a catch.
