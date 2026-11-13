@@ -13,6 +13,7 @@ import { ConfigModule, ENV } from './config/config.module';
 import type { Env } from './config/env';
 import { DatabaseModule } from './database/database.module';
 import { HealthController } from './health/health.controller';
+import { MatchesModule } from './matches/matches.module';
 import { MediaModule } from './media/media.module';
 import { PeopleModule } from './people/people.module';
 import { PersonsModule } from './people/persons.service';
@@ -43,6 +44,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module';
     PeopleModule,
     TeamsModule,
     SyncModule,
+    MatchesModule,
   ],
   controllers: [HealthController],
   providers: [

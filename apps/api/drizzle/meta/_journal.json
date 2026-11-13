@@ -15,6 +15,13 @@
       "when": 1794600796314,
       "tag": "0001_people_and_rosters",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794602771865,
+      "tag": "0002_matches_and_ledger",
+      "breakpoints": true
     }
   ]
 }

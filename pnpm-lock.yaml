@@ -223,6 +223,12 @@ importers:
       '@scoresphere/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@scoresphere/engine-kit':
+        specifier: workspace:*
+        version: link:../../packages/engine-kit
+      '@scoresphere/sports':
+        specifier: workspace:*
+        version: link:../../packages/sports
       cookie-parser:
         specifier: 1.4.7
         version: 1.4.7

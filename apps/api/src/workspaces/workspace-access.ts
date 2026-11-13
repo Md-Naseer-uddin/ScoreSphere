@@ -14,6 +14,7 @@ import { and, eq, isNull } from 'drizzle-orm';
 import type { AuthenticatedRequest } from '../auth/decorators';
 import { ApiError } from '../common/api-error';
 import { DB, type Database } from '../database/database.module';
+import type { DbExecutor } from '../database/types';
 import { workspaceMemberships, workspaces } from '../database/schema';
 
 /** The caller's verified access to one workspace. Every workspace-scoped query takes this. */
@@ -30,6 +31,46 @@ type WorkspaceRequest = AuthenticatedRequest & { workspace?: WorkspaceContext };
 const MIN_ROLE = 'scoresphere:min-workspace-role';
 
 const notFound = () => new ApiError(404, 'NOT_FOUND', 'Workspace not found.');
+
+/** The user's active membership in a live workspace, or undefined. */
+export async function findActiveMembership(db: DbExecutor, workspaceId: string, userId: string) {
+  const [row] = await db
+    .select({
+      membershipId: workspaceMemberships.id,
+      role: workspaceMemberships.role,
+      type: workspaces.type,
+    })
+    .from(workspaceMemberships)
+    .innerJoin(workspaces, eq(workspaces.id, workspaceMemberships.workspaceId))
+    .where(
+      and(
+        eq(workspaceMemberships.workspaceId, workspaceId),
+        eq(workspaceMemberships.userId, userId),
+        eq(workspaceMemberships.status, 'ACTIVE'),
+        isNull(workspaces.archivedAt),
+      ),
+    );
+  return row;
+}
+
+/**
+ * For routes keyed by something other than `:workspaceId` (e.g. a match): resolves the
+ * caller's access to the owning workspace, with the same 404/403 rules as the guard.
+ */
+export async function requireWorkspaceRole(
+  db: DbExecutor,
+  workspaceId: string,
+  userId: string,
+  role: WorkspaceRole,
+  notFoundError: () => ApiError = notFound,
+): Promise<WorkspaceContext> {
+  const row = await findActiveMembership(db, workspaceId, userId);
+  if (!row) throw notFoundError();
+  if (!hasRole(row.role, role)) {
+    throw new ApiError(403, 'FORBIDDEN', "You don't have permission to do that in this workspace.");
+  }
+  return { workspaceId, userId, ...row };
+}
 
 /**
  * Resolves `:workspaceId` to the caller's active membership. Non-members get 404 so
@@ -50,22 +91,7 @@ export class WorkspaceAccessGuard implements CanActivate {
     const parsed = idSchema.safeParse(req.params.workspaceId);
     if (!parsed.success) throw notFound();
 
-    const [row] = await this.db
-      .select({
-        membershipId: workspaceMemberships.id,
-        role: workspaceMemberships.role,
-        type: workspaces.type,
-      })
-      .from(workspaceMemberships)
-      .innerJoin(workspaces, eq(workspaces.id, workspaceMemberships.workspaceId))
-      .where(
-        and(
-          eq(workspaceMemberships.workspaceId, parsed.data),
-          eq(workspaceMemberships.userId, user.id),
-          eq(workspaceMemberships.status, 'ACTIVE'),
-          isNull(workspaces.archivedAt),
-        ),
-      );
+    const row = await findActiveMembership(this.db, parsed.data, user.id);
     if (!row) throw notFound();
 
     const required = this.reflector.get<WorkspaceRole | undefined>(MIN_ROLE, context.getHandler());
