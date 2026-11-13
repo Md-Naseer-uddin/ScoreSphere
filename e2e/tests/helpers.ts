@@ -37,3 +37,43 @@ export async function createOrganization(page: Page, name: string): Promise<void
   await page.getByRole('button', { name: 'Create organization' }).click();
   await expect(page.getByRole('heading', { name, level: 1 })).toBeVisible();
 }
+
+export async function login(page: Page, phone: string, password: string): Promise<void> {
+  await page.goto('/auth/login');
+  await page.getByLabel('Mobile number').fill(phone);
+  await page.getByLabel('Password', { exact: true }).fill(password);
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await expect(page.getByRole('link', { name: 'Matches' })).toBeVisible();
+}
+
+/** Sets up a singles badminton quick match from the wizard and opens game 1. Returns the match ID. */
+export async function startBadmintonMatch(page: Page, a: string, b: string): Promise<string> {
+  await page.goto('/app/matches/new?sport=badminton');
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('textbox', { name: 'Name for Side A player 1' }).fill(a);
+  await page.getByRole('textbox', { name: 'Name for Side B player 1' }).fill(b);
+  await page.getByRole('button', { name: 'Start match' }).click();
+  await page.waitForURL(/\/app\/matches\/[0-9a-f-]+\/score$/);
+  await page
+    .getByRole('radiogroup', { name: 'Who serves first?' })
+    .getByRole('radio', { name: a })
+    .click();
+  await page.getByRole('button', { name: 'Start game 1' }).click();
+  return page.url().split('/').at(-2)!;
+}
+
+/** Taps a rally button and waits for the saved score, as a scorer would see it. */
+export async function point(
+  page: Page,
+  name: string,
+  side: 0 | 1,
+  expected: number,
+): Promise<void> {
+  await page.getByRole('button', { name: `Point ${name}` }).click();
+  await expect(page.getByTestId(`points-${side}`)).toHaveText(String(expected));
+}
+
+export async function expectScore(page: Page, a: number, b: number): Promise<void> {
+  await expect(page.getByTestId('points-0')).toHaveText(String(a));
+  await expect(page.getByTestId('points-1')).toHaveText(String(b));
+}
