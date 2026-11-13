@@ -43,15 +43,23 @@ Dependency rule: `sports → engine-kit → contracts`. Packages never import ap
 
 ## Commands
 
-Run from the repo root. pnpm comes via corepack (`corepack pnpm …`, or `pnpm` once corepack is enabled).
+Run from the repo root with Node 24 (`.nvmrc`). Enable pnpm once with `corepack enable pnpm`. Local ports: Postgres **55432**, API **3300**, web **5173**; this machine runs other projects on 3000/5432.
 
 | Task | Command |
 |---|---|
-| Install | `corepack pnpm install` |
-| Local services (Postgres, MinIO) | `docker compose -f infra/docker-compose.yml up -d` |
-| Dev (all apps) | `corepack pnpm dev` |
-| Lint / typecheck / test / build | `corepack pnpm lint` · `typecheck` · `test` · `build` |
-| One package | `corepack pnpm --filter @scoresphere/<name> <script>` |
+| Install | `pnpm install` |
+| Local Postgres | `docker compose -f infra/docker-compose.yml up -d` |
+| Dev (all apps) | `pnpm dev` |
+| Lint / typecheck / test / build | `pnpm lint` · `typecheck` · `test` · `build` · `format:check` |
+| One package | `pnpm --filter @scoresphere/<name> <script>` |
+| DB migrations | `pnpm --filter @scoresphere/api db:generate` / `db:migrate` |
+
+## Toolchain notes
+
+- **TypeScript is pinned to 6.0.x:** typescript-eslint doesn't support TS 7 yet.
+- **NestJS stays on 11:** nestjs-zod doesn't support 12 yet.
+- **pnpm enforces a minimum release age.** Pin versions at least a day old, and don't add `minimumReleaseAgeExclude` entries.
+- **New dependencies with install scripts** must be approved under `allowBuilds` in `pnpm-workspace.yaml`.
 
 ## Working method
 
