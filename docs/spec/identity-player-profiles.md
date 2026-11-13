@@ -1,5 +1,7 @@
 # Phone Identity, User Profiles, Registered Players and Guests
 
+> **Amended (2026-11-14):** parts of this document are superseded by ADRs [0010](../adr/0010-global-persons-roster-members.md), [0011](../adr/0011-participant-kinds.md), [0012](../adr/0012-phone-lookup-privacy.md), [0013](../adr/0013-claim-confirmation.md), [0014](../adr/0014-otp-challenges-deferred.md), [0025](../adr/0025-phone-verification-deferred.md), [0026](../adr/0026-adult-accounts-only.md) (no phone verification, lookup responses, claim approval, roster members, minors). Where they disagree, the [ADRs](../adr/) and the root [plan.md](../../plan.md) win.
+
 ## 1. Account login decision
 
 The required login identifier is a **unique verified mobile phone number**, replacing email as the primary identity. Password remains required. Email is optional and may be used for secondary communication or recovery only after verification.

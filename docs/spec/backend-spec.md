@@ -1,5 +1,7 @@
 # Backend Technical Specification — NestJS
 
+> **Amended (2026-11-14):** parts of this document are superseded by ADRs [0001](../adr/0001-orm-drizzle.md), [0002](../adr/0002-realtime-sse-listen-notify.md), [0005](../adr/0005-undo-void-replace.md), [0006](../adr/0006-lifecycle-and-clocks-as-events.md), [0009](../adr/0009-accept-and-flag-validation.md), [0010](../adr/0010-global-persons-roster-members.md), [0015](../adr/0015-sports-content-in-code.md), [0025](../adr/0025-phone-verification-deferred.md) (Drizzle, SSE, undo, lifecycle events, validation policy, identity, no OTP). Where they disagree, the [ADRs](../adr/) and the root [plan.md](../../plan.md) win.
+
 ## 1. Backend principles
 
 - Modular monolith with clear bounded modules.

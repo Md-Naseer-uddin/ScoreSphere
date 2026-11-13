@@ -1,5 +1,7 @@
 # Frontend Technical Specification
 
+> **Amended (2026-11-14):** parts of this document are superseded by ADRs [0003](../adr/0003-client-storage-dexie.md), [0011](../adr/0011-participant-kinds.md), [0021](../adr/0021-share-link-fragment.md) (Dexie on Android too, participant kinds, share-link fragment). Where they disagree, the [ADRs](../adr/) and the root [plan.md](../../plan.md) win.
+
 ## 1. Technology
 
 - React + TypeScript + Vite (unless existing repository uses an equivalent supported setup).

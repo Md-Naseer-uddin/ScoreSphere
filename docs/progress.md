@@ -22,7 +22,7 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
 ## M0 checklist
 
 - [x] Git repo, remote, spec moved to `docs/spec/`
-- [ ] ADRs D1–D25, spec amendment notes, root `CLAUDE.md`
+- [x] ADRs D1–D25 (+0026–0027), spec amendment notes, root `CLAUDE.md`
 - [ ] Monorepo tooling (pnpm, Turborepo, TypeScript, ESLint, Prettier, Vitest)
 - [ ] Packages: `config`, `contracts`, `engine-kit`, `sports`
 - [ ] API skeleton (NestJS, config, logging, errors, health, OpenAPI, Drizzle)
@@ -33,7 +33,7 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
 
 ## Next
 
-ADRs and spec amendment notes, then monorepo tooling.
+Monorepo tooling (pnpm workspace, Turborepo, TypeScript, ESLint, Prettier, Vitest).
 
 ## Needs the owner
 

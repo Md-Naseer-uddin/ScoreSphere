@@ -1,5 +1,7 @@
 # Sports Catalogue, Rules Content and Configurable Rules Engine
 
+> **Amended (2026-11-14):** parts of this document are superseded by ADRs [0015](../adr/0015-sports-content-in-code.md), [0016](../adr/0016-rules-engine-two-layers.md) (content and presets in code, two-layer rules engine). Where they disagree, the [ADRs](../adr/) and the root [plan.md](../../plan.md) win.
+
 ## 1. Supported sports
 
 Initial sports: Cricket, Badminton, Tennis, Chess, Kabaddi, Volleyball, Basketball, Wrestling, Football, Kho-Kho, Field Hockey and Carrom. More sports should be added through the sport registry and a new scoring engine adapter.

@@ -1,5 +1,7 @@
 # Multi-Sport Scoring Platform — Technical Specification Pack
 
+> **Amended (2026-11-14):** parts of this document are superseded by ADRs [0010](../adr/0010-global-persons-roster-members.md), [0011](../adr/0011-participant-kinds.md), [0025](../adr/0025-phone-verification-deferred.md), [0026](../adr/0026-adult-accounts-only.md) (participant model, phone verification, minors). Where they disagree, the [ADRs](../adr/) and the root [plan.md](../../plan.md) win.
+
 **Document status:** Product/engineering baseline for implementation planning  
 **Version:** 1.1  
 **Last updated:** 2026-11-13  

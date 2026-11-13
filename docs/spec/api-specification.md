@@ -1,5 +1,7 @@
 # REST API and Realtime Contract Specification
 
+> **Amended (2026-11-14):** parts of this document are superseded by ADRs [0002](../adr/0002-realtime-sse-listen-notify.md), [0004](../adr/0004-single-write-path.md), [0006](../adr/0006-lifecycle-and-clocks-as-events.md), [0007](../adr/0007-scorer-lease-epoch.md), [0012](../adr/0012-phone-lookup-privacy.md), [0015](../adr/0015-sports-content-in-code.md), [0020](../adr/0020-session-transport.md), [0021](../adr/0021-share-link-fragment.md), [0025](../adr/0025-phone-verification-deferred.md) (single events endpoint, SSE instead of Socket.IO, lookup, sessions, share links, no OTP). Where they disagree, the [ADRs](../adr/) and the root [plan.md](../../plan.md) win.
+
 Base path: `/api/v1`. Use JSON, UUID IDs and consistent error envelopes. All private endpoints require an authenticated session/token and workspace authorization. Exact implementation may use secure cookie sessions or short-lived access tokens plus rotating refresh tokens; document the final choice.
 
 ## 1. Standard response conventions

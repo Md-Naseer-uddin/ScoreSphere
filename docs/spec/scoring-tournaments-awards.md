@@ -1,5 +1,7 @@
 # Scoring Engines, Tournaments, Awards and Statistics
 
+> **Amended (2026-11-14):** parts of this document are superseded by ADRs [0005](../adr/0005-undo-void-replace.md), [0006](../adr/0006-lifecycle-and-clocks-as-events.md), [0015](../adr/0015-sports-content-in-code.md), [0023](../adr/0023-tournament-award-schema.md), [0024](../adr/0024-pii-free-events.md) (undo via VOID/REPLACE, lifecycle events, award status, fixture model). Where they disagree, the [ADRs](../adr/) and the root [plan.md](../../plan.md) win.
+
 ## 1. Shared scoring contract
 
 Each sport engine implements a common contract while retaining sport-specific state and actions.

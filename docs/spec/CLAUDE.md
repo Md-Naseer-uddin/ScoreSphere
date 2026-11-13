@@ -1,5 +1,7 @@
 # Instructions for Claude Opus 5.5 — Sports Scoring Platform
 
+> **Amended (2026-11-14):** parts of this document are superseded by ADRs [0001](../adr/0001-orm-drizzle.md), [0017](../adr/0017-package-layout.md) (Drizzle instead of Prisma, package layout. The root CLAUDE.md replaces this file for day-to-day work). Where they disagree, the [ADRs](../adr/) and the root [plan.md](../../plan.md) win.
+
 You are acting as a principal software architect and senior full-stack engineer. The attached specification pack is the product and engineering source of truth for the multi-sport scoring platform.
 
 ## Read first

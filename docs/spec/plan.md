@@ -1,5 +1,7 @@
 # Complete Phased Implementation Plan
 
+> **Superseded (2026-11-14):** the root [plan.md](../../plan.md) replaces this plan. Kept for reference only.
+
 **Scope:** React + TypeScript + Tailwind frontend; NestJS backend; PostgreSQL/Prisma; Socket.IO; offline PWA; Capacitor Android APK.  
 **Product:** Individual + organization use, 12 sports, configurable rules, phone identity, device-local guests, tournaments, awards, history and live sharing.
 

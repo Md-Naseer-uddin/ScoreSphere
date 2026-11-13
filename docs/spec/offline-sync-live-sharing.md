@@ -1,5 +1,7 @@
 # Offline-First, Synchronization and Live Sharing Specification
 
+> **Amended (2026-11-14):** parts of this document are superseded by ADRs [0002](../adr/0002-realtime-sse-listen-notify.md), [0003](../adr/0003-client-storage-dexie.md), [0004](../adr/0004-single-write-path.md), [0006](../adr/0006-lifecycle-and-clocks-as-events.md), [0007](../adr/0007-scorer-lease-epoch.md), [0008](../adr/0008-offline-match-creation.md), [0009](../adr/0009-accept-and-flag-validation.md), [0019](../adr/0019-engine-versioning.md), [0021](../adr/0021-share-link-fragment.md) (Dexie everywhere, one write path, lease epochs, offline match creation, SSE). Where they disagree, the [ADRs](../adr/) and the root [plan.md](../../plan.md) win.
+
 ## 1. Design goals
 
 - User can prepare a match online, then score it without network connectivity.

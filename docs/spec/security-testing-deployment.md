@@ -1,5 +1,7 @@
 # Security, Testing, Deployment and Operations
 
+> **Amended (2026-11-14):** parts of this document are superseded by ADRs [0020](../adr/0020-session-transport.md), [0021](../adr/0021-share-link-fragment.md), [0025](../adr/0025-phone-verification-deferred.md), [0026](../adr/0026-adult-accounts-only.md), [0027](../adr/0027-apk-built-in-ci.md) (session transport, share links, no OTP, minors, APK built in CI). Where they disagree, the [ADRs](../adr/) and the root [plan.md](../../plan.md) win.
+
 ## 1. Authentication security
 
 - Required account identifier: verified unique phone number.

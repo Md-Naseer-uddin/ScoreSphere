@@ -1,5 +1,7 @@
 # System Architecture
 
+> **Amended (2026-11-14):** parts of this document are superseded by ADRs [0001](../adr/0001-orm-drizzle.md), [0002](../adr/0002-realtime-sse-listen-notify.md), [0003](../adr/0003-client-storage-dexie.md), [0004](../adr/0004-single-write-path.md), [0005](../adr/0005-undo-void-replace.md), [0007](../adr/0007-scorer-lease-epoch.md), [0010](../adr/0010-global-persons-roster-members.md), [0011](../adr/0011-participant-kinds.md), [0015](../adr/0015-sports-content-in-code.md), [0017](../adr/0017-package-layout.md) (ORM, realtime, client storage, write path, undo, lease, identity, package layout). Where they disagree, the [ADRs](../adr/) and the root [plan.md](../../plan.md) win.
+
 ## 1. Architecture recommendation
 
 Use a **TypeScript monorepo with a modular NestJS monolith and a React client**. The same React client is built as a web/PWA application and packaged for Android using Capacitor. PostgreSQL is the server-side source of truth. IndexedDB (web) and SQLite (native Android) hold offline data and pending scoring events.

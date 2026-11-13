@@ -1,5 +1,7 @@
 # PostgreSQL Database Schema Specification
 
+> **Amended (2026-11-14):** parts of this document are superseded by ADRs [0001](../adr/0001-orm-drizzle.md), [0005](../adr/0005-undo-void-replace.md), [0006](../adr/0006-lifecycle-and-clocks-as-events.md), [0007](../adr/0007-scorer-lease-epoch.md), [0008](../adr/0008-offline-match-creation.md), [0010](../adr/0010-global-persons-roster-members.md), [0011](../adr/0011-participant-kinds.md), [0014](../adr/0014-otp-challenges-deferred.md), [0015](../adr/0015-sports-content-in-code.md), [0022](../adr/0022-uuidv7-ids.md), [0023](../adr/0023-tournament-award-schema.md), [0024](../adr/0024-pii-free-events.md), [0025](../adr/0025-phone-verification-deferred.md) (persons/roster members, ledger columns, dropped seed tables, tournament and award fixes). Where they disagree, the [ADRs](../adr/) and the root [plan.md](../../plan.md) win.
+
 ## 1. General conventions
 
 - PostgreSQL is the cloud source of truth.
