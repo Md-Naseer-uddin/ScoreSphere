@@ -1,16 +1,8 @@
-import type { SportKey } from '@scoresphere/contracts';
+import type { MatchResult, MatchRoster, SportKey } from '@scoresphere/contracts';
 import type { z } from 'zod';
 import type { Result } from './result.js';
 
-/** A participant as the engine sees it: an opaque match-scoped ID, never personal data (ADR 0024). */
-export interface MatchParticipant {
-  participantId: string;
-  side: number;
-}
-
-export interface MatchRoster {
-  sides: { side: number; participantIds: string[] }[];
-}
+export type { MatchResult, MatchRoster };
 
 /** Why the engine refused a command. `code` is stable; `message` is for the scorer. */
 export interface EngineError {
@@ -37,12 +29,6 @@ export interface ApplyContext {
   occurredAt: number;
 }
 
-export interface MatchResult {
-  status: 'in_progress' | 'won' | 'drawn' | 'abandoned' | 'no_result';
-  winnerSide?: number;
-  summary: string;
-}
-
 /** One statistic for one participant or side, keyed by a sport-specific metric (spec scoring §6). */
 export interface MetricRecord {
   metric: string;
@@ -64,11 +50,14 @@ export interface Preset<Config> {
  * The contract every sport engine implements (plan §3.3).
  * Engines are pure and forward-only: undo, corrections, lifecycle and
  * replay are handled by the ledger in engine-kit (ADR 0005).
+ * `apply` must not mutate its input state, and must depend only on its arguments.
  */
 export interface SportEngine<State, Config, Command extends { type: string }> {
   readonly sport: SportKey;
   readonly version: number;
   readonly settingsSchema: z.ZodType<Config>;
+  /** Validates command payloads from the ledger before `validate` sees them. */
+  readonly commandSchema: z.ZodType<Command>;
   readonly presets: readonly Preset<Config>[];
   init(config: Config, roster: MatchRoster): State;
   commands(state: State): CommandDescriptor[];
