@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "icons": "pwa-assets-generator",
-    "android:sync": "cap sync android"
+    "android:sync": "cap sync android",
+    "android:assets": "pnpm dlx @capacitor/assets@4.0.0 generate --android"
   },
   "dependencies": {
     "@capacitor/android": "8.6.2",
