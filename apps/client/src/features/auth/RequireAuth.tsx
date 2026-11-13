@@ -1,5 +1,5 @@
 import { Loader2, WifiOff } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation } from 'react-router';
 import { Button } from '@/components/ui/button';
@@ -19,9 +19,19 @@ export function FullScreenSpinner() {
 export function RequireAuth({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
   const status = useSession((s) => s.status);
+  const hasUser = useSession((s) => s.user !== null);
   const location = useLocation();
 
+  // Working offline: check the session again as soon as the connection returns.
+  useEffect(() => {
+    if (status !== 'offline') return;
+    const retry = () => void refreshSession();
+    window.addEventListener('online', retry);
+    return () => window.removeEventListener('online', retry);
+  }, [status]);
+
   if (status === 'loading') return <FullScreenSpinner />;
+  if (status === 'offline' && hasUser) return children;
   if (status === 'offline') {
     return (
       <div className="mx-auto flex min-h-dvh max-w-sm flex-col items-center justify-center gap-3 p-6 text-center">

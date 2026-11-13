@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { fail, mockApi, ok } from '@/test/fetch-mock';
-import { refreshSession, useSession } from './session';
+import { clearSession, OFFLINE_WINDOW_MS, refreshSession, useSession } from './session';
 
 const session = {
   accessToken: 'a',
@@ -35,5 +35,47 @@ describe('refreshSession', () => {
     );
     expect(await refreshSession()).toBe(false);
     expect(useSession.getState().status).toBe('offline');
+  });
+});
+
+describe('offline start', () => {
+  const offlineFetch = () =>
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => Promise.reject(new TypeError('offline'))),
+    );
+
+  it('continues as the last signed-in account so scoring works offline', async () => {
+    mockApi({ 'POST /auth/refresh': ok(session) });
+    await refreshSession();
+    useSession.setState({ status: 'loading', accessToken: null, user: null });
+    offlineFetch();
+    await refreshSession();
+    expect(useSession.getState()).toMatchObject({
+      status: 'offline',
+      accessToken: null,
+      user: session.user,
+    });
+  });
+
+  it('forgets the account on sign-out', async () => {
+    mockApi({ 'POST /auth/refresh': ok(session) });
+    await refreshSession();
+    await clearSession();
+    useSession.setState({ status: 'loading' });
+    offlineFetch();
+    await refreshSession();
+    expect(useSession.getState()).toMatchObject({ status: 'offline', user: null });
+  });
+
+  it('stops offline access after the offline window', async () => {
+    mockApi({ 'POST /auth/refresh': ok(session) });
+    await refreshSession();
+    useSession.setState({ status: 'loading', accessToken: null, user: null });
+    offlineFetch();
+    vi.spyOn(Date, 'now').mockReturnValue(Date.now() + OFFLINE_WINDOW_MS + 60_000);
+    await refreshSession();
+    vi.restoreAllMocks();
+    expect(useSession.getState()).toMatchObject({ status: 'offline', user: null });
   });
 });

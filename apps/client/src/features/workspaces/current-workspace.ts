@@ -1,7 +1,9 @@
 import type { WorkspaceSummary } from '@scoresphere/contracts';
 import { useQuery } from '@tanstack/react-query';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { create } from 'zustand';
 import { useSession } from '@/features/auth/session';
+import { db } from '@/lib/db';
 import { listWorkspaces, workspaceKeys } from './workspaces-api';
 
 const KEY = 'scoresphere.currentWorkspace';
@@ -34,9 +36,22 @@ export const useWorkspaceSelection = create<{
   },
 }));
 
+/** The user's workspaces: from the server when reachable, else from the device copy. */
 export function useWorkspaces() {
   const authenticated = useSession((s) => s.status === 'authenticated');
-  return useQuery({ queryKey: workspaceKeys.all, queryFn: listWorkspaces, enabled: authenticated });
+  const query = useQuery({
+    queryKey: workspaceKeys.all,
+    queryFn: listWorkspaces,
+    enabled: authenticated,
+  });
+  const cached = useLiveQuery(
+    async () =>
+      (await db.workspaces.toArray()).sort(
+        (a, b) => Number(b.type === 'PERSONAL') - Number(a.type === 'PERSONAL'),
+      ),
+    [],
+  );
+  return { ...query, data: query.data ?? (cached?.length ? cached : undefined) };
 }
 
 /** The workspace new teams and matches belong to: the user's pick, else their personal one. */
