@@ -28,3 +28,12 @@ export async function register(
   await page.getByRole('button', { name: 'Continue' }).click();
   return code;
 }
+
+/** Creates an organization from the workspace switcher and lands on its settings page. */
+export async function createOrganization(page: Page, name: string): Promise<void> {
+  await page.getByRole('button', { name: /Personal/ }).click();
+  await page.getByRole('menuitem', { name: 'New organization' }).click();
+  await page.getByLabel('Name').fill(name);
+  await page.getByRole('button', { name: 'Create organization' }).click();
+  await expect(page.getByRole('heading', { name, level: 1 })).toBeVisible();
+}

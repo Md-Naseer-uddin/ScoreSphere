@@ -5,7 +5,8 @@ const log = readFileSync(new URL('./logs/api.log', import.meta.url), 'utf8');
 const CROCKFORD = '[0-9A-HJKMNP-TV-Z]';
 
 const forbidden = {
-  'phone number': /(?<![\d])(?:\+91)?[6-9]\d{9}(?![\d])/,
+  // Standalone only: UUIDs and timestamps contain long digit runs inside hex/word characters.
+  'phone number': /(?<![\w-])(?:\+91)?[6-9]\d{9}(?![\w-])/,
   'recovery code': new RegExp(
     `\\b${CROCKFORD}{4}-${CROCKFORD}{4}-${CROCKFORD}{4}-${CROCKFORD}{4}\\b`,
   ),
