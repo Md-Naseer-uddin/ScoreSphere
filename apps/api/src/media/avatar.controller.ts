@@ -5,6 +5,11 @@ import { Throttle } from '@nestjs/throttler';
 import { type AuthUser, CurrentUser } from '../auth/decorators';
 import { AVATAR_MAX_BYTES, AvatarService } from './avatar.service';
 
+/** The part of multer's file object we use; avoids depending on its global Express types. */
+interface UploadedImage {
+  buffer: Buffer;
+}
+
 @Controller('me/avatar')
 export class AvatarController {
   constructor(private readonly avatars: AvatarService) {}
@@ -17,7 +22,7 @@ export class AvatarController {
   )
   upload(
     @CurrentUser() user: AuthUser,
-    @UploadedFile() file: Express.Multer.File | undefined,
+    @UploadedFile() file: UploadedImage | undefined,
   ): Promise<Me> {
     return this.avatars.replace(user.id, file?.buffer);
   }
