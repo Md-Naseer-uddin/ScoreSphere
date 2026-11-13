@@ -31,3 +31,4 @@ Each record explains a decision that changes or extends the original spec in [do
 | [0025](0025-phone-verification-deferred.md) | Phone numbers are not verified for now *(owner)* |
 | [0026](0026-adult-accounts-only.md) | Accounts are 18+ only for the pilot *(owner)* |
 | [0027](0027-apk-built-in-ci.md) | The Android APK is built in GitHub Actions *(owner)* |
+| [0028](0028-avatar-upload-through-api.md) | Avatars are uploaded through the API and re-encoded server-side |
