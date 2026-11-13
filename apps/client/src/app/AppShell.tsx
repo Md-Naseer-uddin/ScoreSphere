@@ -1,6 +1,7 @@
 import { House, ListOrdered, Trophy, User, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, Outlet } from 'react-router';
+import { useReferenceSync } from '@/features/sync/reference-sync';
 import { WorkspaceSwitcher } from '@/features/workspaces/WorkspaceSwitcher';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { cn } from '@/lib/utils';
@@ -17,6 +18,7 @@ const NAV = [
 export function AppShell() {
   const { t } = useTranslation();
   const online = useOnlineStatus();
+  useReferenceSync();
 
   return (
     <div className="flex min-h-dvh flex-col">

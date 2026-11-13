@@ -10,6 +10,9 @@ import { NotFoundPage } from '@/features/common/NotFoundPage';
 import { HomePage } from '@/features/home/HomePage';
 import { ProfilePage } from '@/features/profile/ProfilePage';
 import { SportsPage } from '@/features/sports/SportsPage';
+import { RosterPage } from '@/features/teams/RosterPage';
+import { TeamDetailPage } from '@/features/teams/TeamDetailPage';
+import { TeamsPage } from '@/features/teams/TeamsPage';
 import { CreateOrganizationPage } from '@/features/workspaces/CreateOrganizationPage';
 import { JoinPage } from '@/features/workspaces/JoinPage';
 import { WorkspaceSettingsPage } from '@/features/workspaces/WorkspaceSettingsPage';
@@ -44,7 +47,9 @@ export const routes: RouteObject[] = [
       { index: true, element: <HomePage /> },
       { path: 'sports', element: <SportsPage /> },
       { path: 'matches', element: <ComingSoon /> },
-      { path: 'teams', element: <ComingSoon /> },
+      { path: 'teams', element: <TeamsPage /> },
+      { path: 'teams/roster', element: <RosterPage /> },
+      { path: 'teams/:teamId', element: <TeamDetailPage /> },
       { path: 'profile', element: <ProfilePage /> },
       { path: 'workspaces/new', element: <CreateOrganizationPage /> },
       { path: 'workspaces/:workspaceId', element: <WorkspaceSettingsPage /> },

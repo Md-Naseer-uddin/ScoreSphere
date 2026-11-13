@@ -10,6 +10,7 @@ import { apiFetch, json } from '@/lib/api';
 import { getDeviceId } from '@/lib/db';
 import { APP_VERSION, clientPlatform } from '@/lib/platform';
 import { queryClient } from '@/lib/query-client';
+import { clearReferenceData } from '@/features/sync/reference-sync';
 import { refreshTokenStore } from './refresh-token-store';
 import { applySession, clearSession } from './session';
 
@@ -61,6 +62,8 @@ export async function logout(): Promise<void> {
   } finally {
     await clearSession();
     queryClient.clear();
+    // Shared phones are common: the next person must not see this account's rosters.
+    await clearReferenceData().catch(() => undefined);
   }
 }
 

@@ -9,6 +9,7 @@ import { AvatarSection } from './AvatarSection';
 import { DevicesCard } from './DevicesCard';
 import { getMe, profileKeys } from './profile-api';
 import { ProfileDetailsCard } from './ProfileDetailsCard';
+import { RosterLinksCard } from './RosterLinksCard';
 import { SecurityCard } from './SecurityCard';
 
 export function ProfilePage() {
@@ -24,6 +25,7 @@ export function ProfilePage() {
     <section className="space-y-4">
       <h1 className="sr-only">{t('profile.title')}</h1>
       <AvatarSection me={me} />
+      <RosterLinksCard />
       <ProfileDetailsCard me={me} />
       <SecurityCard me={me} />
       <DevicesCard />

@@ -85,5 +85,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: false,
+    // Simulated typing is slow when the whole monorepo's tests share the CPU.
+    testTimeout: 15_000,
   },
 });

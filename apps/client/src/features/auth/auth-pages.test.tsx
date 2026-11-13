@@ -31,14 +31,14 @@ describe('safeNext', () => {
 describe('sign in', () => {
   it('validates the phone number before calling the API', async () => {
     signOut();
-    const { fetchMock } = mockApi({});
+    const { calls } = mockApi({});
     renderApp('/auth/login');
     const user = userEvent.setup();
     await user.type(await screen.findByLabelText('Mobile number'), '12345');
     await user.type(screen.getByLabelText('Password'), 'secret');
     await user.click(screen.getByRole('button', { name: 'Sign in' }));
     expect(await screen.findByText('Enter a 10-digit Indian mobile number.')).toBeInTheDocument();
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(calls.filter((c) => c.path.startsWith('/auth/'))).toEqual([]);
   });
 
   it('shows a wrong-password error from the server', async () => {
@@ -61,6 +61,13 @@ describe('sign in', () => {
     const { calls } = mockApi({
       'POST /auth/login': ok(session),
       'GET /workspaces': ok([]),
+      'GET /sync/reference': ok({
+        cursor: new Date().toISOString(),
+        workspaces: [],
+        teams: [],
+        teamMembers: [],
+        rosterMembers: [],
+      }),
     });
     const router = renderApp('/auth/login?next=%2Fapp%2Fsports');
     const user = userEvent.setup();
@@ -76,7 +83,7 @@ describe('sign in', () => {
 describe('register', () => {
   it('requires the 18+ confirmation', async () => {
     signOut();
-    const { fetchMock } = mockApi({});
+    const { calls } = mockApi({});
     renderApp('/auth/register');
     const user = userEvent.setup();
     await user.type(await screen.findByLabelText('Name'), 'Asha');
@@ -86,7 +93,7 @@ describe('register', () => {
     expect(
       await screen.findByText('You must be 18 or older to create an account.'),
     ).toBeInTheDocument();
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(calls.filter((c) => c.path.startsWith('/auth/'))).toEqual([]);
   });
 
   it('creates the account and shows the recovery code once', async () => {
