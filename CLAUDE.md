@@ -68,6 +68,8 @@ Run from the repo root with Node 24 (`.nvmrc`). Enable pnpm once with `corepack 
 - Every workspace-owned query goes through the workspace-scoped repository. Every endpoint gets authorization-matrix tests.
 - Never claim something is done unless the code, tests and the end-to-end flow exist. Definition of done: [plan.md §4](plan.md).
 - If a scoring rule or award criterion is ambiguous, make it configurable or ask. Never silently invent scoring semantics.
+- **Before every push**, run `pnpm format:check && pnpm lint && pnpm typecheck && pnpm build && pnpm test`. For user-facing flows, also run `pnpm e2e` (needs local Postgres). Typecheck alone missed a build-only error once.
+- **Local processes:** other projects run on this machine, so stop only processes you started, by PID or process group. Never use broad `pkill` patterns.
 
 ## Git
 
