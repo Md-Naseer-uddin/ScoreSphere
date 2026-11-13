@@ -1,0 +1,6 @@
+pnpm-lock.yaml
+dist
+coverage
+docs/spec
+apps/client/android
+*.md
