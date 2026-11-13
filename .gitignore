@@ -42,3 +42,5 @@ blob-report/
 .claude/*.lock
 .claude/settings.local.json
 .storage/
+e2e/.storage-e2e/
+apps/api/.storage-e2e/

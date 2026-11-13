@@ -1,6 +1,7 @@
 packages:
   - apps/*
   - packages/*
+  - e2e
 allowBuilds:
   '@scarf/scarf': false
   '@swc/core': true

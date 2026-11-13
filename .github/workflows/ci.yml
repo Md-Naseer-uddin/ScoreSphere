@@ -27,6 +27,42 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
 
+  e2e:
+    name: End-to-end (Playwright)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: scoresphere
+          POSTGRES_PASSWORD: scoresphere
+          POSTGRES_DB: scoresphere
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U scoresphere"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @scoresphere/e2e exec playwright install --with-deps chromium
+      - run: pnpm e2e
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            e2e/playwright-report
+            e2e/test-results
+          retention-days: 14
+
   android:
     name: Android debug APK
     runs-on: ubuntu-latest
