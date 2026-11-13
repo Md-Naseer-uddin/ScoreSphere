@@ -1,6 +1,7 @@
 import { House, ListOrdered, Trophy, User, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, Outlet } from 'react-router';
+import { WorkspaceSwitcher } from '@/features/workspaces/WorkspaceSwitcher';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { cn } from '@/lib/utils';
 
@@ -20,7 +21,9 @@ export function AppShell() {
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background/95 px-4 pt-[env(safe-area-inset-top)] backdrop-blur">
-        <span className="py-3 text-lg font-semibold">{t('app.name')}</span>
+        <div className="py-2">
+          <WorkspaceSwitcher />
+        </div>
         {!online && (
           <span
             role="status"

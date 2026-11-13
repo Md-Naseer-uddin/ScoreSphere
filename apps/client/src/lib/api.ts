@@ -1,5 +1,6 @@
 import { errorEnvelopeSchema, type ErrorCode } from '@scoresphere/contracts';
 import type { z } from 'zod';
+import { getAccessToken, refreshSession } from '@/features/auth/session';
 import { env } from './env';
 
 export type ClientErrorCode = ErrorCode | 'NETWORK_ERROR' | 'INVALID_RESPONSE';
@@ -18,23 +19,40 @@ export class ApiClientError extends Error {
   }
 }
 
+export type ApiInit = RequestInit & {
+  /** Attach the access token and retry once after refreshing on 401. Default true. */
+  auth?: boolean;
+};
+
+/** JSON request body plus its content type, e.g. `apiFetch(path, { method: 'POST', ...json(data) })`. */
+export function json(data: unknown): Pick<RequestInit, 'body' | 'headers'> {
+  return { body: JSON.stringify(data), headers: { 'Content-Type': 'application/json' } };
+}
+
 /** Calls the API and returns the unwrapped `data`, validated against `schema` when given. */
 export async function apiFetch<T>(
   path: string,
-  init: RequestInit = {},
+  init: ApiInit = {},
   schema?: z.ZodType<T>,
 ): Promise<T> {
-  let res: Response;
-  try {
-    res = await fetch(`${env.apiUrl}${path}`, {
-      ...init,
-      headers: { Accept: 'application/json', ...init.headers },
-    });
-  } catch {
-    throw new ApiClientError('NETWORK_ERROR', 'You appear to be offline.', 0);
-  }
+  const { auth = true, ...rest } = init;
 
-  const body: unknown = await res.json().catch(() => undefined);
+  const send = async (): Promise<Response> => {
+    const headers = new Headers(rest.headers);
+    headers.set('Accept', 'application/json');
+    const token = auth ? getAccessToken() : null;
+    if (token) headers.set('Authorization', `Bearer ${token}`);
+    try {
+      return await fetch(`${env.apiUrl}${path}`, { ...rest, headers, credentials: 'include' });
+    } catch {
+      throw new ApiClientError('NETWORK_ERROR', 'You appear to be offline.', 0);
+    }
+  };
+
+  let res = await send();
+  if (auth && res.status === 401 && (await refreshSession())) res = await send();
+
+  const body: unknown = res.status === 204 ? undefined : await res.json().catch(() => undefined);
 
   if (!res.ok) {
     const parsed = errorEnvelopeSchema.safeParse(body);
@@ -52,4 +70,9 @@ export async function apiFetch<T>(
     throw new ApiClientError('INVALID_RESPONSE', 'Unexpected server response.', res.status);
   }
   return result.data;
+}
+
+/** Turns a server-relative media path (e.g. an avatar) into a loadable URL. */
+export function mediaUrl(path: string | null | undefined): string | undefined {
+  return path ? `${env.apiUrl}${path}` : undefined;
 }

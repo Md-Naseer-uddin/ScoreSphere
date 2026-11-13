@@ -1,8 +1,18 @@
 import { Navigate, type RouteObject } from 'react-router';
+import { AuthLayout } from '@/features/auth/AuthLayout';
+import { ForgotPasswordPage } from '@/features/auth/ForgotPasswordPage';
+import { LoginPage } from '@/features/auth/LoginPage';
+import { RecoveryCodePage } from '@/features/auth/RecoveryCodePage';
+import { RegisterPage } from '@/features/auth/RegisterPage';
+import { RequireAuth } from '@/features/auth/RequireAuth';
 import { ComingSoon } from '@/features/common/ComingSoon';
 import { NotFoundPage } from '@/features/common/NotFoundPage';
 import { HomePage } from '@/features/home/HomePage';
+import { ProfilePage } from '@/features/profile/ProfilePage';
 import { SportsPage } from '@/features/sports/SportsPage';
+import { CreateOrganizationPage } from '@/features/workspaces/CreateOrganizationPage';
+import { JoinPage } from '@/features/workspaces/JoinPage';
+import { WorkspaceSettingsPage } from '@/features/workspaces/WorkspaceSettingsPage';
 import { AppShell } from './AppShell';
 import { RouteError } from './RouteError';
 
@@ -10,15 +20,34 @@ import { RouteError } from './RouteError';
 export const routes: RouteObject[] = [
   { path: '/', element: <Navigate to="/app" replace /> },
   {
+    path: '/auth',
+    element: <AuthLayout />,
+    errorElement: <RouteError />,
+    children: [
+      { index: true, element: <Navigate to="/auth/login" replace /> },
+      { path: 'login', element: <LoginPage /> },
+      { path: 'register', element: <RegisterPage /> },
+      { path: 'forgot-password', element: <ForgotPasswordPage /> },
+      { path: 'recovery-code', element: <RecoveryCodePage /> },
+    ],
+  },
+  { path: '/join', element: <JoinPage />, errorElement: <RouteError /> },
+  {
     path: '/app',
-    element: <AppShell />,
+    element: (
+      <RequireAuth>
+        <AppShell />
+      </RequireAuth>
+    ),
     errorElement: <RouteError />,
     children: [
       { index: true, element: <HomePage /> },
       { path: 'sports', element: <SportsPage /> },
       { path: 'matches', element: <ComingSoon /> },
       { path: 'teams', element: <ComingSoon /> },
-      { path: 'profile', element: <ComingSoon /> },
+      { path: 'profile', element: <ProfilePage /> },
+      { path: 'workspaces/new', element: <CreateOrganizationPage /> },
+      { path: 'workspaces/:workspaceId', element: <WorkspaceSettingsPage /> },
     ],
   },
   { path: '*', element: <NotFoundPage /> },

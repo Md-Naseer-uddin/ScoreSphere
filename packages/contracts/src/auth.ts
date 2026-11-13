@@ -3,7 +3,7 @@ import { idSchema } from './ids.js';
 import { phoneSchema } from './phone.js';
 
 export const passwordSchema = z.string().min(8, 'PASSWORD_TOO_SHORT').max(128, 'PASSWORD_TOO_LONG');
-export const displayNameSchema = z.string().trim().min(1).max(100);
+export const displayNameSchema = z.string().trim().min(1, 'REQUIRED').max(100, 'TOO_LONG');
 
 export const CLIENT_PLATFORMS = ['WEB', 'ANDROID'] as const;
 export const clientPlatformSchema = z.enum(CLIENT_PLATFORMS);
@@ -27,14 +27,14 @@ export const registerRequestSchema = z.object({
   password: passwordSchema,
   displayName: displayNameSchema,
   /** Accounts are 18+ only (ADR 0026). */
-  adultConfirmed: z.literal(true),
+  adultConfirmed: z.literal(true, { error: 'ADULT_REQUIRED' }),
   device: deviceInfoSchema,
 });
 export type RegisterRequest = z.input<typeof registerRequestSchema>;
 
 export const loginRequestSchema = z.object({
   phone: phoneSchema,
-  password: z.string().min(1).max(128),
+  password: z.string().min(1, 'REQUIRED').max(128),
   device: deviceInfoSchema,
 });
 export type LoginRequest = z.input<typeof loginRequestSchema>;

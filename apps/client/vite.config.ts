@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { fileURLToPath, URL } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
@@ -5,7 +6,14 @@ import { defaultClientConditions } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { defineConfig } from 'vitest/config';
 
+const { version } = JSON.parse(
+  readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
+) as {
+  version: string;
+};
+
 export default defineConfig({
+  define: { __APP_VERSION__: JSON.stringify(version) },
   // Resolve workspace packages from TypeScript source for instant HMR.
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
@@ -57,6 +65,11 @@ export default defineConfig({
               name: 'react',
               test: /node_modules[\\/](react|react-dom|react-router|scheduler)[\\/]/,
             },
+            { name: 'zod', test: /node_modules[\\/]zod[\\/]/ },
+            {
+              name: 'ui',
+              test: /node_modules[\\/](radix-ui|@radix-ui|@floating-ui|lucide-react|sonner|react-hook-form|@hookform)[\\/]/,
+            },
             { name: 'vendor', test: /node_modules/ },
           ],
         },
@@ -66,7 +79,7 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
-    proxy: { '/api': 'http://localhost:3300' },
+    proxy: { '/api': process.env.API_PROXY_TARGET ?? 'http://localhost:3300' },
   },
   test: {
     environment: 'jsdom',

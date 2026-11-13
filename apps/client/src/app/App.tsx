@@ -1,27 +1,25 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router';
-import { ApiClientError } from '@/lib/api';
+import { Toaster } from '@/components/ui/sonner';
+import { refreshSession } from '@/features/auth/session';
+import { queryClient } from '@/lib/query-client';
 import { routes } from './routes';
 import { UpdatePrompt } from './UpdatePrompt';
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      // Client errors (4xx) won't succeed on retry; network blips and 5xx might.
-      retry: (failureCount, error) =>
-        !(error instanceof ApiClientError && error.status >= 400 && error.status < 500) &&
-        failureCount < 2,
-    },
-  },
-});
 
 const router = createBrowserRouter(routes);
 
 export function App() {
+  // Restore the session from the refresh cookie (web) or secure storage (Android).
+  useEffect(() => {
+    void refreshSession();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
       <UpdatePrompt />
+      <Toaster position="top-center" />
     </QueryClientProvider>
   );
 }
