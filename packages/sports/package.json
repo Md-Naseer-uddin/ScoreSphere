@@ -8,6 +8,11 @@
       "source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./golden": {
+      "source": "./src/golden.ts",
+      "types": "./dist/golden.d.ts",
+      "default": "./dist/golden.js"
     }
   },
   "files": [
