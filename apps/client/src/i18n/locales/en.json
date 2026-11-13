@@ -1,0 +1,43 @@
+{
+  "app": {
+    "name": "ScoreSphere",
+    "offline": "Offline",
+    "tagline": "Score 12 sports, online or offline."
+  },
+  "nav": {
+    "home": "Home",
+    "sports": "Sports",
+    "matches": "Matches",
+    "teams": "Teams",
+    "profile": "Profile"
+  },
+  "home": {
+    "title": "Ready to score",
+    "startMatch": "Start a match",
+    "browseSports": "Browse sports"
+  },
+  "sports": {
+    "title": "Sports",
+    "participation": {
+      "individual": "Individual",
+      "team": "Team",
+      "either": "Singles or teams"
+    },
+    "timed": "Timed"
+  },
+  "common": {
+    "comingSoon": "Coming soon",
+    "comingSoonBody": "This part of ScoreSphere is being built.",
+    "notFound": "Page not found",
+    "notFoundBody": "That page doesn't exist.",
+    "goHome": "Go home",
+    "error": "Something went wrong",
+    "errorBody": "Reload the page to try again. Matches saved on this device are safe.",
+    "reload": "Reload"
+  },
+  "update": {
+    "available": "A new version is ready.",
+    "reload": "Update now",
+    "later": "Later"
+  }
+}
