@@ -59,6 +59,8 @@ export interface SportEngine<State, Config, Command extends { type: string }> {
   /** Validates command payloads from the ledger before `validate` sees them. */
   readonly commandSchema: z.ZodType<Command>;
   readonly presets: readonly Preset<Config>[];
+  /** Checks that the roster fits the settings (e.g. two players a side for doubles). */
+  validateSetup(config: Config, roster: MatchRoster): Result<void, EngineError>;
   init(config: Config, roster: MatchRoster): State;
   commands(state: State): CommandDescriptor[];
   validate(state: State, command: Command): Result<void, EngineError>;

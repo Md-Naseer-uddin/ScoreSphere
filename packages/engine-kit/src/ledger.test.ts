@@ -28,6 +28,7 @@ const tally: SportEngine<State, Config, Command> = {
   settingsSchema: configSchema,
   commandSchema,
   presets: [],
+  validateSetup: () => ok(undefined),
   init: (config) => ({ target: config.target, score: [0, 0] }),
   commands: () => [],
   validate: (state, cmd) =>

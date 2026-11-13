@@ -118,6 +118,8 @@ function parseCreated<S, C, Cmd extends { type: string }>(
   }
   const config = engine.settingsSchema.safeParse(created.data.config);
   if (!config.success) return err(failure('BAD_PAYLOAD', 1, 'The match settings are invalid.'));
+  const setup = engine.validateSetup(config.data, created.data.roster);
+  if (!setup.ok) return err(engineRejected(1, setup.error));
   const state = engine.init(config.data, created.data.roster);
   return ok({
     version: 1,

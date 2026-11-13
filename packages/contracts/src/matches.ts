@@ -184,7 +184,9 @@ export const matchSummarySchema = z.object({
   title: z.string().nullable(),
   status: matchStatusSchema,
   version: z.int(),
-  sides: z.array(z.object({ side: sideIndexSchema, name: z.string(), teamId: idSchema.nullable() })),
+  sides: z.array(
+    z.object({ side: sideIndexSchema, name: z.string(), teamId: idSchema.nullable() }),
+  ),
   result: matchResultSchema.nullable(),
   needsReview: z.boolean(),
   leaseEpoch: z.int(),

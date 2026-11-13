@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { matchEventSchema, newId, postMatchEventsRequestSchema } from './index.js';
 
-const base = () => ({ eventId: newId(), leaseEpoch: 1, engineVersion: 1, occurredAt: 1_700_000_000_000 });
+const base = () => ({
+  eventId: newId(),
+  leaseEpoch: 1,
+  engineVersion: 1,
+  occurredAt: 1_700_000_000_000,
+});
 
 const created = () => ({
   ...base(),
