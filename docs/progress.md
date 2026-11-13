@@ -9,8 +9,8 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
 | M0 — Foundations | done (on-device APK check pending, see below) |
 | M1 — Identity and workspaces | done |
 | M2 — People and rosters | done |
-| M3 — Walking skeleton: Badminton, offline-first | next |
-| M4 — Cricket | not started |
+| M3 — Walking skeleton: Badminton, offline-first | done (on-device check pending) |
+| M4 — Cricket | next |
 | M5 — Rally family + Chess | not started |
 | M6 — Pilot release | not started |
 | M7 — Tournaments, statistics, profiles | not started |
@@ -47,15 +47,50 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
 - Client: Teams tab, team detail, roster, add-member sheet, link-by-phone dialog, profile roster-link card.
 - Playwright e2e of the roster claim journey.
 
-## Next — M3: Walking skeleton (Badminton, offline-first)
+**M3**
+- **Contracts:** event envelope, batch sync protocol, lease, share links and live snapshots.
+- **Ledger:** engine-kit fold with VOID/REPLACE, lifecycle events and playing time.
+  - Strict replay on the device, lenient replay on the server (accept and flag, ADR 0009).
+  - The scoring device numbers events (ADR 0030).
+- **Badminton engine:** singles and doubles, rally scoring, deuce and cap, service courts and doubles rotation.
+  - Presets: BWF 3×21 and 3×15 (official), plus two casual ones.
+  - Stats, Player of the Match and rules content citing the BWF Laws.
+  - Golden logs (including the Law 11 doubles service example) and property tests, run against the package, the server build and the client build.
+- **API:**
+  - `POST /matches/:id/events` handles offline creation, idempotency, lease epoch fencing and kept rejections.
+  - Lease claim, takeover, release and heartbeat.
+  - History, detail and ledger reads.
+  - Share links, plus SSE live streams over `LISTEN/NOTIFY` with `Last-Event-ID` catch-up.
+- **Client:**
+  - Dexie match store and a sync worker with all six sync states.
+  - Offline start as the last signed-in account (ADR 0031).
+  - Match wizard (roster members, quick guests or typed names).
+  - Scoring screen with undo, corrections, pause, early finish, abandon and handover; keeps the screen awake.
+  - Match summary and scorecard, history, take-over and the `/live#token` spectator page with a stale badge.
+- **Playwright:**
+  - Offline scoring through a reload, with every event stored exactly once.
+  - A spectator who joins mid-match catches up; a revoked link stops working.
+  - A takeover fences the old device off and keeps its events.
 
-1. **contracts:** event envelope (`eventId`, `localSeq`, `leaseEpoch`, `kind`, `targetSeq`, `engineVersion`), sync request/response (`ACCEPTED | ALREADY_PROCESSED | REJECTED | CONFLICT`), match DTOs, share-link DTOs.
-2. **engine-kit:** ledger fold with VOID/REPLACE, lifecycle/roster/clock events, replay, correction re-validation (ADR 0005, 0006).
-3. **Badminton engine** in `packages/sports/src/badminton`: singles/doubles, rally scoring, deuce and cap, service court and rotation, settings + presets, stats, Player of the Match, rules content, golden logs + property tests.
-4. **API:** `matches`, `match_side_participants`, `match_events`, `match_event_rejections`, `match_share_links` schema; `POST /matches/:id/events` (offline creation via `MATCH_CREATED`, idempotency, lease epoch, accept-and-flag `NEEDS_REVIEW`); `GET /matches/:id/events?after=`; `POST /matches/:id/lease`; match list for history.
-5. **Live:** share links (create/revoke/expire), SSE via `LISTEN/NOTIFY` with `Last-Event-ID` catch-up, `/live#token` page with a stale badge.
-6. **Client:** match wizard, scoring screen from `commands()`, timeline with undo/correction, summary/scorecard, history list, Dexie event store + sync worker, sync-status UI.
-7. **Exit tests (Playwright):** online → offline mid-match → reload → continue → reconnect → every event synced exactly once; spectator joins mid-match; revoked link stops; force-takeover rejects stale events but keeps them.
+## Next — M4: Cricket
+
+1. **Engine:**
+   - Deliveries and extras (wide, no-ball, bye, leg-bye).
+   - All dismissal types, including run-outs at either end.
+   - Strike rotation, overs and innings, free hit, retired hurt/out, super over when configured.
+   - Playing XI and substitutions as roster events (ADR 0006): add the `ROSTER` event kind.
+2. **Settings and presets:**
+   - Formats: T20, ODI, T10, box, gully.
+   - Local variants as typed settings: six-and-out, last-man-stands, one-tip-one-hand, consecutive-wide penalty with explicit threshold semantics.
+3. **Scorecards:** batting, bowling, fall of wickets, extras.
+4. **Stats:** runs, balls, strike rate, 4s/6s, wickets, overs, economy, maidens.
+5. **Match awards:** Player of the Match, Best Batter and Best Bowler, with proposed tie-breaks for the owner to sign off.
+6. **Match setup:** teams and playing XI from the roster.
+7. **Scoring UI:** fast ball-by-ball entry, plus the scorecard on the summary and live pages.
+8. **Exit:**
+   - Golden logs reproduce scorecards exactly, including a gully game.
+   - Property tests pass.
+   - The offline e2e passes for cricket.
 
 ## Needs the owner
 
@@ -64,3 +99,8 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
   - The APK can't reach an API until one is deployed: it needs `VITE_API_URL` and `VITE_PUBLIC_APP_URL` at build time.
 - **Staging deploy target.** Nothing is deployed until a hosting provider is chosen; storage stays on local disk until then.
 - **Android developer verification** for sideloaded apps, before the pilot.
+- **M3 on-device check:** on the CI-built APK, score a badminton match offline, kill and reopen the app, reconnect, and check the screen stays awake while scoring.
+- **Badminton rules sign-off:**
+  - The 3×15 interval and change-of-ends points. The preset leaves those prompts off until they're confirmed from the 2027 Laws.
+  - Player of the Match goes to the winning side (partners share it) and isn't awarded automatically for a walkover.
+- **Golden logs from real scoresheets:** the current badminton logs are constructed (except the Law 11 example), and M4 needs real cricket scoresheets, including a gully match. Please share photos or PDFs of a few local scoresheets.

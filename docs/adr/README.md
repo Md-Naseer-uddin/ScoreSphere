@@ -33,3 +33,5 @@ Each record explains a decision that changes or extends the original spec in [do
 | [0027](0027-apk-built-in-ci.md) | The Android APK is built in GitHub Actions *(owner)* |
 | [0028](0028-avatar-upload-through-api.md) | Avatars are uploaded through the API and re-encoded server-side |
 | [0029](0029-roster-link-states.md) | Roster link states instead of an association-requests table |
+| [0030](0030-device-assigned-sequence.md) | The scoring device numbers ledger events |
+| [0031](0031-offline-session-window.md) | The last signed-in account stays usable offline for 14 days |
