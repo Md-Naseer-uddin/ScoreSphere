@@ -1,5 +1,10 @@
 import { z } from 'zod';
 
+const bool = z
+  .enum(['true', 'false'])
+  .default('true')
+  .transform((value) => value === 'true');
+
 const csv = z
   .string()
   .default('')
@@ -17,6 +22,15 @@ export const envSchema = z.object({
   DATABASE_URL: z.string().regex(/^postgres(ql)?:\/\//, 'must be a postgres:// URL'),
   CORS_ORIGINS: csv,
   APP_VERSION: z.string().default('0.0.0'),
+  /** HMAC key for access tokens; at least 32 characters. */
+  JWT_SECRET: z.string().min(32, 'must be at least 32 characters'),
+  ACCESS_TOKEN_TTL_SECONDS: z.coerce.number().int().positive().default(900),
+  REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().positive().default(30),
+  RATE_LIMIT_ENABLED: bool,
+  /** Local directory for uploaded media until object storage is configured. */
+  STORAGE_DIR: z.string().default('.storage'),
+  /** Base URL of the web app, used in invitation links. */
+  PUBLIC_APP_URL: z.url().default('http://localhost:5173'),
 });
 
 export type Env = z.infer<typeof envSchema>;

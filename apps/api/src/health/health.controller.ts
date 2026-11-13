@@ -1,11 +1,13 @@
 import { Controller, Get, Inject } from '@nestjs/common';
 import type { HealthStatus } from '@scoresphere/contracts';
 import { Pool } from 'pg';
+import { Public } from '../auth/decorators';
 import { ApiError } from '../common/api-error';
 import { ENV } from '../config/config.module';
 import type { Env } from '../config/env';
 import { PG_POOL } from '../database/database.module';
 
+@Public()
 @Controller('health')
 export class HealthController {
   constructor(

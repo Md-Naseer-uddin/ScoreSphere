@@ -1,5 +1,6 @@
 import type { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { Logger } from 'nestjs-pino';
 import { cleanupOpenApiDoc } from 'nestjs-zod';
@@ -11,6 +12,7 @@ export function configureApp(app: INestApplication): void {
   const env = app.get<Env>(ENV);
   app.useLogger(app.get(Logger));
   app.use(helmet());
+  app.use(cookieParser());
   app.enableCors({ origin: env.CORS_ORIGINS, credentials: true });
   app.setGlobalPrefix('api/v1');
   app.enableShutdownHooks();
