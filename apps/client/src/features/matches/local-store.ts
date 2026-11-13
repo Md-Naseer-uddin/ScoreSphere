@@ -162,6 +162,16 @@ export async function createLocalMatch(
   return ok(matchId);
 }
 
+/**
+ * The projection after the last event recorded on this device, so a tap extends it instead
+ * of replaying the whole ledger (a long cricket innings is hundreds of events).
+ */
+const projectionCache = new Map<string, { version: number; projection: AnyProjection }>();
+
+export function forgetProjection(matchId: string): void {
+  projectionCache.delete(matchId);
+}
+
 export type RecordError = LedgerError | { code: 'NOT_SCORER'; message: string; seq: number };
 
 export interface NewEvent {
@@ -179,40 +189,51 @@ export async function recordEvent(
   input: NewEvent,
   database: LocalDatabase = db,
 ): Promise<Result<AnyProjection, RecordError>> {
-  return database.transaction('rw', database.matches, database.matchEvents, async () => {
-    const match = await database.matches.get(matchId);
-    if (!match) throw new Error('Match not found on this device');
-    if (!match.holdsLease) {
-      return err({
-        code: 'NOT_SCORER',
-        message: 'Another device is scoring this match.',
-        seq: match.version + 1,
-      });
-    }
-    const engine = engineFor(match.sport, match.engineVersion);
-    const ledger = (await matchEvents(matchId, database)).map(toLedger);
-    const current = project(engine, ledger);
-    if (!current) throw new Error('The match on this device is damaged');
+  const result = await database.transaction(
+    'rw',
+    database.matches,
+    database.matchEvents,
+    async (): Promise<Result<AnyProjection, RecordError>> => {
+      const match = await database.matches.get(matchId);
+      if (!match) throw new Error('Match not found on this device');
+      if (!match.holdsLease) {
+        return err({
+          code: 'NOT_SCORER',
+          message: 'Another device is scoring this match.',
+          seq: match.version + 1,
+        });
+      }
+      const engine = engineFor(match.sport, match.engineVersion);
+      const ledger = (await matchEvents(matchId, database)).filter((e) => e.seq > 0).map(toLedger);
+      const cached = projectionCache.get(matchId);
+      const current =
+        cached && cached.version === match.version ? cached.projection : project(engine, ledger);
+      if (!current) throw new Error('The match on this device is damaged');
 
-    const event: LocalMatchEvent = {
-      matchId,
-      seq: match.version + 1,
-      eventId: newId(),
-      kind: input.kind,
-      payload: input.payload,
-      targetSeq: input.targetSeq ?? null,
-      leaseEpoch: match.leaseEpoch,
-      engineVersion: match.engineVersion,
-      occurredAt: Date.now(),
-      sync: 'pending',
-      code: null,
-    };
-    const next = append(engine, current, ledger, toLedger(event));
-    if (!next.ok) return next;
-    await database.matchEvents.add(event);
-    await database.matches.update(matchId, summary(engine, next.value));
-    return next;
-  });
+      const event: LocalMatchEvent = {
+        matchId,
+        seq: match.version + 1,
+        eventId: newId(),
+        kind: input.kind,
+        payload: input.payload,
+        targetSeq: input.targetSeq ?? null,
+        leaseEpoch: match.leaseEpoch,
+        engineVersion: match.engineVersion,
+        occurredAt: Date.now(),
+        sync: 'pending',
+        code: null,
+      };
+      const next = append(engine, current, ledger, toLedger(event));
+      if (!next.ok) return next;
+      await database.matchEvents.add(event);
+      await database.matches.update(matchId, summary(engine, next.value));
+      return next;
+    },
+  );
+  // Only after the transaction committed: the cache must never get ahead of the database.
+  if (result.ok)
+    projectionCache.set(matchId, { version: result.value.version, projection: result.value });
+  return result;
 }
 
 /**
@@ -241,6 +262,7 @@ export async function adoptServerMatch(
   }));
   const p = project(engine, events.map(toLedger));
   if (!p) throw new Error('The match from the server could not be read');
+  forgetProjection(detail.id);
   await database.transaction('rw', database.matches, database.matchEvents, async () => {
     const existing = await matchEvents(detail.id, database);
     // Events this device had but the server never accepted stay, renumbered out of the way.

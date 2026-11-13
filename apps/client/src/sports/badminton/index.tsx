@@ -390,7 +390,11 @@ export const badmintonUi: SportUi = {
       config: { ...preset.config, discipline: 'singles' },
     };
   },
-  playersPerSide: (config) => ((config as BadmintonSettings).discipline === 'doubles' ? 2 : 1),
+  sideSize: (config) => {
+    const n = (config as BadmintonSettings).discipline === 'doubles' ? 2 : 1;
+    return { min: n, max: n, initial: n };
+  },
+  namedSides: false,
   Scoreboard,
   Controls,
   Scorecard,

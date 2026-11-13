@@ -306,7 +306,8 @@
     "concede": {
       "retired": "Retired",
       "walkover": "Walkover (didn't play)",
-      "disqualified": "Disqualified"
+      "disqualified": "Disqualified",
+      "forfeit": "Forfeited"
     },
     "abandon": "Abandon match",
     "abandonBody": "The match ends with no result. You can undo this straight afterwards.",
@@ -377,7 +378,13 @@
       "titleLabel": "Match name (optional)",
       "titlePlaceholder": "e.g. Club final",
       "duplicate": "A player can only appear once.",
-      "start": "Start match"
+      "start": "Start match",
+      "defaultSideName": "Team {{side}}",
+      "team": "Saved team for side {{side}}",
+      "noTeam": "No saved team",
+      "sideName": "Side {{side}} name",
+      "addPlayer": "Add player to side {{side}}",
+      "removePlayer": "Remove last player"
     },
     "share": {
       "title": "Live link",
@@ -454,6 +461,180 @@
       "changeEnds": "Change ends",
       "gameWon": "Game to {{name}}, {{score}}",
       "matchWon": "Match to {{name}}"
+    }
+  },
+  "cricket": {
+    "notStarted": "Record the toss or start the first innings.",
+    "tossLine": "{{name}} won the toss and chose to {{decision}}",
+    "decision": {
+      "bat": "bat",
+      "bowl": "bowl"
+    },
+    "chose": {
+      "bat": "Chose to bat",
+      "bowl": "Chose to bowl"
+    },
+    "recordToss": "Record the toss (optional)",
+    "tossWinner": "Who won the toss?",
+    "inningsN": "Innings {{n}}",
+    "superOver": "Super over",
+    "startInnings": "Start innings {{n}}",
+    "startSuperOver": "Start the super over",
+    "target": "Target: {{runs}}",
+    "whoBats": "Who bats first?",
+    "striker": "Striker (on strike)",
+    "nonStriker": "Non-striker",
+    "startPlay": "Start innings",
+    "pickBowler": "Who bowls over {{over}}?",
+    "changeBowler": "Change bowler",
+    "bowler": "Bowler",
+    "pickBatter": "Next batter",
+    "nextBatter": "Who comes in?",
+    "returning": "Retired hurt — returning",
+    "need": "Need {{runs}} from {{balls}} balls · RRR {{rrr}}",
+    "runRate": "Run rate {{crr}}",
+    "freeHit": "Free hit",
+    "thisOver": "This over",
+    "tied": "Match tied",
+    "wicket": "Wicket",
+    "howOut": "How out?",
+    "whoIsOut": "Who is out?",
+    "whichEnd": "Wicket put down at",
+    "end": {
+      "striker": "Striker's end",
+      "non_striker": "Non-striker's end"
+    },
+    "runsCompleted": "Runs completed",
+    "offDelivery": "Off which delivery?",
+    "deliveryKind": {
+      "bat": "Fair ball",
+      "wide": "Wide",
+      "no_ball_bat": "No-ball",
+      "bye": "Bye",
+      "leg_bye": "Leg bye"
+    },
+    "fielder": "Fielder",
+    "noFielder": "Not recorded",
+    "confirmWicket": "Record wicket",
+    "dismissal": {
+      "bowled": "Bowled",
+      "caught": "Caught",
+      "lbw": "LBW",
+      "run_out": "Run out",
+      "stumped": "Stumped",
+      "hit_wicket": "Hit wicket",
+      "one_tip_one_hand": "One tip one hand",
+      "obstructing_field": "Obstructing the field",
+      "hit_ball_twice": "Hit the ball twice",
+      "timed_out": "Timed out",
+      "six_and_out": "Six and out",
+      "retired_out": "Retired out"
+    },
+    "retire": "Retire batter",
+    "retired": {
+      "hurt": "Retired hurt",
+      "out": "Retired out"
+    },
+    "swapStrike": "Swap strike",
+    "declare": "Declare",
+    "panel": {
+      "wide": "Wide: runs run",
+      "no_ball": "No-ball",
+      "bye": "Byes",
+      "leg_bye": "Leg byes",
+      "more": "Other runs"
+    },
+    "pad": {
+      "dot": "Dot ball",
+      "runs_one": "{{count}} run",
+      "runs_other": "{{count}} runs",
+      "four": "Four",
+      "six": "Six",
+      "wide": "Wd",
+      "no_ball": "Nb",
+      "bye": "Bye",
+      "leg_bye": "LB",
+      "wicket": "Wicket",
+      "more": "More",
+      "nbByes": "Nb + {{runs}} bye",
+      "nbLegByes": "Nb + {{runs}} lb",
+      "fiveRuns": "5 runs",
+      "fourRun": "4 run (not boundary)",
+      "sevenRuns": "7 runs"
+    },
+    "batting": "Batting",
+    "bowling": "Bowling",
+    "extras": "Extras",
+    "didNotBat": "Did not bat",
+    "fallOfWickets": "Fall of wickets",
+    "text": {
+      "dot": "Dot ball",
+      "runs_one": "{{count}} run",
+      "runs_other": "{{count}} runs",
+      "four": "FOUR",
+      "six": "SIX",
+      "wide_one": "Wide +{{count}}",
+      "wide_other": "Wide +{{count}}",
+      "wide_zero": "Wide",
+      "no_ball_bat_one": "No-ball +{{count}}",
+      "no_ball_bat_other": "No-ball +{{count}}",
+      "no_ball_bat_zero": "No-ball",
+      "no_ball_bye_one": "No-ball + {{count}} bye",
+      "no_ball_bye_other": "No-ball + {{count}} byes",
+      "no_ball_leg_bye_one": "No-ball + {{count}} leg bye",
+      "no_ball_leg_bye_other": "No-ball + {{count}} leg byes",
+      "bye_one": "{{count}} bye",
+      "bye_other": "{{count}} byes",
+      "leg_bye_one": "{{count}} leg bye",
+      "leg_bye_other": "{{count}} leg byes",
+      "wicket": "WICKET ({{kind}})",
+      "endOfOver": "end of over {{over}}",
+      "inningsStarted": "Innings started: {{striker}} and {{nonStriker}}",
+      "bowler": "{{name}} to bowl",
+      "batter": "{{name}} comes in",
+      "retired": {
+        "hurt": "{{name}} retired hurt",
+        "out": "{{name}} retired out"
+      },
+      "concede": {
+        "forfeit": "{{name}} forfeited",
+        "walkover": "{{name}} gave a walkover"
+      }
+    },
+    "announce": {
+      "wicket": "Wicket!",
+      "overComplete": "End of over {{over}}",
+      "inningsClosed": "Innings over",
+      "widePenalty": "{{runs}} penalty run(s) for wides in a row",
+      "superOver": "Scores level: super over"
+    },
+    "setup": {
+      "rules": "Rules",
+      "overs": "Overs per side",
+      "players": "Max players per side",
+      "bowlerLimit": "Max overs per bowler",
+      "ballsPerOver": "Balls per over",
+      "wideRuns": "Runs for a wide",
+      "noBallRuns": "Runs for a no-ball",
+      "freeHit": "Free hit after a no-ball",
+      "consecutiveOvers": "A bowler may bowl overs in a row",
+      "lastManStands": "Last man stands",
+      "oneTipOneHand": "One tip one hand is out",
+      "consecutiveWides": "Penalty for wides in a row",
+      "widesInARow": "Wides in a row",
+      "penaltyRuns": "Penalty runs",
+      "sixAndOut": "Six and out",
+      "sixAndOutOption": {
+        "off": "Off",
+        "out_runs_count": "Out, the six counts",
+        "out_no_runs": "Out, no runs"
+      },
+      "superOver": "If the scores are level",
+      "superOverOption": {
+        "off": "Tie",
+        "once": "One super over",
+        "until_decided": "Super overs until there is a winner"
+      }
     }
   }
 }

@@ -4,8 +4,8 @@ import {
   type SideIndex,
   type SportKey,
 } from '@scoresphere/contracts';
-import { isScorable, SPORTS } from '@scoresphere/sports';
-import { ArrowLeft } from 'lucide-react';
+import { SPORTS } from '@scoresphere/sports';
+import { ArrowLeft, Minus, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useSearchParams } from 'react-router';
@@ -15,10 +15,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useSession } from '@/features/auth/session';
-import { useQuickGuests, useRoster } from '@/features/teams/local-data';
+import { useQuickGuests, useRoster, useTeams } from '@/features/teams/local-data';
 import { useCurrentWorkspace } from '@/features/workspaces/current-workspace';
+import { db } from '@/lib/db';
 import { sportUi } from '@/sports/registry';
-import type { SportSetup } from '@/sports/types';
+import type { SportSetup, SportUi } from '@/sports/types';
 import { createLocalMatch } from './local-store';
 
 /** A player slot: picked from the roster or the device's quick guests, or typed in. */
@@ -27,12 +28,32 @@ interface Slot {
   name: string;
 }
 
+interface SideDraft {
+  name: string;
+  teamId: string | null;
+  slots: Slot[];
+}
+
 const emptySlot = (): Slot => ({ pick: '', name: '' });
+const LETTERS = ['A', 'B'] as const;
 type Step = 'sport' | 'format' | 'players';
 
+function draftSides(
+  ui: SportUi | undefined,
+  setup: SportSetup | null,
+  defaultName: (letter: string) => string,
+): SideDraft[] {
+  const size = ui && setup ? ui.sideSize(setup.config).initial : 1;
+  return LETTERS.map((letter) => ({
+    name: ui?.namedSides ? defaultName(letter) : '',
+    teamId: null,
+    slots: Array.from({ length: size }, emptySlot),
+  }));
+}
+
 /**
- * Match setup (spec frontend §7): sport → format → players → start. Works offline: rosters
- * and guests come from the device, and the match is created locally (ADR 0008).
+ * Match setup (spec frontend §7): sport → format → sides → start. Works offline: teams,
+ * rosters and guests come from the device, and the match is created locally (ADR 0008).
  */
 export function NewMatchPage() {
   const { t } = useTranslation();
@@ -42,26 +63,27 @@ export function NewMatchPage() {
   const userId = useSession((s) => s.user?.id);
   const roster = useRoster(workspace?.id);
   const guests = useQuickGuests();
+  const teams = useTeams(workspace?.id);
+  const defaultName = (letter: string) => t('matches.new.defaultSideName', { side: letter });
 
   const initialSport = params.get('sport') as SportKey | null;
   const [sport, setSport] = useState<SportKey | null>(
-    initialSport && isScorable(initialSport) ? initialSport : null,
+    initialSport && sportUi(initialSport) ? initialSport : null,
   );
+  const ui = sport ? sportUi(sport) : undefined;
   const [step, setStep] = useState<Step>(sport ? 'format' : 'sport');
-  const [setup, setSetup] = useState<SportSetup | null>(() =>
-    sport ? (sportUi(sport)?.defaultSetup() ?? null) : null,
-  );
-  const [slots, setSlots] = useState<[Slot[], Slot[]]>([[emptySlot()], [emptySlot()]]);
+  const [setup, setSetup] = useState<SportSetup | null>(() => ui?.defaultSetup() ?? null);
+  const [sides, setSides] = useState<SideDraft[]>(() => draftSides(ui, setup, defaultName));
   const [title, setTitle] = useState('');
   const [saving, setSaving] = useState(false);
-  const ui = sport ? sportUi(sport) : undefined;
 
+  const size = ui && setup ? ui.sideSize(setup.config) : { min: 1, max: 1, initial: 1 };
   const options = useMemo(
     () => [
       ...(roster ?? []).map((m) => ({
         value: `roster:${m.id}`,
         label: m.displayName,
-        rosterMemberId: m.id,
+        rosterMemberId: m.id as string | null,
       })),
       ...(guests ?? []).map((g) => ({
         value: `guest:${g.id}`,
@@ -71,44 +93,71 @@ export function NewMatchPage() {
     ],
     [roster, guests],
   );
+  const sportTeams = (teams ?? []).filter(
+    (team) => team.sportKeys.length === 0 || (sport !== null && team.sportKeys.includes(sport)),
+  );
 
-  const chooseSetup = (next: SportSetup, forSport: SportKey | null = sport) => {
+  const chooseSport = (key: SportKey) => {
+    const next = sportUi(key);
+    const defaults = next?.defaultSetup() ?? null;
+    setSport(key);
+    setSetup(defaults);
+    setSides(draftSides(next, defaults, defaultName));
+    setStep('format');
+  };
+
+  const chooseSetup = (next: SportSetup) => {
     setSetup(next);
-    const size = (forSport ? sportUi(forSport)?.playersPerSide(next.config) : undefined) ?? 1;
-    setSlots(
-      (current) =>
-        current.map((side) => Array.from({ length: size }, (_, i) => side[i] ?? emptySlot())) as [
-          Slot[],
-          Slot[],
-        ],
+    const { min, max } = ui!.sideSize(next.config);
+    setSides((current) =>
+      current.map((side) => {
+        const slots = side.slots.slice(0, max);
+        while (slots.length < min) slots.push(emptySlot());
+        return { ...side, slots };
+      }),
     );
+  };
+
+  const updateSide = (index: number, patch: Partial<SideDraft>) =>
+    setSides((current) => current.map((side, i) => (i === index ? { ...side, ...patch } : side)));
+
+  const pickTeam = async (index: number, teamId: string) => {
+    if (!teamId) return updateSide(index, { teamId: null });
+    const team = sportTeams.find((x) => x.id === teamId);
+    const members = await db.teamMembers.where('teamId').equals(teamId).toArray();
+    const slots: Slot[] = members
+      .slice(0, size.max)
+      .map((m) => ({ pick: `roster:${m.rosterMemberId}`, name: '' }));
+    while (slots.length < size.min) slots.push(emptySlot());
+    updateSide(index, { teamId, name: team?.name ?? '', slots });
   };
 
   const slotName = (slot: Slot) =>
     slot.pick ? (options.find((o) => o.value === slot.pick)?.label ?? '') : slot.name.trim();
-  const picks = slots
-    .flat()
-    .map((s) => s.pick)
-    .filter(Boolean);
+  const picks = sides.flatMap((s) => s.slots.map((x) => x.pick)).filter(Boolean);
   const duplicate = new Set(picks).size !== picks.length;
-  const complete = slots.every((side) => side.every((s) => slotName(s).length > 0));
+  const complete =
+    sides.every(
+      (side) => side.slots.length >= size.min && side.slots.every((s) => slotName(s).length > 0),
+    ) &&
+    (!ui?.namedSides || sides.every((side) => side.name.trim().length > 0));
 
   const start = async () => {
     if (!sport || !setup || !workspace || !userId || !complete || duplicate) return;
     setSaving(true);
-    const sides: MatchSideSnapshot[] = slots.map((side, index) => {
-      const participants = side.map((slot) => ({
+    const snapshot: MatchSideSnapshot[] = sides.map((side, index) => {
+      const participants = side.slots.map((slot) => ({
         participantId: newId(),
         displayName: slotName(slot),
         rosterMemberId: options.find((o) => o.value === slot.pick)?.rosterMemberId ?? null,
       }));
+      const name = ui?.namedSides
+        ? side.name.trim()
+        : participants.map((p) => p.displayName).join(' / ');
       return {
         side: index as SideIndex,
-        name: participants
-          .map((p) => p.displayName)
-          .join(' / ')
-          .slice(0, 60),
-        teamId: null,
+        name: name.slice(0, 60),
+        teamId: side.teamId,
         participants,
       };
     });
@@ -120,7 +169,7 @@ export function NewMatchPage() {
       presetVersion: setup.presetVersion,
       config: setup.config,
       title: title.trim() || null,
-      sides,
+      sides: snapshot,
     }).catch(() => null);
     setSaving(false);
     if (!created?.ok) {
@@ -142,29 +191,22 @@ export function NewMatchPage() {
       </div>
 
       {step === 'sport' && (
-        <div className="space-y-4">
-          <ChoiceGroup
-            label={t('matches.new.sport')}
-            value={sport}
-            onChange={(key) => {
-              setSport(key);
-              const defaults = sportUi(key)?.defaultSetup();
-              if (defaults) chooseSetup(defaults, key);
-              setStep('format');
-            }}
-            choices={SPORTS.map((s) => ({
-              value: s.key,
-              label: s.name,
-              hint: isScorable(s.key) ? undefined : t('common.comingSoon'),
-              disabled: !isScorable(s.key),
-            }))}
-          />
-        </div>
+        <ChoiceGroup
+          label={t('matches.new.sport')}
+          value={sport}
+          onChange={chooseSport}
+          choices={SPORTS.map((s) => ({
+            value: s.key,
+            label: s.name,
+            hint: sportUi(s.key) ? undefined : t('common.comingSoon'),
+            disabled: !sportUi(s.key),
+          }))}
+        />
       )}
 
       {step === 'format' && ui && (
         <div className="space-y-5">
-          <ui.Setup value={setup} onChange={(next) => chooseSetup(next)} />
+          <ui.Setup value={setup} onChange={chooseSetup} />
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => setStep('sport')}>
               {t('common.back')}
@@ -176,56 +218,109 @@ export function NewMatchPage() {
         </div>
       )}
 
-      {step === 'players' && (
+      {step === 'players' && ui && (
         <div className="space-y-6">
-          {slots.map((side, sideIndex) => (
-            <fieldset key={sideIndex} className="space-y-3 rounded-xl border p-4">
-              <legend className="px-1 text-sm font-medium">
-                {t('matches.new.sideLabel', { side: sideIndex === 0 ? 'A' : 'B' })}
-              </legend>
-              {side.map((slot, slotIndex) => {
-                const id = `slot-${sideIndex}-${slotIndex}`;
-                const update = (patch: Partial<Slot>) =>
-                  setSlots((current) => {
-                    const next = current.map((s) => [...s]) as [Slot[], Slot[]];
-                    next[sideIndex]![slotIndex] = { ...slot, ...patch };
-                    return next;
-                  });
-                const label = t('matches.new.player', {
-                  side: sideIndex === 0 ? 'A' : 'B',
-                  n: slotIndex + 1,
-                });
-                return (
-                  <div key={slotIndex} className="space-y-2">
-                    <Label htmlFor={`${id}-pick`}>{label}</Label>
+          {sides.map((side, sideIndex) => {
+            const letter = LETTERS[sideIndex]!;
+            return (
+              <fieldset key={sideIndex} className="space-y-3 rounded-xl border p-4">
+                <legend className="px-1 text-sm font-medium">
+                  {t('matches.new.sideLabel', { side: letter })}
+                </legend>
+                {ui.namedSides && sportTeams.length > 0 && (
+                  <div className="space-y-1">
+                    <Label htmlFor={`team-${sideIndex}`}>
+                      {t('matches.new.team', { side: letter })}
+                    </Label>
                     <select
-                      id={`${id}-pick`}
+                      id={`team-${sideIndex}`}
                       className="h-11 w-full rounded-lg border bg-background px-3 text-sm"
-                      value={slot.pick}
-                      onChange={(e) => update({ pick: e.target.value })}
+                      value={side.teamId ?? ''}
+                      onChange={(e) => void pickTeam(sideIndex, e.target.value)}
                     >
-                      <option value="">{t('matches.new.typeName')}</option>
-                      {options.map((o) => (
-                        <option key={o.value} value={o.value}>
-                          {o.label}
-                          {o.rosterMemberId ? '' : ` · ${t('matches.new.guest')}`}
+                      <option value="">{t('matches.new.noTeam')}</option>
+                      {sportTeams.map((team) => (
+                        <option key={team.id} value={team.id}>
+                          {team.name}
                         </option>
                       ))}
                     </select>
-                    {!slot.pick && (
-                      <Input
-                        aria-label={t('matches.new.nameFor', { player: label })}
-                        placeholder={t('matches.new.namePlaceholder')}
-                        maxLength={60}
-                        value={slot.name}
-                        onChange={(e) => update({ name: e.target.value })}
-                      />
-                    )}
                   </div>
-                );
-              })}
-            </fieldset>
-          ))}
+                )}
+                {ui.namedSides && (
+                  <div className="space-y-1">
+                    <Label htmlFor={`side-name-${sideIndex}`}>
+                      {t('matches.new.sideName', { side: letter })}
+                    </Label>
+                    <Input
+                      id={`side-name-${sideIndex}`}
+                      maxLength={60}
+                      value={side.name}
+                      onChange={(e) => updateSide(sideIndex, { name: e.target.value })}
+                    />
+                  </div>
+                )}
+                {side.slots.map((slot, slotIndex) => {
+                  const id = `slot-${sideIndex}-${slotIndex}`;
+                  const update = (patch: Partial<Slot>) =>
+                    updateSide(sideIndex, {
+                      slots: side.slots.map((s, i) =>
+                        i === slotIndex ? { ...slot, ...patch } : s,
+                      ),
+                    });
+                  const label = t('matches.new.player', { side: letter, n: slotIndex + 1 });
+                  return (
+                    <div key={slotIndex} className="space-y-2">
+                      <Label htmlFor={`${id}-pick`}>{label}</Label>
+                      <select
+                        id={`${id}-pick`}
+                        className="h-11 w-full rounded-lg border bg-background px-3 text-sm"
+                        value={slot.pick}
+                        onChange={(e) => update({ pick: e.target.value })}
+                      >
+                        <option value="">{t('matches.new.typeName')}</option>
+                        {options.map((o) => (
+                          <option key={o.value} value={o.value}>
+                            {o.label}
+                            {o.rosterMemberId ? '' : ` · ${t('matches.new.guest')}`}
+                          </option>
+                        ))}
+                      </select>
+                      {!slot.pick && (
+                        <Input
+                          aria-label={t('matches.new.nameFor', { player: label })}
+                          placeholder={t('matches.new.namePlaceholder')}
+                          maxLength={60}
+                          value={slot.name}
+                          onChange={(e) => update({ name: e.target.value })}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+                {size.max > size.min && (
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={side.slots.length >= size.max}
+                      onClick={() => updateSide(sideIndex, { slots: [...side.slots, emptySlot()] })}
+                    >
+                      <Plus aria-hidden /> {t('matches.new.addPlayer', { side: letter })}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      disabled={side.slots.length <= size.min}
+                      onClick={() => updateSide(sideIndex, { slots: side.slots.slice(0, -1) })}
+                    >
+                      <Minus aria-hidden /> {t('matches.new.removePlayer')}
+                    </Button>
+                  </div>
+                )}
+              </fieldset>
+            );
+          })}
           <div className="space-y-1">
             <Label htmlFor="match-title">{t('matches.new.titleLabel')}</Label>
             <Input

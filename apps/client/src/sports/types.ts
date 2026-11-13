@@ -34,7 +34,10 @@ export interface SportUi {
   sport: SportKey;
   Setup: ComponentType<SetupProps>;
   defaultSetup: () => SportSetup;
-  playersPerSide: (config: Record<string, unknown>) => number;
+  /** How many players each side can have, and how many slots the wizard starts with. */
+  sideSize: (config: Record<string, unknown>) => { min: number; max: number; initial: number };
+  /** Team sports name their sides (often after a team); others are named after the players. */
+  namedSides: boolean;
   Scoreboard: ComponentType<MatchViewProps>;
   Controls: ComponentType<ControlsProps>;
   Scorecard: ComponentType<MatchViewProps>;
