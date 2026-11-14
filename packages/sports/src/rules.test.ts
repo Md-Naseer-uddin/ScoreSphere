@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { badmintonPresets } from './badminton/settings.js';
 import { chessPresets } from './chess/settings.js';
 import { type AnySportEngine, latestEngine } from './engines.js';
+import { previewRules } from './rule-preview.js';
 import { tennisPresets } from './tennis/settings.js';
 import { volleyballPresets } from './volleyball/settings.js';
 
@@ -181,5 +182,43 @@ describe('rules in the pilot sports', () => {
     // Each press was 1 s after the last, so each side used 2 s and gained two increments.
     expect(p.state.clocks[0].remainingMs).toBe(base - 2000 + 2 * inc + 60_000);
     expect(p.state.clocks[1].remainingMs).toBe(base - 2000 + 2 * inc + 60_000);
+  });
+});
+
+describe('rule preview', () => {
+  it.each(PILOT)('%s has a sample game that runs under its presets', (sport) => {
+    const engine = latestEngine(sport)!;
+    for (const preset of engine.presets) {
+      const config = { discipline: 'singles', ...preset.config };
+      const preview = previewRules(engine, config, []);
+      expect(preview, preset.key).not.toBeNull();
+      // A chess game with no clock has only its start: its rules are about the clock.
+      expect(preview!.timeline.length, preset.key).toBeGreaterThan(0);
+      expect(preview!.summary).toBe(preview!.summaryWithout);
+    }
+  });
+
+  it('shows what the cricket wide rule does in the sample over', () => {
+    const engine = latestEngine('cricket')!;
+    const rule: Rule = {
+      id: 'wides',
+      name: 'Three wides',
+      priority: 0,
+      trigger: 'ball',
+      conditions: [{ source: 'state', key: 'consecutive_wides', op: 'gte', value: 3 }],
+      actions: [
+        { command: 'penalty_runs', params: { runs: 5 } },
+        { command: 'reset_wide_count', params: {} },
+      ],
+    };
+    const config = engine.presets.find((p) => p.key === 't20')!.config as Record<string, unknown>;
+    const preview = previewRules(engine, config, [rule])!;
+    const fired = preview.timeline.filter((t) => t.derived?.length);
+    expect(fired).toHaveLength(1);
+    expect(fired[0]!.derived!.map((d) => d.command?.type)).toEqual([
+      'penalty_runs',
+      'reset_wide_count',
+    ]);
+    expect(preview.summary).not.toBe(preview.summaryWithout);
   });
 });
