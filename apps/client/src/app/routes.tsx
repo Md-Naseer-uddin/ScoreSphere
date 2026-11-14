@@ -15,7 +15,7 @@ import { MatchPage } from '@/features/matches/MatchPage';
 import { NewMatchPage } from '@/features/matches/NewMatchPage';
 import { ScoreMatchPage } from '@/features/matches/ScoreMatchPage';
 import { ProfilePage } from '@/features/profile/ProfilePage';
-import { SportsPage } from '@/features/sports/SportsPage';
+import { SportPage, SportsPage } from '@/features/sports/SportsPage';
 import { PlayerPage } from '@/features/stats/PlayerPage';
 import { RosterPage } from '@/features/teams/RosterPage';
 import { TeamDetailPage } from '@/features/teams/TeamDetailPage';
@@ -65,6 +65,7 @@ export const routes: RouteObject[] = [
         children: [
           { index: true, element: <HomePage /> },
           { path: 'sports', element: <SportsPage /> },
+          { path: 'sports/:sportKey', element: <SportPage /> },
           { path: 'matches', element: <MatchesPage /> },
           { path: 'matches/new', element: <NewMatchPage /> },
           { path: 'matches/:matchId', element: <MatchPage /> },
