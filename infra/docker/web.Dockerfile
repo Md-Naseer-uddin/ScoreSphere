@@ -15,6 +15,6 @@ COPY infra/docker/web.nginx.conf.template /etc/nginx/templates/default.conf.temp
 COPY infra/docker/security-headers.conf /etc/nginx/snippets/security-headers.conf
 COPY --from=build /repo/apps/client/dist /usr/share/nginx/html
 # The API is proxied under /api, so app and API share an origin (first-party refresh cookie).
-# API_UPSTREAM is substituted into the nginx config at start.
-ENV API_UPSTREAM=http://api:3300
+# API_HOSTPORT (host:port of the API) is substituted into the nginx config at start.
+ENV API_HOSTPORT=api:3300
 EXPOSE 8080
