@@ -85,7 +85,7 @@ export function ForgotPasswordPage() {
           </Button>
           <p className="text-center text-sm text-muted-foreground">{t('auth.noRecoveryCode')}</p>
           <p className="text-center text-sm">
-            <Link to="/auth/login" className="text-primary underline-offset-4 hover:underline">
+            <Link to="/auth/login" className="text-primary underline underline-offset-4">
               {t('auth.backToSignIn')}
             </Link>
           </p>

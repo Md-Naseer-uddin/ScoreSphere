@@ -64,7 +64,7 @@ export function StatsSummary({ stats }: { stats: PlayerStats }) {
               <li key={m.matchId} className="flex justify-between gap-2">
                 <Link
                   to={`/app/matches/${m.matchId}`}
-                  className="truncate text-primary underline-offset-4 hover:underline"
+                  className="truncate text-primary underline underline-offset-4"
                 >
                   {m.title || getSport(m.sport).name}
                 </Link>

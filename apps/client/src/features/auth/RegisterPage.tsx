@@ -105,11 +105,11 @@ export function RegisterPage() {
           </div>
           <p className="text-xs text-muted-foreground">
             {t('legal.consentBefore')}{' '}
-            <Link to="/terms" className="text-primary underline-offset-4 hover:underline">
+            <Link to="/terms" className="text-primary underline underline-offset-4">
               {t('legal.terms')}
             </Link>{' '}
             {t('legal.consentMiddle')}{' '}
-            <Link to="/privacy" className="text-primary underline-offset-4 hover:underline">
+            <Link to="/privacy" className="text-primary underline underline-offset-4">
               {t('legal.privacy')}
             </Link>
             .
@@ -121,7 +121,7 @@ export function RegisterPage() {
             {t('auth.haveAccount')}{' '}
             <Link
               to={`/auth/login?next=${encodeURIComponent(next)}`}
-              className="text-primary underline-offset-4 hover:underline"
+              className="text-primary underline underline-offset-4"
             >
               {t('auth.signIn')}
             </Link>

@@ -69,15 +69,12 @@ export function LoginPage() {
             {t('auth.signIn')}
           </Button>
           <div className="flex justify-between text-sm">
-            <Link
-              to="/auth/forgot-password"
-              className="text-primary underline-offset-4 hover:underline"
-            >
+            <Link to="/auth/forgot-password" className="text-primary underline underline-offset-4">
               {t('auth.forgotPassword')}
             </Link>
             <Link
               to={`/auth/register?next=${encodeURIComponent(next)}`}
-              className="text-primary underline-offset-4 hover:underline"
+              className="text-primary underline underline-offset-4"
             >
               {t('auth.createAccount')}
             </Link>

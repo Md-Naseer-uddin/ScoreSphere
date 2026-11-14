@@ -45,7 +45,7 @@ export function DownloadPage() {
               {info.releaseNotesUrl && (
                 <a
                   href={info.releaseNotesUrl}
-                  className="text-primary underline-offset-4 hover:underline"
+                  className="text-primary underline underline-offset-4"
                   rel="noopener"
                 >
                   {t('download.releaseNotes')}

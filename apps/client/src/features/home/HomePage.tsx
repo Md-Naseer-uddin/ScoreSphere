@@ -19,7 +19,7 @@ export function HomePage() {
         </Button>
       </div>
       <p className="text-sm text-muted-foreground">
-        <Link to="/download" className="text-primary underline-offset-4 hover:underline">
+        <Link to="/download" className="text-primary underline underline-offset-4">
           {t('home.getApp')}
         </Link>
       </p>

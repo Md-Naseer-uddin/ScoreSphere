@@ -83,7 +83,7 @@ export function YourDataCard() {
         <CardTitle>{t('yourData.title')}</CardTitle>
         <CardDescription>
           {t('yourData.body')}{' '}
-          <Link to="/privacy" className="text-primary underline-offset-4 hover:underline">
+          <Link to="/privacy" className="text-primary underline underline-offset-4">
             {t('legal.privacy')}
           </Link>
         </CardDescription>
