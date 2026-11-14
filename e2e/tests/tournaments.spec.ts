@@ -102,4 +102,11 @@ test('a league: fixtures, scoring, standings, awards, and republishing after a c
   await expect(page.getByText('Awards published')).toBeVisible();
   await expect(page.getByTestId('tournament-award-champion')).toContainText('Ravi');
   await expect(page.getByTestId('tournament-award-runner-up')).toContainText('Asha');
+
+  // Asha's player page reflects the corrected result.
+  await page.goto('/app/teams/roster');
+  await page.getByRole('link', { name: 'Asha' }).click();
+  await expect(page.getByTestId('stats-badminton')).toContainText(
+    '1 played · 0 won · 0 drawn · 1 lost',
+  );
 });

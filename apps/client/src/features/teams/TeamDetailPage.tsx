@@ -1,6 +1,7 @@
 import { getSport } from '@scoresphere/sports';
+import { TeamStatsCard } from '@/features/stats/TeamStatsCard';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -51,6 +52,8 @@ export function TeamDetailPage() {
         />
       )}
 
+      <TeamStatsCard workspaceId={team.workspaceId} teamId={team.id} />
+
       {members.length === 0 ? (
         <p className="rounded-xl border border-dashed p-6 text-center text-muted-foreground">
           {t('teams.noMembers')}
@@ -64,7 +67,12 @@ export function TeamDetailPage() {
                 <AvatarFallback>{initials(rosterMember.displayName)}</AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
-                <p className="truncate font-medium">{rosterMember.displayName}</p>
+                <Link
+                  to={`/app/players/${rosterMember.id}`}
+                  className="block truncate font-medium hover:underline"
+                >
+                  {rosterMember.displayName}
+                </Link>
                 {(jerseyNumber ?? rosterMember.jerseyNumber) && (
                   <p className="text-sm text-muted-foreground">
                     {t('teams.jerseyShort', { number: jerseyNumber ?? rosterMember.jerseyNumber })}

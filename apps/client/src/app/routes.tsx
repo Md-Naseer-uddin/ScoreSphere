@@ -16,6 +16,7 @@ import { NewMatchPage } from '@/features/matches/NewMatchPage';
 import { ScoreMatchPage } from '@/features/matches/ScoreMatchPage';
 import { ProfilePage } from '@/features/profile/ProfilePage';
 import { SportsPage } from '@/features/sports/SportsPage';
+import { PlayerPage } from '@/features/stats/PlayerPage';
 import { RosterPage } from '@/features/teams/RosterPage';
 import { TeamDetailPage } from '@/features/teams/TeamDetailPage';
 import { TeamsPage } from '@/features/teams/TeamsPage';
@@ -68,6 +69,7 @@ export const routes: RouteObject[] = [
           { path: 'tournaments', element: <TournamentsPage /> },
           { path: 'tournaments/new', element: <NewTournamentPage /> },
           { path: 'tournaments/:tournamentId', element: <TournamentPage /> },
+          { path: 'players/:rosterMemberId', element: <PlayerPage /> },
           { path: 'teams', element: <TeamsPage /> },
           { path: 'teams/roster', element: <RosterPage /> },
           { path: 'teams/:teamId', element: <TeamDetailPage /> },

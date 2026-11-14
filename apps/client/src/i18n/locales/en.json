@@ -768,7 +768,14 @@
       "breaks": "Breaks",
       "points_scored": "Points scored",
       "attack_points": "Attack points",
-      "block_points": "Block points"
+      "block_points": "Block points",
+      "fours": "Fours",
+      "sixes": "Sixes",
+      "maidens": "Maidens",
+      "catches": "Catches",
+      "service_points_won": "Points won on serve",
+      "service_aces": "Aces",
+      "moves": "Moves"
     }
   },
   "legal": {
@@ -858,5 +865,19 @@
     "needsReview": "Needs review",
     "republish": "Publish awards",
     "awardsPublished": "Awards published"
+  },
+  "stats": {
+    "player": "Player",
+    "none": "No completed matches yet.",
+    "needsOnline": "Connect to the internet to see statistics.",
+    "record": "{{played}} played · {{won}} won · {{drawn}} drawn · {{lost}} lost",
+    "recent": "Recent matches",
+    "result": {
+      "won": "Won",
+      "drawn": "Drawn",
+      "lost": "Lost"
+    },
+    "teamRecord": "Team record",
+    "mine": "My statistics"
   }
 }

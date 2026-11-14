@@ -1,5 +1,6 @@
 import { hasRole, type RosterMember } from '@scoresphere/contracts';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -80,7 +81,12 @@ export function RosterPage() {
                 <AvatarImage src={mediaUrl(member.avatarUrl)} alt="" />
                 <AvatarFallback>{initials(member.displayName)}</AvatarFallback>
               </Avatar>
-              <p className="min-w-0 flex-1 truncate font-medium">{member.displayName}</p>
+              <Link
+                to={`/app/players/${member.id}`}
+                className="min-w-0 flex-1 truncate font-medium hover:underline"
+              >
+                {member.displayName}
+              </Link>
               <LinkBadge link={member.link} />
               {canManage && member.link === 'NONE' && (
                 <LinkPhoneDialog workspaceId={workspace.id} member={member} />

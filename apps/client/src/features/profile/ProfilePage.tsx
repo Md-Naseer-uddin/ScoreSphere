@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { logout } from '@/features/auth/auth-api';
+import { MyStatsCard } from '@/features/stats/TeamStatsCard';
 import { AvatarSection } from './AvatarSection';
 import { DevicesCard } from './DevicesCard';
 import { getMe, profileKeys } from './profile-api';
@@ -27,6 +28,7 @@ export function ProfilePage() {
       <h1 className="sr-only">{t('profile.title')}</h1>
       <AvatarSection me={me} />
       <RosterLinksCard />
+      <MyStatsCard />
       <ProfileDetailsCard me={me} />
       <SecurityCard me={me} />
       <YourDataCard />
