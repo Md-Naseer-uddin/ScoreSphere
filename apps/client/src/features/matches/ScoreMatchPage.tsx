@@ -117,7 +117,8 @@ export function ScoreMatchPage() {
       }
       const last = result.value.timeline[result.value.timeline.length - 1];
       if (input.kind === 'COMMAND' && last) {
-        for (const message of ui.announce?.(last.facts, match.sides) ?? []) toast.info(message);
+        const facts = [...last.facts, ...(last.derived ?? []).flatMap((d) => d.facts)];
+        for (const message of ui.announce?.(facts, match.sides) ?? []) toast.info(message);
       }
       void syncMatch(matchId);
       return true;

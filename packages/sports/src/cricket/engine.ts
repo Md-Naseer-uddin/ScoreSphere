@@ -10,6 +10,8 @@ import {
 } from '@scoresphere/engine-kit';
 import { z } from 'zod';
 import { cricketPresets, type CricketSettings, cricketSettingsSchema } from './settings.js';
+import { DELIVERY_KINDS, DISMISSALS } from './kinds.js';
+import { cricketRuleCatalogue, cricketRuleVariables } from './rules.js';
 import { cricketStats } from './stats.js';
 
 /**
@@ -24,18 +26,7 @@ type Side = 0 | 1;
 export type End = 'striker' | 'non_striker';
 const sideSchema = z.union([z.literal(0), z.literal(1)]);
 
-export const DISMISSALS = [
-  'bowled',
-  'caught',
-  'lbw',
-  'run_out',
-  'stumped',
-  'hit_wicket',
-  'obstructing_field',
-  'hit_ball_twice',
-  'timed_out',
-  'one_tip_one_hand',
-] as const;
+export { DELIVERY_KINDS, DISMISSALS };
 export type DismissalKind = (typeof DISMISSALS)[number] | 'six_and_out' | 'retired_out';
 
 /** Dismissals credited to the bowler (Laws 32–39). One-tip-one-hand counts as a catch. */
@@ -48,16 +39,6 @@ const BOWLER_CREDITED = new Set<DismissalKind>([
   'one_tip_one_hand',
 ]);
 
-/** How the runs on a delivery were scored. Wides and no-balls are re-bowled. */
-export const DELIVERY_KINDS = [
-  'bat',
-  'bye',
-  'leg_bye',
-  'wide',
-  'no_ball_bat',
-  'no_ball_bye',
-  'no_ball_leg_bye',
-] as const;
 export type DeliveryKind = (typeof DELIVERY_KINDS)[number];
 
 const wicketSchema = z.object({
@@ -97,6 +78,10 @@ export const cricketCommandSchema = z.discriminatedUnion('type', [
     side: sideSchema,
     reason: z.enum(['forfeit', 'walkover']),
   }),
+  /** Extra runs to the batting side, e.g. from a local rule (D16b). */
+  z.object({ type: z.literal('penalty_runs'), runs: z.int().min(1).max(10) }),
+  /** Starts the count of wides in a row again (used by rules). */
+  z.object({ type: z.literal('reset_wide_count') }),
 ]);
 export type CricketCommand = z.infer<typeof cricketCommandSchema>;
 type Cmd<T extends CricketCommand['type']> = Extract<CricketCommand, { type: T }>;
@@ -357,8 +342,19 @@ function validate(state: CricketState, cmd: CricketCommand): Result<void, Engine
         : fail('NOT_NOW', 'There is no innings to declare.');
     case 'concede':
       return state.phase === 'complete' ? fail('MATCH_OVER', 'The match is over.') : ok(undefined);
+    case 'penalty_runs':
+    case 'reset_wide_count':
+      return inn && !inn.closed && OPEN_PHASES.includes(state.phase)
+        ? ok(undefined)
+        : fail('NOT_NOW', 'There is no innings in progress.');
   }
 }
+
+const OPEN_PHASES: readonly CricketState['phase'][] = [
+  'in_play',
+  'awaiting_bowler',
+  'awaiting_batter',
+];
 
 function validateDelivery(state: CricketState, cmd: Cmd<'delivery'>): Result<void, EngineError> {
   const inn = currentInnings(state);
@@ -594,6 +590,20 @@ function apply(
     case 'declare': {
       const { next, inn } = editable(state);
       return closeInnings(next, inn, 'declared', []);
+    }
+    case 'penalty_runs': {
+      const { next, inn } = editable(state);
+      inn.runs += cmd.runs;
+      inn.extras.penalties += cmd.runs;
+      const facts: DomainFact[] = [{ type: 'penalty_runs', data: { runs: cmd.runs } }];
+      if (inn.target !== null && inn.runs >= inn.target)
+        return closeInnings(next, inn, 'target', facts);
+      return { state: next, facts };
+    }
+    case 'reset_wide_count': {
+      const { next, inn } = editable(state);
+      inn.consecutiveWides = 0;
+      return { state: next, facts: [] };
     }
     case 'concede': {
       const winner = other(cmd.side);
@@ -965,4 +975,6 @@ export const cricketEngine: SportEngine<CricketState, CricketSettings, CricketCo
   isComplete: (state) => state.phase === 'complete',
   result,
   stats: cricketStats,
+  ruleCatalogue: cricketRuleCatalogue,
+  ruleVariables: cricketRuleVariables,
 };

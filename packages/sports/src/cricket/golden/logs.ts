@@ -1,3 +1,4 @@
+import type { Rule } from '@scoresphere/contracts';
 import type { CricketSettings } from '../settings.js';
 
 /**
@@ -21,6 +22,8 @@ export interface CricketGoldenLog {
   name: string;
   source: string;
   config: CricketSettings;
+  /** Custom rules pinned in the match (D16b). */
+  rules?: Rule[];
   players: { A: string[]; B: string[] };
   script: string[];
   expected: {
@@ -160,6 +163,73 @@ export const cricketGoldenLogs: CricketGoldenLog[] = [
       oneTipOneHand: true,
       consecutiveWides: { threshold: 3, penaltyRuns: 1 },
     },
+    players: { A: ['a1', 'a2', 'a3'], B: ['b1', 'b2', 'b3'] },
+    script: [
+      'innings A a1 a2',
+      'bowler b1',
+      'wd wd wd 6!',
+      'next a3',
+      'W:one_tip_one_hand:b2',
+      '1 2 0 0',
+      'bowler b1',
+      '4! W',
+      'innings b1 b2',
+      'bowler a1',
+      '6!',
+      'next b3',
+      '4! 4! 4!',
+    ],
+    expected: {
+      innings: [
+        {
+          score: '11 (1.2)',
+          extras: { wides: 3, noBalls: 0, byes: 0, legByes: 0, penalties: 1 },
+          batters: {
+            a1: [0, 1, 0, 0, 'six and out'],
+            a2: [7, 6, 1, 0, 'b b1'],
+            a3: [0, 1, 0, 0, 'one tip one hand b2 b b1'],
+          },
+          bowlers: { b1: ['1.2', 0, 10, 2] },
+          fallOfWickets: '1-4 (0.1), 2-4 (0.2), 3-11 (1.2)',
+        },
+        {
+          score: '12/1 (0.4)',
+          batters: { b1: [0, 1, 0, 0, 'six and out'], b3: [12, 3, 3, 0, 'not out'] },
+        },
+      ],
+      summary: '11 (1.2) · 12/1 (0.4) · won by 2 wickets',
+      winner: 'B',
+    },
+  },
+  {
+    name: 'The same gully game with the wide penalty as a custom rule (M8)',
+    source: 'constructed',
+    config: {
+      ...base,
+      playersPerSide: 6,
+      allowConsecutiveOvers: true,
+      freeHit: false,
+      lastManStands: true,
+      sixAndOut: 'out_no_runs',
+      oneTipOneHand: true,
+      consecutiveWides: null,
+    },
+    rules: [
+      {
+        id: 'three-wides',
+        name: 'Three wides in a row: 1 penalty run',
+        priority: 50,
+        trigger: 'ball',
+        conditions: [
+          { source: 'fact', key: 'kind', op: 'eq', value: 'wide' },
+          { source: 'state', key: 'consecutive_wides', op: 'gte', value: 3 },
+        ],
+        actions: [
+          { command: 'penalty_runs', params: { runs: 1 } },
+          { command: 'reset_wide_count', params: {} },
+        ],
+      },
+    ],
     players: { A: ['a1', 'a2', 'a3'], B: ['b1', 'b2', 'b3'] },
     script: [
       'innings A a1 a2',

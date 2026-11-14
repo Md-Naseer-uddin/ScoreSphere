@@ -365,7 +365,9 @@
       "title": "Recent events",
       "corrected": "corrected",
       "undone": "undone",
-      "flagged": "flagged for review"
+      "flagged": "flagged for review",
+      "rule": "Rule “{{name}}”: {{effect}}",
+      "ruleSkipped": "Rule “{{name}}” could not apply: {{reason}}"
     },
     "new": {
       "title": "New match",
@@ -604,13 +606,17 @@
       "concede": {
         "forfeit": "{{name}} forfeited",
         "walkover": "{{name}} gave a walkover"
-      }
+      },
+      "penaltyRuns_one": "{{count}} penalty run",
+      "penaltyRuns_other": "{{count}} penalty runs",
+      "resetWides": "wides in a row counted from zero"
     },
     "announce": {
       "wicket": "Wicket!",
       "overComplete": "End of over {{over}}",
       "inningsClosed": "Innings over",
       "widePenalty": "{{runs}} penalty run(s) for wides in a row",
+      "penaltyRuns": "{{runs}} penalty run(s)",
       "superOver": "Scores level: super over"
     },
     "setup": {

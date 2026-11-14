@@ -1112,6 +1112,10 @@ function describe(entry: Entry, sides: SideView[]): string {
       return tr('cricket.declare');
     case 'concede':
       return tr(`cricket.text.concede.${cmd.reason}`, { name: sideName(sides, cmd.side) });
+    case 'penalty_runs':
+      return tr('cricket.text.penaltyRuns', { count: cmd.runs });
+    case 'reset_wide_count':
+      return tr('cricket.text.resetWides');
   }
 }
 
@@ -1126,6 +1130,8 @@ function announce(facts: Entry['facts']): string[] {
         return [tr('cricket.announce.inningsClosed')];
       case 'wide_penalty':
         return [tr('cricket.announce.widePenalty', { runs: f.data?.runs })];
+      case 'penalty_runs':
+        return [tr('cricket.announce.penaltyRuns', { runs: f.data?.runs })];
       case 'super_over_needed':
         return [tr('cricket.announce.superOver')];
       default:

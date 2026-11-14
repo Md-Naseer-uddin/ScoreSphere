@@ -1,4 +1,5 @@
-import { append, type LedgerEvent, replay } from '@scoresphere/engine-kit';
+import type { Rule } from '@scoresphere/contracts';
+import { append, type LedgerEvent, replay, validateRules } from '@scoresphere/engine-kit';
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 import {
@@ -9,6 +10,7 @@ import {
   currentInnings,
 } from './engine.js';
 import { cricketParticipantId, runCricketGoldenLog } from './golden/run.js';
+import { cricketRuleCatalogue } from './rules.js';
 import { cricketPresets, type CricketSettings } from './settings.js';
 
 const t20 = cricketPresets.find((p) => p.key === 't20')!.config;
@@ -385,6 +387,100 @@ describe('properties', () => {
         },
       ),
       { numRuns: 80 },
+    );
+  });
+});
+
+describe('custom rules', () => {
+  const wideRule = (threshold: number, runs: number): Rule => ({
+    id: 'wides',
+    name: 'Wides in a row',
+    priority: 0,
+    trigger: 'ball',
+    conditions: [
+      { source: 'fact', key: 'kind', op: 'eq', value: 'wide' },
+      { source: 'state', key: 'consecutive_wides', op: 'gte', value: threshold },
+    ],
+    actions: [
+      { command: 'penalty_runs', params: { runs } },
+      { command: 'reset_wide_count', params: {} },
+    ],
+  });
+  const withRules = (rules: Rule[], script: string[], config = small) =>
+    runCricketGoldenLog({
+      name: 'test',
+      source: 'test',
+      config,
+      rules,
+      players: { A, B },
+      script,
+      expected: { innings: [], summary: '', winner: null },
+    });
+
+  it('accepts only rules built from the cricket catalogue', () => {
+    expect(validateRules(cricketRuleCatalogue, [wideRule(3, 1)])).toEqual([]);
+    const bad = { ...wideRule(3, 1), actions: [{ command: 'add_wicket', params: {} }] };
+    expect(validateRules(cricketRuleCatalogue, [bad]).map((p) => p.code)).toEqual([
+      'UNKNOWN_COMMAND',
+    ]);
+  });
+
+  it('gives penalty runs after wides in a row, and the count starts again', () => {
+    const run = withRules([wideRule(2, 5)], ['innings A a1 a2', 'bowler b1', 'wd wd wd wd wd 1']);
+    const inn = currentInnings(run.projection.state)!;
+    expect(inn.extras).toMatchObject({ wides: 5, penalties: 10 });
+    expect(inn.runs).toBe(16);
+    expect(inn.consecutiveWides).toBe(0);
+    const fired = run.projection.timeline.flatMap((t) => t.derived ?? []);
+    expect(fired.map((d) => d.command?.type)).toEqual([
+      'penalty_runs',
+      'reset_wide_count',
+      'penalty_runs',
+      'reset_wide_count',
+    ]);
+    // Team runs and extras in the statistics include the rule's runs.
+    const stats = engine.stats(run.projection.state);
+    expect(stats.find((r) => r.metric === 'runs' && !r.participantId)?.value).toBe(16);
+    expect(stats.find((r) => r.metric === 'extras' && !r.participantId)?.value).toBe(15);
+  });
+
+  it('drops the penalty when the wide that earned it is undone', () => {
+    const run = withRules([wideRule(2, 5)], ['innings A a1 a2', 'bowler b1', 'wd wd']);
+    const last = run.events.at(-1)!;
+    const voided = replay(engine, [
+      ...run.events,
+      {
+        seq: last.seq + 1,
+        kind: 'VOID',
+        targetSeq: last.seq,
+        occurredAt: last.occurredAt + 1,
+        payload: {},
+      },
+    ]);
+    expect(voided.ok && currentInnings(voided.value.state)!.runs).toBe(1);
+  });
+
+  it('ends a chase when penalty runs reach the target', () => {
+    const run = withRules(
+      [wideRule(2, 5)],
+      [
+        'innings A a1 a2',
+        'bowler b1',
+        '4! 0 0 0 0 0',
+        'declare',
+        'innings b1 b2',
+        'bowler a1',
+        'wd wd',
+      ],
+    );
+    expect(run.projection.state.phase).toBe('complete');
+    expect(run.projection.status).toBe('completed');
+    expect(currentInnings(run.projection.state)!.closed).toBe('target');
+  });
+
+  it('refuses penalty runs outside an innings', () => {
+    expect(engine.validate(play([]).projection.state, { type: 'penalty_runs', runs: 5 }).ok).toBe(
+      false,
     );
   });
 });

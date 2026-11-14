@@ -48,6 +48,19 @@ export function Timeline({
                     {t('matches.timeline.flagged')}
                   </span>
                 )}
+                {entry.derived?.map((effect, i) => (
+                  <span key={i} className="block text-xs text-muted-foreground">
+                    {effect.invalid
+                      ? t('matches.timeline.ruleSkipped', {
+                          name: effect.ruleName,
+                          reason: effect.invalid.message,
+                        })
+                      : t('matches.timeline.rule', {
+                          name: effect.ruleName,
+                          effect: ui.describe(effect, sides),
+                        })}
+                  </span>
+                ))}
               </span>
               {correction && (
                 <Button

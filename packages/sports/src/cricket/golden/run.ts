@@ -106,6 +106,7 @@ export function runCricketGoldenLog(log: CricketGoldenLog): CricketGoldenRun {
             { side: 1, participantIds: log.players.B.map((h) => ids[h]) },
           ],
         },
+        ...(log.rules ? { rules: log.rules } : {}),
       },
     },
   ];
