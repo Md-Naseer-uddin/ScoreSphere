@@ -81,7 +81,7 @@ export interface TennisState {
 const other = (s: Side): Side => (s === 0 ? 1 : 0);
 const pair = (): [number, number] => [0, 0];
 
-export function sideOf(state: TennisState, playerId: string): Side {
+export function tennisSideOf(state: TennisState, playerId: string): Side {
   return state.players[0].includes(playerId) ? 0 : 1;
 }
 
@@ -103,7 +103,7 @@ function isDecidingSet(state: TennisState): boolean {
 }
 
 /** Who serves the next point. */
-export function currentServer(state: TennisState): string | null {
+export function tennisCurrentServer(state: TennisState): string | null {
   if (state.phase !== 'playing') return null;
   const { game, rotation } = state;
   const played = game.points[0] + game.points[1];
@@ -245,8 +245,8 @@ function apply(
 
 function point(state: TennisState, winner: Side): { state: TennisState; facts: DomainFact[] } {
   const { config } = state;
-  const server = currentServer(state)!;
-  const servingSide = sideOf(state, server);
+  const server = tennisCurrentServer(state)!;
+  const servingSide = tennisSideOf(state, server);
   const facts: DomainFact[] = [];
 
   const stats = {

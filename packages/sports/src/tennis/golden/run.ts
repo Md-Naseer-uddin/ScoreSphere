@@ -1,5 +1,10 @@
 import { append, type LedgerEvent, type MatchProjection, replay } from '@scoresphere/engine-kit';
-import { currentServer, type TennisCommand, tennisEngine, type TennisState } from '../engine.js';
+import {
+  tennisCurrentServer,
+  type TennisCommand,
+  tennisEngine,
+  type TennisState,
+} from '../engine.js';
 import type { TennisSettings } from '../settings.js';
 import type { TennisGoldenLog } from './logs.js';
 
@@ -88,7 +93,7 @@ export function runTennisGoldenLog(log: TennisGoldenLog): TennisGoldenRun {
           : [...body!];
         for (const w of winners) {
           const state = projection.state;
-          const server = byId[currentServer(state)!]!;
+          const server = byId[tennisCurrentServer(state)!]!;
           if (state.game.points[0] + state.game.points[1] === 0) gameServers.push(server);
           pointServers.push(server);
           command({ type: 'point', winner: side(w) }, token);

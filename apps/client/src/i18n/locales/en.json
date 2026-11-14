@@ -307,7 +307,8 @@
       "retired": "Retired",
       "walkover": "Walkover (didn't play)",
       "disqualified": "Disqualified",
-      "forfeit": "Forfeited"
+      "forfeit": "Forfeited",
+      "defaulted": "Defaulted"
     },
     "abandon": "Abandon match",
     "abandonBody": "The match ends with no result. You can undo this straight afterwards.",
@@ -635,6 +636,107 @@
         "once": "One super over",
         "until_decided": "Super overs until there is a winner"
       }
+    }
+  },
+  "tennis": {
+    "noAd": "No-ad scoring (deciding point at deuce)",
+    "deuce": "Deuce",
+    "advantage": "Advantage {{name}}",
+    "tiebreakScore": "Tie-break {{score}}",
+    "serving": "{{name}} serving",
+    "firstServerFor": "First server for {{name}}",
+    "startMatch": "Start match",
+    "metric": {
+      "points_won": "Points won",
+      "service_points_won": "Service points won",
+      "breaks": "Breaks of serve",
+      "tiebreaks_won": "Tie-breaks won"
+    },
+    "timeline": {
+      "point": "Point {{name}}",
+      "game": "Game {{name}} · {{games}}",
+      "set": "Set {{name}}",
+      "start": "{{name}} to serve"
+    },
+    "announce": {
+      "break": "Break of serve: {{name}}",
+      "set": "Set to {{name}}"
+    }
+  },
+  "volleyball": {
+    "setsWon": "Sets won",
+    "serviceLine": "Set {{set}}: {{server}} serving",
+    "timeouts": "Timeouts {{a}}–{{b}} of {{max}}",
+    "setScore": "Set {{set}}: {{score}}",
+    "lineupHint": "Tap {{size}} players in rotation order, starting with position I (the server).",
+    "position": "{{n}}.",
+    "lineup": "{{name}} line-up",
+    "startSet": "Start set {{set}}",
+    "servesFirst": "{{name}} serves first in this set.",
+    "whoScored": "Who scored for {{name}}?",
+    "kind": {
+      "attack": "Attack",
+      "block": "Block",
+      "ace": "Ace"
+    },
+    "opponentError": "Opponent error",
+    "substitution": "Substitution",
+    "team": "Team",
+    "playerOut": "Player out",
+    "playerIn": "Player in",
+    "confirmSub": "Make substitution",
+    "recordScorer": "Record who scored each point",
+    "timeoutFor": "Timeout {{name}}",
+    "player": "Player",
+    "timeline": {
+      "startSet": "Set started: {{name}} serves",
+      "sub": "{{in}} on for {{out}}",
+      "timeout": "Timeout {{name}}"
+    },
+    "setup": {
+      "playersOnCourt": "Players on court",
+      "setsToWin": "Sets to win",
+      "pointsPerSet": "Points per set",
+      "decidingSetPoints": "Deciding set points",
+      "substitutionsPerSet": "Substitutions per set",
+      "timeoutsPerSet": "Timeouts per set"
+    }
+  },
+  "chess": {
+    "timeControl": "Time control",
+    "adjust": "Adjust",
+    "baseMinutes": "Minutes",
+    "incrementSeconds": "Increment (s)",
+    "delaySeconds": "Delay (s)",
+    "white": "White",
+    "black": "Black",
+    "moves_one": "{{count}} move",
+    "moves_other": "{{count}} moves",
+    "whoIsWhite": "Who plays White?",
+    "startClock": "Start White's clock",
+    "press": "{{name}}: moved",
+    "flagFell": "{{name}}'s time ran out",
+    "flagHelp": "Usually a loss on time. It is a draw if {{name}} cannot checkmate by any legal moves.",
+    "lossOnTime": "Loss on time",
+    "drawOnTime": "Draw (no mating material)",
+    "recordResult": "Record result",
+    "howEnded": "How did the game end?",
+    "winner": "Who won?",
+    "inProgress": "Game in progress",
+    "ending": {
+      "checkmate": "Checkmate",
+      "resignation": "Resignation",
+      "agreement": "Draw agreed",
+      "stalemate": "Stalemate",
+      "repetition": "Threefold repetition",
+      "fifty_move": "50-move rule",
+      "insufficient_material": "Insufficient material",
+      "forfeit": "Forfeit"
+    },
+    "timeline": {
+      "start": "{{name}} has White; clock started",
+      "press": "{{name}} moved ({{time}})",
+      "flag": "{{name}}'s flag fell"
     }
   }
 }

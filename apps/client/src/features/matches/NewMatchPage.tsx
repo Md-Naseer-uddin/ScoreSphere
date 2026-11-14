@@ -35,6 +35,7 @@ interface SideDraft {
 }
 
 const emptySlot = (): Slot => ({ pick: '', name: '' });
+const isEmpty = (slot: Slot) => !slot.pick && !slot.name.trim();
 const LETTERS = ['A', 'B'] as const;
 type Step = 'sport' | 'format' | 'players';
 
@@ -108,11 +109,15 @@ export function NewMatchPage() {
 
   const chooseSetup = (next: SportSetup) => {
     setSetup(next);
-    const { min, max } = ui!.sideSize(next.config);
+    const { min, max, initial } = ui!.sideSize(next.config);
     setSides((current) =>
       current.map((side) => {
         const slots = side.slots.slice(0, max);
-        while (slots.length < min) slots.push(emptySlot());
+        // Drop empty slots left over from the previous settings, down to the new size.
+        while (slots.length > initial && slots.length > min && isEmpty(slots[slots.length - 1]!)) {
+          slots.pop();
+        }
+        while (slots.length < Math.max(min, Math.min(initial, max))) slots.push(emptySlot());
         return { ...side, slots };
       }),
     );
