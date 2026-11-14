@@ -7,6 +7,7 @@ import { cricketRules } from './cricket/content.js';
 import { hockeyRules } from './field-hockey/content.js';
 import { footballRules } from './football/content.js';
 import { kabaddiRules } from './kabaddi/content.js';
+import { khoKhoRules } from './kho-kho/content.js';
 import { tennisRules } from './tennis/content.js';
 import { volleyballRules } from './volleyball/content.js';
 
@@ -18,6 +19,7 @@ const RULES_CONTENT: Partial<Record<SportKey, RulesContent>> = {
   football: footballRules,
   'field-hockey': hockeyRules,
   kabaddi: kabaddiRules,
+  'kho-kho': khoKhoRules,
   tennis: tennisRules,
   volleyball: volleyballRules,
 };

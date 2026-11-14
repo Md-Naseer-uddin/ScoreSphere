@@ -6,6 +6,7 @@ import { chessEngine } from './chess/engine.js';
 import { cricketEngine } from './cricket/engine.js';
 import { hockeyEngine } from './field-hockey/engine.js';
 import { kabaddiEngine } from './kabaddi/engine.js';
+import { khoKhoEngine } from './kho-kho/engine.js';
 import { footballEngine } from './football/engine.js';
 import { tennisEngine } from './tennis/engine.js';
 import { volleyballEngine } from './volleyball/engine.js';
@@ -27,6 +28,7 @@ const registry: readonly AnySportEngine[] = [
   footballEngine,
   hockeyEngine,
   kabaddiEngine,
+  khoKhoEngine,
   tennisEngine,
   volleyballEngine,
 ];

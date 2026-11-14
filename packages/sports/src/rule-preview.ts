@@ -163,6 +163,28 @@ const SAMPLES: Partial<Record<SportKey, RuleSample>> = {
       ];
     },
   },
+  'kho-kho': {
+    playersPerSide: () => 3,
+    commands: (_config, ids) => {
+      const out = (chaser: string | undefined, kind = 'touch'): Command => ({
+        type: 'out',
+        kind,
+        ...(chaser ? { chaserId: chaser } : {}),
+      });
+      return [
+        { type: 'start_turn', chasing: 0 },
+        out(ids[0][0]),
+        out(ids[0][1], 'pole_dive'),
+        out(undefined, 'out_of_field'),
+        out(ids[0][0]),
+        { type: 'end_turn' },
+        { type: 'start_turn' },
+        out(ids[1][0]),
+        out(ids[1][2]),
+        { type: 'end_turn' },
+      ];
+    },
+  },
   chess: {
     playersPerSide: () => 1,
     commands: () => [

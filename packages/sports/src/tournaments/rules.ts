@@ -6,6 +6,7 @@ import type { CricketState } from '../cricket/engine.js';
 import type { HockeyState } from '../field-hockey/engine.js';
 import type { FootballState } from '../football/engine.js';
 import type { KabaddiState } from '../kabaddi/engine.js';
+import type { KhoKhoState } from '../kho-kho/engine.js';
 import type { TennisState } from '../tennis/engine.js';
 import type { VolleyballState } from '../volleyball/engine.js';
 import type { StandingsPoints } from './standings.js';
@@ -320,6 +321,30 @@ const RULES: Partial<Record<SportKey, TournamentRules>> = {
         criteria: 'Most tackle points; then most super tackles; still level, shared.',
         metric: 'tackle_points',
         tieBreak: { metric: 'super_tackles', lowerIsBetter: false },
+      },
+    ],
+  },
+  'kho-kho': {
+    points: { win: 2, draw: 1, loss: 0 },
+    tieBreaks: ['point_difference'],
+    allowedTieBreaks: ['point_difference', 'wins'],
+    allowsDraws: true,
+    totals: (state: KhoKhoState, side) => ({
+      pointsFor: state.score[side],
+      pointsAgainst: state.score[side === 0 ? 1 : 0],
+    }),
+    leaderboards: [
+      { metric: 'outs_made', label: 'Most defenders put out' },
+      { metric: 'pole_dives', label: 'Most pole dives' },
+    ],
+    playerAwards: [
+      {
+        key: 'best-chaser',
+        name: 'Best Chaser',
+        criteria:
+          'Most defenders put out over the tournament; then most pole dives; still level, shared.',
+        metric: 'outs_made',
+        tieBreak: { metric: 'pole_dives', lowerIsBetter: false },
       },
     ],
   },
