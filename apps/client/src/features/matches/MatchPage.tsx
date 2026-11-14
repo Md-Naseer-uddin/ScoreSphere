@@ -150,7 +150,13 @@ export function MatchPage() {
         )}
       </div>
 
-      {projection && ui && <ui.Scoreboard projection={projection} sides={sides} />}
+      {projection && ui && (
+        <ui.Scoreboard
+          projection={projection}
+          sides={sides}
+          clockOffsetMs={scoredHere ? 0 : stream.clockOffsetMs}
+        />
+      )}
 
       <div className="flex flex-wrap gap-2">
         {scoredHere && status !== 'completed' && status !== 'abandoned' && (

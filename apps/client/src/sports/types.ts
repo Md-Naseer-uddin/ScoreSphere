@@ -18,6 +18,8 @@ export interface SetupProps {
 export interface MatchViewProps {
   projection: AnyProjection;
   sides: SideView[];
+  /** Add to `Date.now()` to get the scoring device's time; 0 on the scoring device. */
+  clockOffsetMs?: number;
 }
 
 export interface ControlsProps extends MatchViewProps {

@@ -27,6 +27,19 @@ import { MatchUpdatesListener } from './match-updates.listener';
 
 const HEARTBEAT_MS = 20_000;
 type LinkRow = typeof matchShareLinks.$inferSelect;
+type EventRow = typeof matchEvents.$inferSelect;
+
+/** Server time now, and how far the scoring device's clock is from it (latest event). */
+function clockSync(events: EventRow[]) {
+  const latest = events.reduce<EventRow | undefined>(
+    (a, e) => (!a || e.seq > a.seq ? e : a),
+    undefined,
+  );
+  return {
+    serverNow: new Date().toISOString(),
+    scorerClockOffsetMs: latest ? latest.receivedAt.getTime() - latest.occurredAt.getTime() : null,
+  };
+}
 
 const linkNotValid = (code: 'LINK_INVALID' | 'LINK_REVOKED' | 'LINK_EXPIRED') =>
   new ApiError(404, 'NOT_FOUND', 'This live link is not valid any more.', [
@@ -132,6 +145,7 @@ export class LiveService {
       status: match.status as MatchStatus,
       version: match.version,
       scorerSeenAt: match.scorerSeenAt?.toISOString() ?? null,
+      ...clockSync(events),
       sides: sides
         .sort((a, b) => a.side - b.side)
         .map((s) => ({
@@ -159,8 +173,19 @@ export class LiveService {
       version: events.length ? events[events.length - 1]!.seq : after,
       status: match.status as MatchStatus,
       scorerSeenAt: match.scorerSeenAt?.toISOString() ?? null,
+      ...clockSync(await this.latestEvent(matchId, events)),
       events: events.map(toLiveEvent),
     };
+  }
+
+  private async latestEvent(matchId: string, recent: EventRow[]): Promise<EventRow[]> {
+    if (recent.length) return recent;
+    return this.db
+      .select()
+      .from(matchEvents)
+      .where(eq(matchEvents.matchId, matchId))
+      .orderBy(desc(matchEvents.seq))
+      .limit(1);
   }
 
   /**

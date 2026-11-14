@@ -87,7 +87,9 @@ describe('live sharing', () => {
         'events',
         'engineVersion',
         'matchId',
+        'scorerClockOffsetMs',
         'scorerSeenAt',
+        'serverNow',
         'sides',
         'sport',
         'status',
@@ -101,6 +103,9 @@ describe('live sharing', () => {
       participants: [{ participantId: match.players[0], displayName: 'Asha' }],
     });
     expect(snap.events.map((e: { seq: number }) => e.seq)).toEqual([1, 2, 3]);
+    // The scorer's clock offset lets spectators show running clocks; this test device is the server's.
+    expect(Math.abs(snap.scorerClockOffsetMs)).toBeLessThan(5_000);
+    expect(Math.abs(Date.parse(snap.serverNow) - Date.now())).toBeLessThan(5_000);
     expect(res.headers['referrer-policy']).toBe('no-referrer');
   });
 

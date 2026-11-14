@@ -76,7 +76,11 @@ export function LivePage() {
         </div>
         {projection && ui ? (
           <>
-            <ui.Scoreboard projection={projection} sides={snapshot.sides} />
+            <ui.Scoreboard
+              projection={projection}
+              sides={snapshot.sides}
+              clockOffsetMs={view.clockOffsetMs}
+            />
             {view.status === 'completed' && (
               <ui.Scorecard projection={projection} sides={snapshot.sides} />
             )}

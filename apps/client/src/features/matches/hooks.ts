@@ -1,4 +1,5 @@
 import type {
+  LiveDelta,
   LiveEvent,
   LiveSnapshot,
   MatchStatus,
@@ -93,6 +94,14 @@ export interface LiveView {
   connection: StreamStatus;
   /** HTTP status that closed the stream for good (e.g. 404 for a revoked link). */
   closedWith: number | null;
+  /** Add to this device's `Date.now()` to get the scoring device's time, for running clocks. */
+  clockOffsetMs: number;
+}
+
+/** Scorer time = local time + server-vs-local offset − server-vs-scorer offset. */
+function clockOffset(serverNow: string, scorerClockOffsetMs: number | null): number {
+  if (scorerClockOffsetMs === null) return 0;
+  return Date.parse(serverNow) - Date.now() - scorerClockOffsetMs;
 }
 
 /**
@@ -111,6 +120,7 @@ export function useLiveStream(
     scorerSeenAt: null,
     connection: 'connecting',
     closedWith: null,
+    clockOffsetMs: 0,
   });
 
   useEffect(() => {
@@ -132,13 +142,10 @@ export function useLiveStream(
             events,
             status: snapshot.status,
             scorerSeenAt: snapshot.scorerSeenAt,
+            clockOffsetMs: clockOffset(snapshot.serverNow, snapshot.scorerClockOffsetMs),
           }));
         } else if (type === 'delta') {
-          const delta = data as {
-            events: LiveEvent[];
-            status: MatchStatus;
-            scorerSeenAt: string | null;
-          };
+          const delta = data as LiveDelta;
           setView((v) => {
             const last = v.events.length ? v.events[v.events.length - 1]!.seq : 0;
             return {
@@ -146,6 +153,7 @@ export function useLiveStream(
               events: [...v.events, ...delta.events.filter((e) => e.seq > last)],
               status: delta.status,
               scorerSeenAt: delta.scorerSeenAt,
+              clockOffsetMs: clockOffset(delta.serverNow, delta.scorerClockOffsetMs),
             };
           });
         }

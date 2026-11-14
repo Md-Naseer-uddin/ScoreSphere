@@ -258,6 +258,16 @@ export const liveEventSchema = storedMatchEventSchema.pick({
 });
 export type LiveEvent = z.infer<typeof liveEventSchema>;
 
+/**
+ * Lets spectators show running clocks: events carry the scoring device's time, so a viewer
+ * needs both its own offset from the server and the scorer's (plan M5).
+ */
+const clockSync = {
+  serverNow: z.iso.datetime(),
+  /** Server time minus scorer device time, from the latest event; null before any event. */
+  scorerClockOffsetMs: z.int().nullable(),
+};
+
 export const liveSnapshotSchema = z.object({
   matchId: idSchema,
   sport: sportKeySchema,
@@ -266,6 +276,7 @@ export const liveSnapshotSchema = z.object({
   status: matchStatusSchema,
   version: z.int(),
   scorerSeenAt: z.iso.datetime().nullable(),
+  ...clockSync,
   sides: z.array(
     z.object({
       side: sideIndexSchema,
@@ -282,6 +293,7 @@ export const liveDeltaSchema = z.object({
   version: z.int(),
   status: matchStatusSchema,
   scorerSeenAt: z.iso.datetime().nullable(),
+  ...clockSync,
   events: z.array(liveEventSchema),
 });
 export type LiveDelta = z.infer<typeof liveDeltaSchema>;
