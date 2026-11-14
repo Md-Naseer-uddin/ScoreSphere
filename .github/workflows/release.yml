@@ -1,0 +1,90 @@
+# Builds a signed Android APK for a version tag (vX.Y.Z) and publishes it as a GitHub
+# release with its SHA-256, for the download page (plan M6).
+#
+# Needs repository secrets ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD,
+# ANDROID_KEY_ALIAS and ANDROID_KEY_PASSWORD, and variables SCORESPHERE_API_URL and
+# SCORESPHERE_PUBLIC_APP_URL (the APK talks to an absolute API URL).
+name: Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    name: Signed release APK
+    runs-on: ubuntu-latest
+    env:
+      VITE_API_URL: ${{ vars.SCORESPHERE_API_URL }}
+      VITE_PUBLIC_APP_URL: ${{ vars.SCORESPHERE_PUBLIC_APP_URL }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check the release configuration
+        env:
+          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          missing=""
+          for name in KEYSTORE KEYSTORE_PASSWORD KEY_ALIAS KEY_PASSWORD VITE_API_URL VITE_PUBLIC_APP_URL; do
+            [ -n "${!name}" ] || missing="$missing $name"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Release configuration missing:$missing (see the comment at the top of release.yml)"
+            exit 1
+          fi
+          version="${GITHUB_REF_NAME#v}"
+          app_version=$(node -p "require('./apps/client/package.json').version")
+          if [ "$version" != "$app_version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match apps/client/package.json version $app_version"
+            exit 1
+          fi
+          IFS=. read -r major minor patch <<< "$version"
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+          echo "VERSION_CODE=$((major * 10000 + minor * 100 + patch))" >> "$GITHUB_ENV"
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v6
+      - run: pnpm install --frozen-lockfile
+      - name: Build web bundle
+        run: pnpm turbo run build --filter=@scoresphere/client
+      - name: Copy web bundle into the Android project
+        run: pnpm --filter @scoresphere/client exec cap sync android
+      - name: Assemble signed release APK
+        working-directory: apps/client/android
+        env:
+          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          SCORESPHERE_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          SCORESPHERE_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          SCORESPHERE_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE" | base64 -d > "$RUNNER_TEMP/release.jks"
+          SCORESPHERE_KEYSTORE_PATH="$RUNNER_TEMP/release.jks" \
+          SCORESPHERE_VERSION_NAME="$VERSION" \
+          SCORESPHERE_VERSION_CODE="$VERSION_CODE" \
+            ./gradlew assembleRelease --no-daemon
+          rm -f "$RUNNER_TEMP/release.jks"
+      - name: Name the APK and record its SHA-256
+        run: |
+          mkdir -p release
+          cp apps/client/android/app/build/outputs/apk/release/app-release.apk "release/scoresphere-$VERSION.apk"
+          (cd release && sha256sum "scoresphere-$VERSION.apk" > "scoresphere-$VERSION.apk.sha256")
+          echo "SHA256=$(cut -d' ' -f1 release/scoresphere-$VERSION.apk.sha256)" >> "$GITHUB_ENV"
+      - name: Publish the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" release/* \
+            --title "ScoreSphere $VERSION" \
+            --notes "Android 7.0 or newer. SHA-256: \`$SHA256\`. Set APK_URL, APK_SHA256 and LATEST_CLIENT_VERSION on the API so the download page offers this build."

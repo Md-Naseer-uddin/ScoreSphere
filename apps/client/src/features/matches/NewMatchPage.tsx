@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { useSession } from '@/features/auth/session';
 import { useQuickGuests, useRoster, useTeams } from '@/features/teams/local-data';
 import { useCurrentWorkspace } from '@/features/workspaces/current-workspace';
+import { isBelowMinimum, useAppVersionInfo } from '@/lib/app-version';
 import { db } from '@/lib/db';
 import { sportUi } from '@/sports/registry';
 import type { SportSetup, SportUi } from '@/sports/types';
@@ -65,6 +66,7 @@ export function NewMatchPage() {
   const roster = useRoster(workspace?.id);
   const guests = useQuickGuests();
   const teams = useTeams(workspace?.id);
+  const { data: versionInfo } = useAppVersionInfo();
   const defaultName = (letter: string) => t('matches.new.defaultSideName', { side: letter });
 
   const initialSport = params.get('sport') as SportKey | null;
@@ -183,6 +185,19 @@ export function NewMatchPage() {
     }
     navigate(`/app/matches/${created.value}/score`, { replace: true });
   };
+
+  if (isBelowMinimum(versionInfo)) {
+    // Too old to start matches with the current engines (ADR 0019); existing ones still score.
+    return (
+      <section className="space-y-4 py-10 text-center">
+        <h1 className="text-xl font-semibold">{t('matches.new.updateTitle')}</h1>
+        <p className="text-muted-foreground">{t('matches.new.updateBody')}</p>
+        <Button asChild>
+          <Link to="/download">{t('matches.new.getUpdate')}</Link>
+        </Button>
+      </section>
+    );
+  }
 
   return (
     <section className="space-y-6">

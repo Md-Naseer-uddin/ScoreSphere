@@ -14,7 +14,8 @@
   "home": {
     "title": "Ready to score",
     "startMatch": "Start a match",
-    "browseSports": "Browse sports"
+    "browseSports": "Browse sports",
+    "getApp": "Get the Android app or install the web app"
   },
   "sports": {
     "title": "Sports",
@@ -385,7 +386,10 @@
       "noTeam": "No saved team",
       "sideName": "Side {{side}} name",
       "addPlayer": "Add player to side {{side}}",
-      "removePlayer": "Remove last player"
+      "removePlayer": "Remove last player",
+      "updateTitle": "Update ScoreSphere to start new matches",
+      "updateBody": "This version is too old for new matches. Matches already on this device can still be scored.",
+      "getUpdate": "Get the update"
     },
     "share": {
       "title": "Live link",
@@ -785,5 +789,26 @@
     "confirmDelete": "Delete my account",
     "wrongPassword": "That password is not right.",
     "deleted": "Your account has been deleted."
+  },
+  "download": {
+    "title": "Get ScoreSphere",
+    "android": "Android app",
+    "latest": "Latest version: {{version}}",
+    "getApk": "Download the APK",
+    "checksum": "SHA-256 checksum",
+    "verify": "To check the download, compare this with the file's SHA-256 (for example, sha256sum on a computer). Install only if they match.",
+    "releaseNotes": "Release notes",
+    "noApk": "The Android app isn't available for download yet. Use the web app below meanwhile.",
+    "requirements": "Needs Android 7.0 or newer.",
+    "sideload1": "Your phone will ask you to allow installing apps from your browser; allow it for this install only.",
+    "sideload2": "New versions are listed on this page; download and install them the same way. Your matches stay on the phone.",
+    "web": "Web app (any phone)",
+    "webBody": "ScoreSphere also runs in the browser and works offline once installed to your home screen.",
+    "androidChrome": "Android (Chrome)",
+    "androidChromeSteps": "Open the menu (⋮) and tap Install app or Add to Home screen.",
+    "iphone": "iPhone and iPad (Safari)",
+    "iphoneSteps": "Tap Share, then Add to Home Screen, and open ScoreSphere from the home screen.",
+    "iphoneOffline": "On iPhone, offline scoring needs the home-screen app: Safari can clear data for websites that aren't installed.",
+    "thisVersion": "You are using version {{version}}."
   }
 }

@@ -37,3 +37,13 @@ test('a user reads the privacy notice, downloads their data and deletes their ac
   await page.getByRole('button', { name: 'Sign in' }).click();
   await expect(page.getByRole('alert')).toBeVisible();
 });
+
+test('the download page explains how to get the app', async ({ page }) => {
+  await page.goto('/download');
+  await expect(page.getByRole('heading', { name: 'Get ScoreSphere', level: 1 })).toBeVisible();
+  // No APK is configured in this environment.
+  await expect(
+    page.getByText("The Android app isn't available for download yet.", { exact: false }),
+  ).toBeVisible();
+  await expect(page.getByText(/^Tap Share, then Add to Home Screen/)).toBeVisible();
+});

@@ -7,6 +7,7 @@ import { RegisterPage } from '@/features/auth/RegisterPage';
 import { RequireAuth } from '@/features/auth/RequireAuth';
 import { NotFoundPage } from '@/features/common/NotFoundPage';
 import { HomePage } from '@/features/home/HomePage';
+import { DownloadPage } from '@/features/download/DownloadPage';
 import { PrivacyPage, TermsPage } from '@/features/legal/LegalPage';
 import { LivePage } from '@/features/live/LivePage';
 import { MatchesPage } from '@/features/matches/MatchesPage';
@@ -44,6 +45,7 @@ export const routes: RouteObject[] = [
   { path: '/live', element: <LivePage />, errorElement: <RouteError /> },
   { path: '/privacy', element: <PrivacyPage /> },
   { path: '/terms', element: <TermsPage /> },
+  { path: '/download', element: <DownloadPage /> },
   {
     path: '/app',
     element: (

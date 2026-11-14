@@ -7,8 +7,9 @@ android {
         applicationId "com.scoresphere.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        // Release builds get these from the tag (see .github/workflows/release.yml).
+        versionCode Integer.parseInt(System.getenv('SCORESPHERE_VERSION_CODE') ?: '1')
+        versionName System.getenv('SCORESPHERE_VERSION_NAME') ?: '0.0.0'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,8 +17,21 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // The release keystore never lives in the repository: CI decodes it from a secret.
+    def keystorePath = System.getenv('SCORESPHERE_KEYSTORE_PATH')
+    signingConfigs {
+        if (keystorePath) {
+            release {
+                storeFile file(keystorePath)
+                storePassword System.getenv('SCORESPHERE_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('SCORESPHERE_KEY_ALIAS')
+                keyPassword System.getenv('SCORESPHERE_KEY_PASSWORD')
+            }
+        }
+    }
     buildTypes {
         release {
+            if (keystorePath) signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
