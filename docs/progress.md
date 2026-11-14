@@ -16,8 +16,8 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
 | M7 — Tournaments, statistics, profiles | done |
 | M8 — Rules builder | done |
 | M9 — Football, Field Hockey, Basketball | done (award criteria pending owner sign-off) |
-| M10 — Kabaddi, Kho-Kho, Wrestling, Carrom | next |
-| M11 — v1.0 hardening | not started |
+| M10 — Kabaddi, Kho-Kho, Wrestling, Carrom | done (rule editions and award criteria pending owner sign-off) |
+| M11 — v1.0 hardening | next |
 
 ## Done so far
 
@@ -256,26 +256,55 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
   - On-court tracking and minutes.
   - The shot clock is not recorded.
 
-## Next — M10: Kabaddi, Kho-Kho, Wrestling, Carrom
+**M10** — all twelve sports can now be scored.
+- **Kabaddi:**
+  - Each raid is recorded once it ends (touches, bonus, back safely, tackled or out). Players out, revivals and all outs follow from that.
+  - Super tackles, and do-or-die raids after two empty raids.
+  - Teams take turns to raid, and the second half starts with the other team.
+  - Bonus only with six or more defenders; technical points; players out of bounds.
+  - Timeouts per half; a raid timer aid on the scoring device.
+  - Awards: Best Raider, Best Defender and Player of the Match.
+- **Kho-kho:**
+  - Timed chasing turns that alternate from the toss.
+  - Outs by touch, pole dive, out of field or late entry; batches of defenders.
+  - Points by turn.
+  - Award: Best Chaser.
+- **Wrestling (UWW):**
+  - Freestyle, Greco-Roman and women's, with the weight category shown.
+  - Points of 1, 2, 4 and 5; cautions with 1 or 2 penalty points, and disqualification on the third.
+  - Fall, and technical superiority (10, or 8 in Greco-Roman).
+  - Criteria for level bouts.
+  - Classification points, used for tournament standings.
+- **Carrom (ICF):**
+  - Each board records its winner, the loser's coins left and who covered the queen. The queen counts only below 22.
+  - Games to 25, or 8 boards with extra boards while level; best of three; breaks alternate; fouls counted.
+- **Each sport has:**
+  - presets;
+  - a rule catalogue;
+  - rules help;
+  - tournament standings;
+  - golden logs and property tests on both builds;
+  - scoring screens;
+  - a scorecard;
+  - an offline-and-reload e2e test.
 
-Each sport must meet the same definition of done as M9 (plan §4).
+**Not built in M10:**
+- **Kabaddi:** knockout tie-breaks (golden raid), cards and lobby rules.
+- **Kho-kho:**
+  - Dream runs, follow-ons and tie-breaks.
+  - Defending time per player, so there is no Best Defender award.
+- **Wrestling:** passivity is scored as ordinary points, and there's no shot clock.
+- **Carrom:** recording coin by coin.
 
-1. **Kabaddi:**
-   - Raids with a raid timer, touch and bonus points, tackles, and all-outs.
-   - Revival of out players, the do-or-die raid and the super tackle.
-   - Stats: raid and tackle points.
-   - Awards: Best Raider and Best Defender.
-2. **Kho-Kho:**
-   - Chasing and defending turns with a turn timer, dismissals and points.
-   - Side changes between turns.
-3. **Wrestling:**
-   - Style and weight metadata, periods, scoring actions and cautions.
-   - Technical superiority, fall, and the criteria for level scores.
-   - Weight categories run as separate tournaments.
-4. **Carrom:**
-   - Boards, coins, the queen and her cover, fouls and penalty coins.
-   - Board points and the match target.
-5. **Owner sign-off:** the rule edition and award criteria for each sport.
+## Next — M11: v1.0 hardening and release
+
+1. **Accessibility audit:** screen-reader labels on scoring controls, contrast, reduced motion and tap targets, across all twelve scoring screens.
+2. **Load and stress:**
+   - k6 scripts for event ingestion and SSE fan-out.
+   - Offline stress (long ledgers) and replay performance.
+3. **Security review and the release checklist:** dependency audit, headers, rate limits, authorization-matrix coverage for the new endpoints, and log scan.
+4. **The spec's MVP acceptance criteria:** walk through each one and record the evidence.
+5. **For the owner:** the Android device matrix, Hindi localisation (if the pilot asks for it), and the v1.0 release itself.
 
 ## Needs the owner
 
@@ -303,6 +332,11 @@ Each sport must meet the same definition of done as M9 (plan §4).
   - Hockey and basketball rules help cite the "current edition" of the FIH and FIBA rules; please confirm the edition to cite.
   - Basketball standings give 2 for a win and 1 for a loss; FIBA gives 0 for a forfeit, which isn't separated yet.
   - A hockey shoot-out winner gets the 3 points of a win; some FIH events give 2 and 1 instead.
+- **M10 sign-off (kabaddi, kho-kho, wrestling, carrom):**
+  - Kabaddi and kho-kho presets are marked casual until you confirm which match the current AKFI/KKFI rules. Please also confirm the source links.
+  - Kabaddi standings: 2 for a win and 1 for a draw (the Pro Kabaddi system differs).
+  - Award criteria: Best Raider/Defender (raid and tackle points), Best Chaser (defenders put out).
+  - Wrestling and carrom rules help cite the "current edition" of the UWW and ICF rules; please confirm the edition to cite.
 
 - **M5 on-device check:** on the APK, run a chess clock, lock the screen and kill the app, then reopen; the displayed time should be within ±1 s.
 - **Pilot launch:**
