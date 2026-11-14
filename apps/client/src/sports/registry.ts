@@ -10,6 +10,7 @@ import { khoKhoUi } from './kho-kho';
 import { tennisUi } from './tennis';
 import type { SportUi } from './types';
 import { volleyballUi } from './volleyball';
+import { wrestlingUi } from './wrestling';
 
 /** Sports with a scoring screen. Others show as coming soon until their milestone. */
 const registry: Partial<Record<SportKey, SportUi>> = {
@@ -23,6 +24,7 @@ const registry: Partial<Record<SportKey, SportUi>> = {
   'kho-kho': khoKhoUi,
   tennis: tennisUi,
   volleyball: volleyballUi,
+  wrestling: wrestlingUi,
 };
 
 export function sportUi(sport: SportKey): SportUi | undefined {

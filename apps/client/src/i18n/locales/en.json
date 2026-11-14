@@ -317,7 +317,9 @@
       "walkover": "Walkover (didn't play)",
       "disqualified": "Disqualified",
       "forfeit": "Forfeited",
-      "defaulted": "Defaulted"
+      "defaulted": "Defaulted",
+      "injury": "Injured",
+      "disqualification": "Disqualified"
     },
     "abandon": "Abandon match",
     "abandonBody": "The match ends with no result. You can undo this straight afterwards.",
@@ -1280,6 +1282,67 @@
     },
     "announce": {
       "batchOut": "Batch out: {{name}} chasing"
+    }
+  },
+  "wrestling": {
+    "setup": {
+      "weightClass": "Weight category (optional)",
+      "periods": "Periods",
+      "periodMinutes": "Minutes per period",
+      "technicalSuperiority": "Lead for technical superiority (blank: none)"
+    },
+    "style": {
+      "freestyle": "Freestyle",
+      "greco_roman": "Greco-Roman",
+      "womens": "Women’s wrestling"
+    },
+    "beforeBout": "Before the bout",
+    "period": "Period {{n}}",
+    "break": "Break",
+    "final": "Bout over",
+    "cautions_one": "{{count}} caution",
+    "cautions_other": "{{count}} cautions",
+    "pointsFor_one": "{{count}} point {{name}}",
+    "pointsFor_other": "{{count}} points {{name}}",
+    "caution": "Caution",
+    "cautionFor": "Caution to {{name}}",
+    "cautionPoints_one": "{{count}} point to {{name}}",
+    "cautionPoints_other": "{{count}} points to {{name}}",
+    "fall": "Fall",
+    "classification": "Classification points {{a}} – {{b}}: {{score}}",
+    "kind": {
+      "takedown": "takedown",
+      "exposure": "exposure",
+      "reversal": "reversal",
+      "step_out": "step out",
+      "throw": "throw",
+      "passivity": "passivity",
+      "other": "other",
+      "caution": "caution"
+    },
+    "ending": {
+      "injury": "injury",
+      "forfeit": "forfeit",
+      "disqualification": "disqualification"
+    },
+    "method": {
+      "fall": "by fall",
+      "technical_superiority": "by technical superiority",
+      "points": "on points",
+      "criteria": "on criteria",
+      "cautions": "by the opponent’s three cautions",
+      "injury": "by injury",
+      "forfeit": "by forfeit",
+      "disqualification": "by disqualification"
+    },
+    "timeline": {
+      "caution_one": "Caution to {{name}} (1 point to the opponent)",
+      "caution_other": "Caution to {{name}} ({{count}} points to the opponent)",
+      "fall": "Fall: {{name}} wins",
+      "concede": "{{name}} out: {{reason}}"
+    },
+    "announce": {
+      "won": "{{name}} wins {{method}}"
     }
   }
 }
