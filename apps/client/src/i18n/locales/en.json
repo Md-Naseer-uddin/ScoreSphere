@@ -1247,5 +1247,39 @@
       "allOut": "All out! Points to {{name}}",
       "superTackle": "Super tackle by {{name}}!"
     }
+  },
+  "khoKho": {
+    "setup": {
+      "innings": "Innings",
+      "turnMinutes": "Minutes per turn",
+      "batchSize": "Defenders per batch",
+      "pointsPerOut": "Points per defender out"
+    },
+    "turnOf": "Turn {{n}}: {{name}} chasing",
+    "endOfTurn": "End of turn {{n}}",
+    "chasing": "chasing",
+    "batch": "Batch {{batch}}: {{out}} of {{size}} out",
+    "chaser": "Chaser",
+    "defender": "Defender",
+    "by": "by {{name}}",
+    "kind": {
+      "touch": "Touch",
+      "pole_dive": "Pole dive",
+      "out_of_field": "Out of the field",
+      "late_entry": "Late entry",
+      "other": "Other out"
+    },
+    "endTurn": "End turn {{n}}",
+    "startTurn": "Start turn {{n}}",
+    "firstChase": "Who chases first?",
+    "byTurn": "Points by turn",
+    "box": {
+      "outs": "Outs",
+      "dives": "Dives",
+      "timesOut": "Times out"
+    },
+    "announce": {
+      "batchOut": "Batch out: {{name}} chasing"
+    }
   }
 }

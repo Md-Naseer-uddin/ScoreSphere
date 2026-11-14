@@ -6,6 +6,7 @@ import { cricketUi } from './cricket';
 import { hockeyUi } from './field-hockey';
 import { footballUi } from './football';
 import { kabaddiUi } from './kabaddi';
+import { khoKhoUi } from './kho-kho';
 import { tennisUi } from './tennis';
 import type { SportUi } from './types';
 import { volleyballUi } from './volleyball';
@@ -19,6 +20,7 @@ const registry: Partial<Record<SportKey, SportUi>> = {
   'field-hockey': hockeyUi,
   football: footballUi,
   kabaddi: kabaddiUi,
+  'kho-kho': khoKhoUi,
   tennis: tennisUi,
   volleyball: volleyballUi,
 };

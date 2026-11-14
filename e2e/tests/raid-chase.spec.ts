@@ -80,3 +80,52 @@ test('kabaddi: an all out, a super tackle and a failed do-or-die raid, offline t
   );
   expect(match).toEqual({ status: 'completed', summary: '5–1' });
 });
+
+test('kho-kho: a batch put out, then the other team chases, offline through a reload', async ({
+  browser,
+}) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.goto('/auth/register');
+  await register(page, 'Coach Sarika', newPhone(), 'kho-kho password 1');
+
+  await page.goto('/app/matches/new?sport=kho-kho');
+  await page.getByRole('radio', { name: /School game/ }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await teams(page, ['Mumbai', ['Ravi']], ['Pune', ['Kiran']]);
+  await page.getByRole('button', { name: 'Start match' }).click();
+  await page.waitForURL(/\/score$/);
+  const matchId = page.url().split('/').at(-2)!;
+
+  await page.getByRole('radio', { name: 'Mumbai' }).click();
+  await page.getByRole('button', { name: 'Start turn 1' }).click();
+  await expect(page.getByTestId('kho-kho-status')).toContainText('Turn 1: Mumbai chasing');
+  await page.getByLabel('Chaser').selectOption({ label: 'Ravi' });
+  await page.getByRole('button', { name: 'Touch', exact: true }).click();
+  await expect(page.getByTestId('points-0')).toHaveText('1');
+  await expect(page.getByTestId('batch')).toHaveText('Batch 1: 1 of 3 out');
+  await page.getByRole('button', { name: 'Pole dive' }).click();
+  await expect(page.getByTestId('points-0')).toHaveText('2');
+
+  await serviceWorkerReady(page);
+  await context.setOffline(true);
+  await page.getByRole('button', { name: 'Out of the field' }).click();
+  await expect(page.getByTestId('batch')).toHaveText('Batch 2: 0 of 3 out');
+  await page.reload();
+  await expect(page.getByTestId('points-0')).toHaveText('3');
+  await page.getByRole('button', { name: 'End turn 1' }).click();
+  await page.getByRole('button', { name: 'Start turn 2' }).click();
+  await expect(page.getByTestId('kho-kho-status')).toContainText('Turn 2: Pune chasing');
+  await page.getByRole('button', { name: 'Touch', exact: true }).click();
+  await expect(page.getByTestId('points-1')).toHaveText('1');
+  await page.getByRole('button', { name: 'End turn 2' }).click();
+  await expect(page.getByTestId('kho-kho-status')).toHaveText('Full time');
+
+  await context.setOffline(false);
+  await expect(syncBadge(page)).toHaveText('Synced', { timeout: 30_000 });
+  const [match] = await query<{ status: string; summary: string }>(
+    `select status, result->>'summary' as summary from matches where id = $1`,
+    [matchId],
+  );
+  expect(match).toEqual({ status: 'completed', summary: '3–1' });
+});
