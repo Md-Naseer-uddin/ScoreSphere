@@ -13,9 +13,9 @@ import { cricketPresets } from './cricket/settings.js';
  * with the length of a match, not small slowdowns.
  */
 function timed<T>(fn: () => T): { value: T; ms: number } {
-  const start = performance.now();
+  const start = Date.now();
   const value = fn();
-  return { value, ms: performance.now() - start };
+  return { value, ms: Date.now() - start };
 }
 
 describe('replay performance', () => {
