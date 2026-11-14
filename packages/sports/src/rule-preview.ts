@@ -93,6 +93,26 @@ const SAMPLES: Partial<Record<SportKey, RuleSample>> = {
       ];
     },
   },
+  'field-hockey': {
+    playersPerSide: () => 2,
+    commands: (config, ids) => {
+      // Play restarts after goals and penalty corners when the clock stops for them.
+      const restart: Command[] = config.stopClock ? [{ type: 'restart_clock' }] : [];
+      return [
+        { type: 'start_period' },
+        { type: 'penalty_corner', side: 0 },
+        ...restart,
+        { type: 'goal', side: 0, kind: 'penalty_corner', scorerId: ids[0][0] },
+        ...restart,
+        { type: 'card', side: 1, playerId: ids[1][1], color: 'green' },
+        { type: 'goal', side: 1, kind: 'field_goal', scorerId: ids[1][0] },
+        ...restart,
+        { type: 'penalty_stroke', side: 0, scored: true, takerId: ids[0][1] },
+        ...restart,
+        { type: 'end_period' },
+      ];
+    },
+  },
   chess: {
     playersPerSide: () => 1,
     commands: () => [

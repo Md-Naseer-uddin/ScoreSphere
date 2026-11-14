@@ -8,7 +8,15 @@ import { previewRules } from './rule-preview.js';
 import { tennisPresets } from './tennis/settings.js';
 import { volleyballPresets } from './volleyball/settings.js';
 
-const PILOT = ['badminton', 'chess', 'cricket', 'football', 'tennis', 'volleyball'] as const;
+const PILOT = [
+  'badminton',
+  'chess',
+  'cricket',
+  'field-hockey',
+  'football',
+  'tennis',
+  'volleyball',
+] as const;
 
 /** A valid value for a field: its first option, or its minimum. */
 const sample = (f: RuleField) =>
@@ -194,6 +202,8 @@ describe('rule preview', () => {
       expect(preview, preset.key).not.toBeNull();
       // A chess game with no clock has only its start: its rules are about the clock.
       expect(preview!.timeline.length, preset.key).toBeGreaterThan(0);
+      // The sample plays through every event the preset allows, except chess without a clock.
+      if (sport !== 'chess') expect(preview!.timeline.length, preset.key).toBeGreaterThan(4);
       expect(preview!.summary).toBe(preview!.summaryWithout);
     }
   });

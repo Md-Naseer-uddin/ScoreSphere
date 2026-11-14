@@ -14,3 +14,5 @@ export * from './chess/golden/logs.js';
 export * from './chess/golden/run.js';
 export * from './football/golden/logs.js';
 export * from './football/golden/run.js';
+export * from './field-hockey/golden/logs.js';
+export * from './field-hockey/golden/run.js';

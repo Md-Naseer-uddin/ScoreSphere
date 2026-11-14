@@ -6,6 +6,7 @@ export * from './cricket/index.js';
 export * from './content.js';
 export * from './rules-content.js';
 export * from './engines.js';
+export * from './field-hockey/index.js';
 export * from './football/index.js';
 export * from './tennis/index.js';
 export * from './tournaments/index.js';

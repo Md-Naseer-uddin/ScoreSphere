@@ -3,6 +3,7 @@ import type { SportEngine } from '@scoresphere/engine-kit';
 import { badmintonEngine } from './badminton/engine.js';
 import { chessEngine } from './chess/engine.js';
 import { cricketEngine } from './cricket/engine.js';
+import { hockeyEngine } from './field-hockey/engine.js';
 import { footballEngine } from './football/engine.js';
 import { tennisEngine } from './tennis/engine.js';
 import { volleyballEngine } from './volleyball/engine.js';
@@ -21,6 +22,7 @@ const registry: readonly AnySportEngine[] = [
   chessEngine,
   cricketEngine,
   footballEngine,
+  hockeyEngine,
   tennisEngine,
   volleyballEngine,
 ];
