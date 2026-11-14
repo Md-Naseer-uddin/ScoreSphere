@@ -766,5 +766,24 @@
       "attack_points": "Attack points",
       "block_points": "Block points"
     }
+  },
+  "legal": {
+    "privacy": "Privacy notice",
+    "terms": "Terms of use",
+    "updated": "Last updated {{date}}",
+    "draft": "This is the pilot version of this notice. It will be reviewed by a lawyer before ScoreSphere is publicly launched.",
+    "consentBefore": "By creating an account you agree to the",
+    "consentMiddle": "and have read the"
+  },
+  "yourData": {
+    "title": "Your data",
+    "body": "Download a copy of everything ScoreSphere holds about you, or delete your account.",
+    "download": "Download my data",
+    "delete": "Delete account",
+    "deleteTitle": "Delete your account?",
+    "deleteBody": "Your number and personal details are erased and you are signed out everywhere. Your personal workspace and its matches are deleted. Organisations keep their own records, no longer linked to you. This cannot be undone.",
+    "confirmDelete": "Delete my account",
+    "wrongPassword": "That password is not right.",
+    "deleted": "Your account has been deleted."
   }
 }

@@ -103,6 +103,17 @@ export function RegisterPage() {
               </p>
             )}
           </div>
+          <p className="text-xs text-muted-foreground">
+            {t('legal.consentBefore')}{' '}
+            <Link to="/terms" className="text-primary underline-offset-4 hover:underline">
+              {t('legal.terms')}
+            </Link>{' '}
+            {t('legal.consentMiddle')}{' '}
+            <Link to="/privacy" className="text-primary underline-offset-4 hover:underline">
+              {t('legal.privacy')}
+            </Link>
+            .
+          </p>
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {t('auth.createAccount')}
           </Button>

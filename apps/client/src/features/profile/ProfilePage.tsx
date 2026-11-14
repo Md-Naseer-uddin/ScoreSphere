@@ -11,6 +11,7 @@ import { getMe, profileKeys } from './profile-api';
 import { ProfileDetailsCard } from './ProfileDetailsCard';
 import { RosterLinksCard } from './RosterLinksCard';
 import { SecurityCard } from './SecurityCard';
+import { YourDataCard } from './YourDataCard';
 
 export function ProfilePage() {
   const { t } = useTranslation();
@@ -28,6 +29,7 @@ export function ProfilePage() {
       <RosterLinksCard />
       <ProfileDetailsCard me={me} />
       <SecurityCard me={me} />
+      <YourDataCard />
       <DevicesCard />
       <Button
         variant="outline"
