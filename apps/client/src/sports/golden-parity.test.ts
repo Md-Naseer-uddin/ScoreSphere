@@ -2,6 +2,7 @@ import {
   badmintonEngine,
   chessEngine,
   cricketEngine,
+  footballEngine,
   tennisEngine,
   volleyballEngine,
 } from '@scoresphere/sports';
@@ -9,8 +10,10 @@ import {
   badmintonGoldenLogs,
   chessGoldenLogs,
   cricketGoldenLogs,
+  footballGoldenLogs,
   runChessGoldenLog,
   runCricketGoldenLog,
+  runFootballGoldenLog,
   runGoldenLog,
   runTennisGoldenLog,
   runVolleyballGoldenLog,
@@ -31,6 +34,12 @@ const suites = [
     engine: volleyballEngine,
   },
   { sport: 'chess', logs: chessGoldenLogs, run: runChessGoldenLog, engine: chessEngine },
+  {
+    sport: 'football',
+    logs: footballGoldenLogs,
+    run: runFootballGoldenLog,
+    engine: footballEngine,
+  },
 ] as const;
 
 for (const suite of suites) {

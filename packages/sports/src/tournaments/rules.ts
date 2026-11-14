@@ -2,6 +2,7 @@ import type { SportKey } from '@scoresphere/contracts';
 import type { MetricRecord } from '@scoresphere/engine-kit';
 import type { BadmintonState } from '../badminton/engine.js';
 import type { CricketState } from '../cricket/engine.js';
+import type { FootballState } from '../football/engine.js';
 import type { TennisState } from '../tennis/engine.js';
 import type { VolleyballState } from '../volleyball/engine.js';
 import type { StandingsPoints } from './standings.js';
@@ -158,6 +159,38 @@ const RULES: Partial<Record<SportKey, TournamentRules>> = {
         criteria:
           'Most points scored (attacks, blocks and aces) over the tournament; still level, shared. Needs point credits.',
         metric: 'points_scored',
+      },
+    ],
+  },
+  football: {
+    points: { win: 3, draw: 1, loss: 0 },
+    tieBreaks: ['goal_difference', 'goals_for'],
+    allowedTieBreaks: ['goal_difference', 'goals_for', 'wins'],
+    allowsDraws: true,
+    // Shootout goals decide a knockout tie but don't count as goals (Law 10).
+    totals: (state: FootballState, side) => ({
+      goalsFor: state.score[side],
+      goalsAgainst: state.score[side === 0 ? 1 : 0],
+    }),
+    derive: (t) => ({ impact_points: 2 * (t.goals ?? 0) + (t.assists ?? 0) }),
+    leaderboards: [
+      { metric: 'goals', label: 'Top scorers' },
+      { metric: 'assists', label: 'Most assists' },
+    ],
+    playerAwards: [
+      {
+        key: 'player-of-the-tournament',
+        name: 'Player of the Tournament',
+        criteria:
+          'Most impact points over the tournament (2 per goal, 1 per assist); still level, shared.',
+        metric: 'impact_points',
+      },
+      {
+        key: 'golden-boot',
+        name: 'Golden Boot',
+        criteria: 'Most goals (not own goals); then most assists; still level, shared.',
+        metric: 'goals',
+        tieBreak: { metric: 'assists', lowerIsBetter: false },
       },
     ],
   },

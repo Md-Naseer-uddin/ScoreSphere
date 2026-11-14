@@ -69,6 +69,30 @@ const SAMPLES: Partial<Record<SportKey, RuleSample>> = {
       ...rallies('rally', 'winner', [1, 0, 1, 1, 0, 0, 1, 0]),
     ],
   },
+  football: {
+    playersPerSide: (config) => Math.min(3, Number(config.playersOnField)),
+    commands: (_config, ids) => {
+      const goal = (side: 0 | 1, scorer: number, kind = 'regular'): Command => ({
+        type: 'goal',
+        side,
+        kind,
+        scorerId: ids[side][scorer],
+      });
+      return [
+        { type: 'start_period', lineups: ids },
+        goal(0, 0),
+        { type: 'card', side: 1, playerId: ids[1][1], color: 'yellow' },
+        goal(1, 0, 'penalty'),
+        goal(0, 1),
+        { type: 'end_period' },
+        { type: 'start_period' },
+        goal(0, 0),
+        { type: 'card', side: 1, playerId: ids[1][1], color: 'yellow' },
+        goal(1, 0),
+        { type: 'end_period' },
+      ];
+    },
+  },
   chess: {
     playersPerSide: () => 1,
     commands: () => [

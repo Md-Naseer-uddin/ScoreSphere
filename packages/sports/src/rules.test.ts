@@ -8,7 +8,7 @@ import { previewRules } from './rule-preview.js';
 import { tennisPresets } from './tennis/settings.js';
 import { volleyballPresets } from './volleyball/settings.js';
 
-const PILOT = ['badminton', 'chess', 'cricket', 'tennis', 'volleyball'] as const;
+const PILOT = ['badminton', 'chess', 'cricket', 'football', 'tennis', 'volleyball'] as const;
 
 /** A valid value for a field: its first option, or its minimum. */
 const sample = (f: RuleField) =>

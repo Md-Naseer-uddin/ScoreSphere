@@ -2,6 +2,7 @@ import type { SportKey } from '@scoresphere/contracts';
 import type { MatchAwardDefinition } from '@scoresphere/engine-kit';
 import { badmintonMatchAwards } from './badminton/awards.js';
 import { cricketMatchAwards } from './cricket/awards.js';
+import { footballMatchAwards } from './football/awards.js';
 import { tennisPlayerOfTheMatch } from './tennis/awards.js';
 import { volleyballMatchAwards } from './volleyball/awards.js';
 
@@ -12,6 +13,7 @@ type AnyAward = MatchAwardDefinition<any>;
 const byEngine: Partial<Record<SportKey, Record<number, readonly AnyAward[]>>> = {
   badminton: { 1: badmintonMatchAwards },
   cricket: { 1: cricketMatchAwards },
+  football: { 1: footballMatchAwards },
   tennis: { 1: [tennisPlayerOfTheMatch] },
   volleyball: { 1: volleyballMatchAwards },
   // Chess records a result only; there is no match award (spec scoring §5).
