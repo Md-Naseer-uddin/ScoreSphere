@@ -94,3 +94,62 @@ test('football: goals, a second yellow and half-time scored offline through a re
   );
   expect(match).toEqual({ status: 'completed', summary: '2–1' });
 });
+
+test('hockey: the clock stops after a goal, a green card runs on playing time, and it syncs', async ({
+  browser,
+}) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.goto('/auth/register');
+  await register(page, 'Coach Gurjit', newPhone(), 'hockey password 1');
+
+  await page.goto('/app/matches/new?sport=field-hockey');
+  await page.getByRole('radio', { name: /4 × 15 minutes \(FIH\)/ }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByLabel('Side A name').fill('Panthers');
+  await page.getByLabel('Side B name').fill('Falcons');
+  await players(page, { A: ['Harpreet', 'Mandeep'], B: ['Rupinder', 'Sunil'] });
+  await page.getByRole('button', { name: 'Start match' }).click();
+  await page.waitForURL(/\/score$/);
+  const matchId = page.url().split('/').at(-2)!;
+
+  await page.getByRole('button', { name: 'Push back' }).click();
+  await expect(page.getByTestId('hockey-status')).toContainText('Quarter 1');
+  await page.getByRole('button', { name: 'Penalty corner Panthers' }).click();
+  await expect(page.getByTestId('hockey-status')).toContainText('clock stopped');
+  await page.getByRole('button', { name: 'Restart clock' }).click();
+  await page.getByRole('button', { name: 'Goal Panthers' }).click();
+  await page.getByRole('radio', { name: 'Penalty corner' }).click();
+  await page.getByLabel('Scorer').selectOption({ label: 'Harpreet' });
+  await page.getByRole('button', { name: 'Record goal' }).click();
+  await expect(page.getByTestId('goals-0')).toHaveText('1');
+  // FIH: the clock waits for the centre pass.
+  await expect(page.getByTestId('hockey-status')).toContainText('clock stopped');
+
+  await serviceWorkerReady(page);
+  await context.setOffline(true);
+  await page.getByRole('button', { name: 'Card', exact: true }).click();
+  await page.getByRole('radio', { name: 'Falcons' }).click();
+  await page.getByRole('radio', { name: 'Sunil' }).click();
+  await page.getByRole('button', { name: 'Green card' }).click();
+  // The clock is stopped, so the two minutes have not started to run down.
+  await expect(page.getByRole('list', { name: 'Suspended players' })).toContainText(
+    'Sunil (Falcons) · 2:00',
+  );
+  await page.reload();
+  await expect(page.getByRole('list', { name: 'Suspended players' })).toContainText('Sunil');
+  await page.getByRole('button', { name: 'Restart clock' }).click();
+  for (const quarter of [1, 2, 3, 4]) {
+    if (quarter > 1) await page.getByRole('button', { name: `Start Quarter ${quarter}` }).click();
+    await page.getByRole('button', { name: `End Quarter ${quarter}` }).click();
+  }
+  await expect(page.getByTestId('hockey-status')).toHaveText('Full time');
+
+  await context.setOffline(false);
+  await expect(syncBadge(page)).toHaveText('Synced', { timeout: 30_000 });
+  const [match] = await query<{ status: string; summary: string }>(
+    `select status, result->>'summary' as summary from matches where id = $1`,
+    [matchId],
+  );
+  expect(match).toEqual({ status: 'completed', summary: '1–0' });
+});

@@ -1051,5 +1051,59 @@
       "shootout": "Level: penalties",
       "draw": "Full time: a draw"
     }
+  },
+  "hockey": {
+    "setup": {
+      "playersOnField": "Players on the field",
+      "periods": "Periods",
+      "periodMinutes": "Minutes per period",
+      "greenCardMinutes": "Green card (minutes)",
+      "yellowCardMinutes": "Yellow card (minutes)",
+      "stopClock": "Stop the clock after goals and for penalty corners",
+      "shootout": "Shoot-out if level (5 each)"
+    },
+    "quarter": "Quarter {{n}}",
+    "clockStopped": "clock stopped",
+    "pcShort_one": "{{count}} PC",
+    "pcShort_other": "{{count}} PCs",
+    "cornersFor_one": "{{count}} penalty corner",
+    "cornersFor_other": "{{count}} penalty corners",
+    "suspended": "Suspended players",
+    "pushBack": "Push back",
+    "restartClock": "Restart clock",
+    "stopClock": "Stop clock",
+    "cornerTo": "Penalty corner {{name}}",
+    "stroke": "Penalty stroke",
+    "strokeTo": "Awarded to",
+    "taker": "Taker",
+    "strokeMissed": "{{name}}: penalty stroke missed",
+    "kind": {
+      "field_goal": "Field goal",
+      "penalty_corner": "Penalty corner",
+      "penalty_stroke": "Penalty stroke"
+    },
+    "card": {
+      "green": "Green card",
+      "yellow": "Yellow card",
+      "red": "Red card"
+    },
+    "longerYellow": "Yellow card for 10 minutes",
+    "shootout": "Shoot-out",
+    "goesFirst": "Who goes first?",
+    "startShootout": "Start shoot-out",
+    "toGo": "{{name}} to go",
+    "timeline": {
+      "strokeScored": "{{name}} penalty stroke scored",
+      "strokeMissed": "{{name}} penalty stroke missed",
+      "green": "Green card: {{name}}",
+      "yellow": "Yellow card: {{name}}",
+      "red": "Red card: {{name}}",
+      "shootout": "Shoot-out: {{name}} go first",
+      "attemptScored": "{{name}} shoot-out: scored",
+      "attemptMissed": "{{name}} shoot-out: missed"
+    },
+    "announce": {
+      "shootout": "Level: shoot-out"
+    }
   }
 }
