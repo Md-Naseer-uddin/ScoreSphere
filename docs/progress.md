@@ -11,8 +11,8 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
 | M2 — People and rosters | done |
 | M3 — Walking skeleton: Badminton, offline-first | done (on-device check pending) |
 | M4 — Cricket | built; exit pending owner (real scoresheets, field test) |
-| M5 — Rally family + Chess | next |
-| M6 — Pilot release | not started |
+| M5 — Rally family + Chess | done (Android screen-lock/kill check pending) |
+| M6 — Pilot release | next |
 | M7 — Tournaments, statistics, profiles | not started |
 | M8 — Rules builder | not started |
 | M9 — Football, Field Hockey, Basketball | not started |
@@ -98,22 +98,65 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
 - Real scoresheet golden logs and a field test (owner, below).
 - Concussion replacements as `ROSTER` events: deferred. They need a way to add a participant snapshot after creation without putting names in events (ADR 0024). The playing XI is the roster chosen at setup.
 
-## Next — M5: Rally family + Chess (timer foundation)
+**M5**
+- **engine-kit:**
+  - Device-time clocks (`Clock`, `formatClock`).
+  - An `onLifecycle` hook, so pausing stops a chess clock without charging the player.
+  - `validate` receives the event's device time.
+  - Live snapshots carry `serverNow` and the scorer's clock offset, so spectators can show running clocks.
+- **Tennis:**
+  - Games with advantage or no-ad scoring, and tie-break sets.
+  - Deciding set: tie-break, advantage or a match tie-break.
+  - Singles and doubles service order, including serving inside a tie-break.
+  - Change-of-ends prompts.
+  - Presets: ITF best of 3, match tie-break and best of 5; short sets and pro set.
+- **Volleyball:**
+  - Rally scoring with a deciding set, and line-ups with clockwise rotation on side-outs.
+  - First-serve alternation per set (new toss in the decider).
+  - Per-set substitution and timeout limits.
+  - Optional point credits (attack, block, ace) feeding MVP, Best Spiker and Best Blocker, which appear only when credits exist.
+- **Chess clock:**
+  - Base time, Fischer increment, delay and staged time controls.
+  - Flag fall, recorded as a loss or a draw (Article 6.9), and every result type.
+  - Presets: classical, rapid, blitz, bullet, no clock.
+- **Tests:**
+  - Golden logs and property tests for each engine, including exact chess clock accounting through presses and pauses.
+  - Every engine's golden logs run against the server and client builds.
+- **Client screens** for all three sports.
+- **Playwright:**
+  - A chess clock stays within ±1 s (plus display rounding) after going offline and a reload.
+  - Tennis and volleyball scored offline through a reload, then synced.
 
-1. **Tennis:**
-   - Point → game → set → match.
-   - Advantage or no-ad, tie-breaks and final-set rules.
-   - Service order.
-2. **Volleyball:** sets, rotation, timeouts and substitutions.
-3. **Shared helpers:** rally/set helpers in engine-kit, shared with badminton where they fit.
-4. **Timers in engine-kit:**
-   - `CLOCK` events with device-owned elapsed time and a derived display.
-   - A server-time offset for spectators.
-   - Recovery after backgrounding, screen lock and process kill.
-5. **Chess clock:** base time, increment, delay, stages, flag fall, and results by resignation, draw, agreement or time.
-6. **Exit:**
-   - Displayed drift within ±1 s after background/kill recovery, with chess increments exact.
-   - Timer tests for screen lock, app kill and offline.
+**Not done in M5:**
+- **Shared rally/set helpers:** not extracted. Badminton, tennis and volleyball differ enough (service rules, tie-breaks, rotation) that each engine stays self-contained.
+- **Volleyball:** libero replacements and substitution re-entry rules are not checked yet. The rules content says so.
+
+## Next — M6: Pilot release
+
+What can be built without the owner:
+1. **Match awards:**
+   - Persist `award_records` with provenance (auto, manual, override), criteria version, metric snapshot and status (ADR 0023).
+   - Compute them on completion.
+   - Organizers can select or override, with a reason, and it is audited.
+2. **Privacy (DPDP):**
+   - Privacy notice and terms pages.
+   - Personal data export.
+   - Account deletion that anonymises match snapshots and roster links.
+   - A retention note.
+3. **Security pass:** headers and CSP, CORS, rate limits on public endpoints, upload checks, share-token abuse.
+4. **Ops:**
+   - Dockerfiles and a deployable compose file.
+   - A metrics endpoint: sync backlog, rejection rate, needs-review count, SSE connections.
+   - A PII-scrubbing error-reporting hook.
+   - Backup and restore scripts.
+   - Runbooks: lost device, leaked share link, bad engine release, sync backlog.
+5. **Distribution:**
+   - In-app version check and minimum-version gate (ADR 0019).
+   - A download page with SHA-256 and release notes.
+   - PWA install help.
+   - A release workflow that signs the APK once keystore secrets exist.
+
+Needs the owner: hosting (staging and production in India), the APK signing keystore, error-tracking account, legal review of the privacy notice.
 
 ## Needs the owner
 
@@ -131,3 +174,5 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
   - Proposed award criteria (impact points; most runs, then fewest balls; most wickets, then fewest runs).
   - Super-over stats are left out of player totals.
   - One tip one hand is credited to the bowler like a catch.
+
+- **M5 on-device check:** on the APK, run a chess clock, lock the screen and kill the app, then reopen; the displayed time should be within ±1 s.
