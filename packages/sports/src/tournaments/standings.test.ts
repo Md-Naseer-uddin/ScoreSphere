@@ -86,6 +86,32 @@ describe('standings', () => {
   });
 });
 
+describe('football standings', () => {
+  it('gives 3 points for a win and 1 for a draw, then goal difference and goals scored', () => {
+    const rules = tournamentRules('football')!;
+    const goals = (a: number, b: number): FixtureResult['totals'] => [
+      { goalsFor: a, goalsAgainst: b },
+      { goalsFor: b, goalsAgainst: a },
+    ];
+    const results: FixtureResult[] = [
+      win('A', 'C', goals(3, 0)),
+      win('B', 'C', goals(4, 2)),
+      { side1: 'A', side2: 'B', winner: null, totals: goals(1, 1) },
+      win('C', 'D', goals(1, 0)),
+      win('B', 'D', goals(2, 1)),
+      win('A', 'D', goals(1, 0)),
+    ];
+    const table = computeStandings(['A', 'B', 'C', 'D'], results, rules.points, rules.tieBreaks);
+    // A and B both have 7 points; A's goal difference (+4) beats B's (+3).
+    expect(table.map((r) => [r.entryId, r.points, r.tieBreaks.goal_difference])).toEqual([
+      ['A', 7, 4],
+      ['B', 7, 3],
+      ['C', 3, -4],
+      ['D', 0, -3],
+    ]);
+  });
+});
+
 describe('player awards', () => {
   it('sums statistics by roster member and applies the tie-break', () => {
     const run = runCricketGoldenLog(cricketGoldenLogs[0]!);
