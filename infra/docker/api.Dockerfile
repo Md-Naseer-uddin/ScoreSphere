@@ -10,9 +10,12 @@ RUN pnpm --filter @scoresphere/api deploy --prod --legacy /out
 
 FROM node:24-alpine
 ENV NODE_ENV=production
+RUN apk add --no-cache su-exec
 WORKDIR /app
 COPY --from=build /out ./
-USER node
+# The entrypoint makes STORAGE_DIR writable, then drops to the `node` user.
+COPY infra/docker/api-entrypoint.sh /usr/local/bin/api-entrypoint
 EXPOSE 3300
 HEALTHCHECK --interval=30s --timeout=5s CMD wget -qO- http://127.0.0.1:3300/api/v1/health || exit 1
+ENTRYPOINT ["api-entrypoint"]
 CMD ["node", "dist/main.js"]
