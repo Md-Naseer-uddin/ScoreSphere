@@ -35,3 +35,4 @@ Each record explains a decision that changes or extends the original spec in [do
 | [0029](0029-roster-link-states.md) | Roster link states instead of an association-requests table |
 | [0030](0030-device-assigned-sequence.md) | The scoring device numbers ledger events |
 | [0031](0031-offline-session-window.md) | The last signed-in account stays usable offline for 14 days |
+| [0032](0032-rule-effects-computed-in-fold.md) | Rule effects are computed in the fold, not stored |

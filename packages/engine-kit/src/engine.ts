@@ -1,6 +1,7 @@
 import type { LifecycleAction, MatchResult, MatchRoster, SportKey } from '@scoresphere/contracts';
 import type { z } from 'zod';
 import type { Result } from './result.js';
+import type { RuleCatalogue } from './rules.js';
 
 export type { MatchResult, MatchRoster };
 
@@ -71,6 +72,10 @@ export interface SportEngine<State, Config, Command extends { type: string }> {
    * abandoned (ADR 0006). Engines without clocks leave it out.
    */
   onLifecycle?(state: State, action: LifecycleAction, ctx: ApplyContext): State;
+  /** What custom rules may use in this sport (D16b); without it, matches can't have rules. */
+  readonly ruleCatalogue?: RuleCatalogue;
+  /** Current values of the catalogue's state variables, for rule conditions. */
+  ruleVariables?(state: State): Record<string, number | string | boolean>;
   isComplete(state: State): boolean;
   result(state: State): MatchResult;
   stats(state: State): MetricRecord[];

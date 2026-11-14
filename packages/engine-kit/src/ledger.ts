@@ -7,6 +7,7 @@ import {
   type MatchStatus,
 } from '@scoresphere/contracts';
 import type { DomainFact, EngineError, SportEngine } from './engine.js';
+import { RULE_LIMITS, ruleMatches, rulesFor, validateRules } from './rules.js';
 import { err, ok, type Result } from './result.js';
 
 /**
@@ -50,8 +51,9 @@ export interface LedgerError {
 
 /** One scoring or lifecycle event as it reads after corrections. */
 export interface TimelineEntry<Command> {
+  /** For a rule's effect, the seq of the event that triggered it. */
   seq: number;
-  kind: 'COMMAND' | 'LIFECYCLE';
+  kind: 'COMMAND' | 'LIFECYCLE' | 'DERIVED';
   occurredAt: number;
   /** The command in effect, after any `REPLACE`. */
   command?: Command;
@@ -63,6 +65,11 @@ export interface TimelineEntry<Command> {
   facts: DomainFact[];
   /** Lenient replays only: why this event was skipped. */
   invalid?: LedgerError;
+  /** Effects of the match's rules on this event, in the order they happened. */
+  derived?: TimelineEntry<Command>[];
+  /** For `DERIVED` entries: the rule that produced this effect (D16b). */
+  ruleId?: string;
+  ruleName?: string;
 }
 
 export interface MatchProjection<State, Config, Command> {
@@ -120,6 +127,16 @@ function parseCreated<S, C, Cmd extends { type: string }>(
   if (!config.success) return err(failure('BAD_PAYLOAD', 1, 'The match settings are invalid.'));
   const setup = engine.validateSetup(config.data, created.data.roster);
   if (!setup.ok) return err(engineRejected(1, setup.error));
+  const rules = created.data.rules ?? [];
+  if (rules.length) {
+    const problems = engine.ruleCatalogue
+      ? validateRules(engine.ruleCatalogue, rules)
+      : [{ message: 'This sport has no custom rules.' }];
+    if (problems.length)
+      return err(
+        failure('BAD_PAYLOAD', 1, `The match's rules are invalid: ${problems[0]!.message}`),
+      );
+  }
   const state = engine.init(config.data, created.data.roster);
   return ok({
     version: 1,
@@ -196,6 +213,7 @@ function step<S, C, Cmd extends { type: string }>(
   if (!valid.ok) return engineRejected(event.seq, valid.error);
   const next = engine.apply(p.state, command, { occurredAt: event.occurredAt });
   p.state = next.state;
+  const derived = fireRules(engine, p, next.facts, event);
   if (engine.isComplete(p.state)) {
     closeLiveInterval(p, event.occurredAt);
     p.status = 'completed';
@@ -208,7 +226,75 @@ function step<S, C, Cmd extends { type: string }>(
     command,
     ...(replacement ? { original: original.data, replacedBy: replacement.seq } : {}),
     facts: next.facts,
+    ...(derived.length ? { derived } : {}),
   };
+}
+
+/**
+ * Runs the match's rules on the facts an event produced (D16b). Effects go through the
+ * engine like any command and are recorded as derived timeline entries; they are computed
+ * here on every replay, never stored, so undo and corrections apply to them too (ADR 0032).
+ * A rule fires at most once per event, and chains stop at the depth and count limits.
+ */
+function fireRules<S, C, Cmd extends { type: string }>(
+  engine: AnyEngine<S, C, Cmd>,
+  p: MatchProjection<S, C, Cmd>,
+  facts: DomainFact[],
+  event: LedgerEvent,
+): TimelineEntry<Cmd>[] {
+  const rules = p.created.rules ?? [];
+  if (!rules.length) return [];
+  const derived: TimelineEntry<Cmd>[] = [];
+  const fired = new Set<string>();
+  const ctx = { occurredAt: event.occurredAt };
+  const queue = facts.map((fact) => ({ fact, depth: 1 }));
+  while (queue.length && derived.length < RULE_LIMITS.maxEffectsPerEvent) {
+    const { fact, depth } = queue.shift()!;
+    for (const rule of rulesFor(rules, fact.type)) {
+      if (fired.has(rule.id)) continue;
+      if (!ruleMatches(rule, fact, engine.ruleVariables?.(p.state) ?? {})) continue;
+      fired.add(rule.id);
+      for (const action of rule.actions) {
+        if (derived.length >= RULE_LIMITS.maxEffectsPerEvent) break;
+        const base = {
+          seq: event.seq,
+          kind: 'DERIVED' as const,
+          occurredAt: event.occurredAt,
+          ruleId: rule.id,
+          ruleName: rule.name,
+        };
+        const parsed = engine.commandSchema.safeParse({ ...action.params, type: action.command });
+        if (!parsed.success) {
+          derived.push({
+            ...base,
+            facts: [],
+            invalid: failure(
+              'BAD_PAYLOAD',
+              event.seq,
+              `Rule "${rule.name}" has an invalid action.`,
+            ),
+          });
+          continue;
+        }
+        const valid = engine.validate(p.state, parsed.data, ctx);
+        if (!valid.ok) {
+          derived.push({
+            ...base,
+            command: parsed.data,
+            facts: [],
+            invalid: engineRejected(event.seq, valid.error),
+          });
+          continue;
+        }
+        const effect = engine.apply(p.state, parsed.data, ctx);
+        p.state = effect.state;
+        derived.push({ ...base, command: parsed.data, facts: effect.facts });
+        if (depth < RULE_LIMITS.maxDepth)
+          for (const f of effect.facts) queue.push({ fact: f, depth: depth + 1 });
+      }
+    }
+  }
+  return derived;
 }
 
 function engineRejected(seq: number, error: EngineError): LedgerError {

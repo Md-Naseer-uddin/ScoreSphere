@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { idSchema } from './ids.js';
+import { rulesSchema } from './rules.js';
 import { sportKeySchema } from './sports.js';
 
 /**
@@ -45,6 +46,9 @@ export const createdPayloadSchema = z.object({
   /** Fully resolved settings; the sport's settings schema validates it. */
   config: z.record(z.string(), z.unknown()),
   roster: matchRosterSchema,
+  /** Custom rules this match plays under (D16b), and the ruleset version they came from. */
+  rules: rulesSchema.optional(),
+  rulesetVersionId: idSchema.optional(),
 });
 export type CreatedPayload = z.infer<typeof createdPayloadSchema>;
 

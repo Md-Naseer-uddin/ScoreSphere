@@ -8,6 +8,7 @@ export * from './ids.js';
 export * from './matches.js';
 export * from './people.js';
 export * from './phone.js';
+export * from './rules.js';
 export * from './sports.js';
 export * from './stats.js';
 export * from './sync.js';
