@@ -12,8 +12,8 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
 | M3 — Walking skeleton: Badminton, offline-first | done (on-device check pending) |
 | M4 — Cricket | built; exit pending owner (real scoresheets, field test) |
 | M5 — Rally family + Chess | done (Android screen-lock/kill check pending) |
-| M6 — Pilot release | next |
-| M7 — Tournaments, statistics, profiles | not started |
+| M6 — Pilot release | built; launch pending owner (hosting, keystore, legal review, pilot users) |
+| M7 — Tournaments, statistics, profiles | next |
 | M8 — Rules builder | not started |
 | M9 — Football, Field Hockey, Basketball | not started |
 | M10 — Kabaddi, Kho-Kho, Wrestling, Carrom | not started |
@@ -131,32 +131,56 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
 - **Shared rally/set helpers:** not extracted. Badminton, tennis and volleyball differ enough (service rules, tie-breaks, rotation) that each engine stays self-contained.
 - **Volleyball:** libero replacements and substitution re-entry rules are not checked yet. The rules content says so.
 
-## Next — M6: Pilot release
+**M6**
+- **Match awards:**
+  - `award_records` with provenance (auto, manual, override), criteria version, metric snapshot and status.
+  - Recomputed automatically when a completed match changes; withdrawn if it reopens; held back while it needs review.
+  - Organizers (admins) select or override with a reason. It is audited, and goes stale if the match changes afterwards.
+  - One awards card on the match and live pages; provisional before sync.
+- **Privacy (DPDP):**
+  - Privacy notice and terms pages (marked for legal review), with a consent notice at registration.
+  - `GET /me/export`.
+  - `POST /me/deletion` anonymises the account: number erased and re-registrable; personal workspace deleted; organisation rosters unlinked. It refuses to strand an organisation without an owner.
+  - A "Your data" card that also clears the account's data from the device.
+- **Security:**
+  - Production config guards: CORS origins, rate limits, https links.
+  - `TRUST_PROXY` for per-client rate limits behind a proxy.
+  - Header and CORS tests.
+  - A strict CSP and headers on the web app (nginx).
+- **Ops:**
+  - Docker images (API and web), built and smoke-tested locally.
+  - Production compose with a migration job (`node dist/migrate.js`).
+  - Backup and restore scripts.
+  - Prometheus metrics behind a token.
+  - Scrubbed error reports to an optional webhook.
+  - Runbooks: deploy, backup and restore drill, lost device, leaked link, bad engine release, sync backlog.
+  - Scoring devices re-send events the server lost (e.g. after a restore).
+- **Distribution:**
+  - `GET /app/version` with a minimum-version gate on new matches (ADR 0019).
+  - `/download` page with the APK checksum and PWA install help.
+  - A tag-triggered release workflow that signs the APK once secrets exist and publishes it with its SHA-256.
 
-What can be built without the owner:
-1. **Match awards:**
-   - Persist `award_records` with provenance (auto, manual, override), criteria version, metric snapshot and status (ADR 0023).
-   - Compute them on completion.
-   - Organizers can select or override, with a reason, and it is audited.
-2. **Privacy (DPDP):**
-   - Privacy notice and terms pages.
-   - Personal data export.
-   - Account deletion that anonymises match snapshots and roster links.
-   - A retention note.
-3. **Security pass:** headers and CSP, CORS, rate limits on public endpoints, upload checks, share-token abuse.
-4. **Ops:**
-   - Dockerfiles and a deployable compose file.
-   - A metrics endpoint: sync backlog, rejection rate, needs-review count, SSE connections.
-   - A PII-scrubbing error-reporting hook.
-   - Backup and restore scripts.
-   - Runbooks: lost device, leaked share link, bad engine release, sync backlog.
-5. **Distribution:**
-   - In-app version check and minimum-version gate (ADR 0019).
-   - A download page with SHA-256 and release notes.
-   - PWA install help.
-   - A release workflow that signs the APK once keystore secrets exist.
+**Not built in M6:**
+- **Live-update channel** for the APK's web bundle: needs a choice of self-hosted service; until then, updates ship as new APKs.
+- **Broadcast delay** on live links: plan §7 default is off.
 
-Needs the owner: hosting (staging and production in India), the APK signing keystore, error-tracking account, legal review of the privacy notice.
+## Next — M7: Tournaments, statistics and player profiles
+
+1. **Schema (ADR 0023):**
+   - `tournaments`.
+   - `tournament_entries`: a team or a roster member.
+   - `tournament_fixtures`: nullable sides and match, with byes.
+   - Standings snapshots.
+   - Tournament-scope awards.
+2. **Fixture generation:** deterministic round-robin and single-elimination, with seeding and byes. Each fixture becomes a normal match, claimed by a scorer device (ADR 0008).
+3. **Standings:** a strategy per sport with configured tie-breaks; recalculated when a match changes.
+4. **Statistics and awards:**
+   - Tournament statistics and leaderboards.
+   - Tournament awards that go stale and are reviewed after corrections.
+5. **Profiles:**
+   - Player and team statistics pages (match, tournament, career), filtered by workspace and privacy.
+   - An optional public tournament page via share link.
+6. **Exit (e2e):** create tournament → fixtures → score → standings → awards → correct a match → award stale → republished.
 
 ## Needs the owner
 
@@ -176,3 +200,9 @@ Needs the owner: hosting (staging and production in India), the APK signing keys
   - One tip one hand is credited to the bowler like a catch.
 
 - **M5 on-device check:** on the APK, run a chess clock, lock the screen and kill the app, then reopen; the displayed time should be within ±1 s.
+- **Pilot launch:**
+  - Hosting in an India region (staging and production).
+  - The APK signing keystore, stored as repository secrets for `release.yml`.
+  - An error-tracking webhook.
+  - A lawyer's review of the privacy notice and terms.
+  - The pilot group of users.
