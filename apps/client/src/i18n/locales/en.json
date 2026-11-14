@@ -1344,5 +1344,46 @@
     "announce": {
       "won": "{{name}} wins {{method}}"
     }
+  },
+  "carrom": {
+    "setup": {
+      "targetPoints": "Points to win a game",
+      "maxBoards": "Boards per game (blank: no limit)",
+      "queenPoints": "Queen points",
+      "queenCountsBelow": "Queen counts below (blank: always)",
+      "gamesToWin": "Games to win"
+    },
+    "discipline": "Singles or doubles",
+    "singles": "Singles",
+    "doubles": "Doubles",
+    "beforeMatch": "Before the first board",
+    "status": "Game {{game}} · board {{board}} · {{name}} to break",
+    "gamesWon": "Games won",
+    "boardResult": "Board {{n}} result",
+    "boardWinner": "Who won the board?",
+    "coinsLeft": "Opponent’s coins left",
+    "fewerCoins": "One coin fewer",
+    "moreCoins": "One coin more",
+    "queenCoveredBy": "Queen covered by",
+    "queenNotCovered": "Nobody",
+    "recordBoard": "Record board",
+    "firstBreak": "Who breaks first?",
+    "start": "Start the first board",
+    "foulBy": "Foul: {{name}}",
+    "game": "Game {{n}}",
+    "board": "Board {{n}}",
+    "withQueen": "with the queen",
+    "fouls": "Fouls: {{a}} – {{b}}",
+    "timeline": {
+      "start": "{{name}} breaks first",
+      "board_one": "Board to {{name}}: {{count}} point",
+      "board_other": "Board to {{name}}: {{count}} points",
+      "boardQueen_one": "Board to {{name}}: {{count}} point, queen included",
+      "boardQueen_other": "Board to {{name}}: {{count}} points, queen included",
+      "boardUndone": "Board to {{name}}"
+    },
+    "announce": {
+      "game": "Game to {{name}}"
+    }
   }
 }
