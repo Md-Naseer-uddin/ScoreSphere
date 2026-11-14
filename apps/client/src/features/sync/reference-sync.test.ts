@@ -64,6 +64,7 @@ describe('syncReference', () => {
         teams: [team(id.t1!, A), team(id.t2!, B)],
         teamMembers: [member(id.m1!, id.t1!, id.r1!)],
         rosterMembers: [roster(id.r1!, A), roster(id.r2!, B)],
+        rulesets: [],
       }),
       'GET /sync/reference?since=2026-11-14T10%3A00%3A00.000Z': ok({
         cursor: '2026-11-14T11:00:00.000Z',
@@ -72,6 +73,7 @@ describe('syncReference', () => {
         teams: [team(id.t1!, A, true)],
         teamMembers: [member(id.m1!, id.t1!, id.r1!, '2026-11-14T10:30:00.000Z')],
         rosterMembers: [roster(id.r3!, A)],
+        rulesets: [],
       }),
     });
 
@@ -105,6 +107,7 @@ describe('syncReference', () => {
         teams: [team(id.t1!, A)],
         teamMembers: [],
         rosterMembers: [roster(id.r1!, A)],
+        rulesets: [],
       }),
     });
     await syncReference(database);

@@ -1131,7 +1131,7 @@ function announce(facts: Entry['facts']): string[] {
       case 'wide_penalty':
         return [tr('cricket.announce.widePenalty', { runs: f.data?.runs })];
       case 'penalty_runs':
-        return [tr('cricket.announce.penaltyRuns', { runs: f.data?.runs })];
+        return [tr('cricket.announce.penaltyRuns', { count: Number(f.data?.runs) })];
       case 'super_over_needed':
         return [tr('cricket.announce.superOver')];
       default:

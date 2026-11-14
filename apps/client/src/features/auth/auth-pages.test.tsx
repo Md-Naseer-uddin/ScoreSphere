@@ -67,6 +67,7 @@ describe('sign in', () => {
         teams: [],
         teamMembers: [],
         rosterMembers: [],
+        rulesets: [],
       }),
     });
     const router = renderApp('/auth/login?next=%2Fapp%2Fsports');

@@ -22,6 +22,8 @@ import { TeamDetailPage } from '@/features/teams/TeamDetailPage';
 import { TeamsPage } from '@/features/teams/TeamsPage';
 import { CreateOrganizationPage } from '@/features/workspaces/CreateOrganizationPage';
 import { JoinPage } from '@/features/workspaces/JoinPage';
+import { RulesetEditorPage } from '@/features/rulesets/RulesetEditorPage';
+import { RulesetsPage } from '@/features/rulesets/RulesetsPage';
 import { TournamentPage } from '@/features/tournaments/TournamentPage';
 import { NewTournamentPage, TournamentsPage } from '@/features/tournaments/TournamentsPage';
 import { WorkspaceSettingsPage } from '@/features/workspaces/WorkspaceSettingsPage';
@@ -69,6 +71,9 @@ export const routes: RouteObject[] = [
           { path: 'tournaments', element: <TournamentsPage /> },
           { path: 'tournaments/new', element: <NewTournamentPage /> },
           { path: 'tournaments/:tournamentId', element: <TournamentPage /> },
+          { path: 'rulesets', element: <RulesetsPage /> },
+          { path: 'rulesets/new', element: <RulesetEditorPage /> },
+          { path: 'rulesets/:rulesetId', element: <RulesetEditorPage /> },
           { path: 'players/:rosterMemberId', element: <PlayerPage /> },
           { path: 'teams', element: <TeamsPage /> },
           { path: 'teams/roster', element: <RosterPage /> },

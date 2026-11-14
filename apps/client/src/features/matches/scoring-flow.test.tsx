@@ -30,6 +30,7 @@ function server() {
       teams: [],
       teamMembers: [],
       rosterMembers: [],
+      rulesets: [],
     }),
     'POST /matches/*': (init) => {
       if (init.url.endsWith('/lease')) {

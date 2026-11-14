@@ -4,7 +4,7 @@ import {
   type SideIndex,
   type SportKey,
 } from '@scoresphere/contracts';
-import { SPORTS } from '@scoresphere/sports';
+import { latestEngine, SPORTS } from '@scoresphere/sports';
 import { ArrowLeft, Minus, Plus } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +14,7 @@ import { ChoiceGroup } from '@/components/ChoiceGroup';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useRulesets } from '@/features/rulesets/RulesetsPage';
 import { useSession } from '@/features/auth/session';
 import { useQuickGuests, useRoster, useTeams } from '@/features/teams/local-data';
 import { getTournament, tournamentKeys } from '@/features/tournaments/tournaments-api';
@@ -89,6 +90,10 @@ export function NewMatchPage() {
   const [sides, setSides] = useState<SideDraft[]>(() => draftSides(ui, setup, defaultName));
   const [title, setTitle] = useState('');
   const [saving, setSaving] = useState(false);
+  // A saved ruleset fixes the settings and adds its rules (plan M8); null means standard.
+  const rulesets = useRulesets(workspace?.id, sport);
+  const [rulesetId, setRulesetId] = useState<string | null>(null);
+  const ruleset = rulesets?.find((r) => r.id === rulesetId) ?? null;
 
   const size = ui && setup ? ui.sideSize(setup.config) : { min: 1, max: 1, initial: 1 };
   const options = useMemo(
@@ -115,8 +120,23 @@ export function NewMatchPage() {
     const defaults = next?.defaultSetup() ?? null;
     setSport(key);
     setSetup(defaults);
+    setRulesetId(null);
     setSides(draftSides(next, defaults, defaultName));
     setStep('format');
+  };
+
+  const chooseRuleset = (id: string) => {
+    const picked = rulesets?.find((r) => r.id === id);
+    setRulesetId(picked?.id ?? null);
+    if (!picked) return chooseSetup(ui!.defaultSetup());
+    const preset = latestEngine(picked.sport)?.presets.find(
+      (p) => p.key === picked.latest.basePresetKey,
+    );
+    chooseSetup({
+      presetKey: picked.latest.basePresetKey,
+      presetVersion: preset?.version ?? 1,
+      config: picked.latest.config,
+    });
   };
 
   const chooseSetup = (next: SportSetup) => {
@@ -221,6 +241,7 @@ export function NewMatchPage() {
       title: title.trim() || (tournament ? tournament.name : null),
       sides: snapshot,
       fixtureId: fixture?.id ?? null,
+      ...(ruleset ? { rules: ruleset.latest.rules, rulesetVersionId: ruleset.latest.id } : {}),
     }).catch(() => null);
     setSaving(false);
     if (!created?.ok) {
@@ -270,7 +291,36 @@ export function NewMatchPage() {
 
       {step === 'format' && ui && (
         <div className="space-y-5">
-          <ui.Setup value={setup} onChange={chooseSetup} />
+          {!fixture && Boolean(rulesets?.length) && (
+            <div className="space-y-2">
+              <p className="text-sm font-medium">{t('rulesets.choose')}</p>
+              <ChoiceGroup
+                label={t('rulesets.choose')}
+                value={rulesetId ?? 'standard'}
+                onChange={chooseRuleset}
+                choices={[
+                  { value: 'standard', label: t('rulesets.standard') },
+                  ...(rulesets ?? []).map((r) => ({
+                    value: r.id,
+                    label: r.name,
+                    hint: t('rulesets.count', { count: r.latest.rules.length }),
+                  })),
+                ]}
+              />
+            </div>
+          )}
+          {ruleset ? (
+            <div className="space-y-1 rounded-xl border p-4 text-sm">
+              <p className="font-medium">{t('rulesets.fixedSettings', { name: ruleset.name })}</p>
+              <ul className="list-disc pl-5 text-muted-foreground">
+                {ruleset.latest.rules.map((r) => (
+                  <li key={r.id}>{r.name}</li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <ui.Setup value={setup} onChange={chooseSetup} />
+          )}
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => setStep('sport')}>
               {t('common.back')}

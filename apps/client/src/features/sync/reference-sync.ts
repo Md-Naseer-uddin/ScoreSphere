@@ -11,7 +11,7 @@ let inflight: Promise<void> | null = null;
 let lastRun = 0;
 
 /**
- * Pulls workspaces, teams and rosters into the device database (plan §3.6). The first run
+ * Pulls workspaces, teams, rosters and rulesets into the device database (plan §3.6). The first run
  * downloads everything; later runs fetch only changes since the stored cursor.
  */
 export function syncReference(database: LocalDatabase = db): Promise<void> {
@@ -38,6 +38,7 @@ async function run(database: LocalDatabase): Promise<void> {
       database.teams,
       database.teamMembers,
       database.rosterMembers,
+      database.rulesets,
       database.settings,
     ],
     async () => {
@@ -51,6 +52,7 @@ async function run(database: LocalDatabase): Promise<void> {
       await database.teams.bulkDelete(goneTeams);
       await database.teamMembers.where('teamId').anyOf(goneTeams).delete();
       await database.rosterMembers.filter((m) => !allowed.has(m.workspaceId)).delete();
+      await database.rulesets.filter((r) => !allowed.has(r.workspaceId)).delete();
 
       await database.teams.bulkPut(data.teams.filter((t) => !t.archived));
       await database.teams.bulkDelete(data.teams.filter((t) => t.archived).map((t) => t.id));
@@ -65,6 +67,10 @@ async function run(database: LocalDatabase): Promise<void> {
       await database.rosterMembers.bulkPut(data.rosterMembers.filter((m) => !m.archived));
       await database.rosterMembers.bulkDelete(
         data.rosterMembers.filter((m) => m.archived).map((m) => m.id),
+      );
+      await database.rulesets.bulkPut(data.rulesets.filter((r) => !r.archivedAt));
+      await database.rulesets.bulkDelete(
+        data.rulesets.filter((r) => r.archivedAt).map((r) => r.id),
       );
 
       await database.settings.put({ key: CURSOR_KEY, value: data.cursor });
@@ -81,6 +87,7 @@ export async function clearReferenceData(database: LocalDatabase = db): Promise<
       database.teams,
       database.teamMembers,
       database.rosterMembers,
+      database.rulesets,
       database.settings,
     ],
     async () => {
@@ -89,6 +96,7 @@ export async function clearReferenceData(database: LocalDatabase = db): Promise<
         database.teams.clear(),
         database.teamMembers.clear(),
         database.rosterMembers.clear(),
+        database.rulesets.clear(),
         database.settings.delete(CURSOR_KEY),
       ]);
     },

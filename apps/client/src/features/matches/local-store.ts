@@ -4,6 +4,7 @@ import {
   type MatchHeader,
   type MatchSideSnapshot,
   newId,
+  type Rule,
   type SportKey,
 } from '@scoresphere/contracts';
 import {
@@ -88,6 +89,9 @@ export interface NewLocalMatch {
   title: string | null;
   sides: MatchSideSnapshot[];
   fixtureId?: string | null;
+  /** Custom rules pinned in the match, and the saved version they came from (ADR 0032). */
+  rules?: Rule[];
+  rulesetVersionId?: string | null;
 }
 
 /**
@@ -129,6 +133,8 @@ export async function createLocalMatch(
             participantIds: s.participants.map((p) => p.participantId),
           })),
         },
+        ...(input.rules?.length ? { rules: input.rules } : {}),
+        ...(input.rulesetVersionId ? { rulesetVersionId: input.rulesetVersionId } : {}),
       },
     },
     {

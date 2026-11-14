@@ -4,6 +4,7 @@ import {
   type MatchStatus,
   newId,
   type RosterMember,
+  type Ruleset,
   type SideIndex,
   type SportKey,
   type Team,
@@ -89,6 +90,7 @@ export class LocalDatabase extends Dexie {
   quickGuests!: EntityTable<QuickGuest, 'id'>;
   matches!: EntityTable<LocalMatch, 'id'>;
   matchEvents!: Table<LocalMatchEvent, [string, number]>;
+  rulesets!: EntityTable<Ruleset, 'id'>;
 
   constructor(name = 'scoresphere') {
     super(name);
@@ -105,6 +107,10 @@ export class LocalDatabase extends Dexie {
       matches: 'id, ownerUserId, [ownerUserId+workspaceId], updatedAt',
       matchEvents: '[matchId+seq], eventId, [matchId+sync]',
     });
+    // Rulesets arrived with M8: forget the reference cursor so the next sync is a full one.
+    this.version(4)
+      .stores({ rulesets: 'id, workspaceId' })
+      .upgrade((tx) => tx.table('settings').delete('referenceCursor'));
   }
 }
 
