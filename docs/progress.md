@@ -13,8 +13,8 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
 | M4 — Cricket | built; exit pending owner (real scoresheets, field test) |
 | M5 — Rally family + Chess | done (Android screen-lock/kill check pending) |
 | M6 — Pilot release | built; launch pending owner (hosting, keystore, legal review, pilot users) |
-| M7 — Tournaments, statistics, profiles | next |
-| M8 — Rules builder | not started |
+| M7 — Tournaments, statistics, profiles | done |
+| M8 — Rules builder | next |
 | M9 — Football, Field Hockey, Basketball | not started |
 | M10 — Kabaddi, Kho-Kho, Wrestling, Carrom | not started |
 | M11 — v1.0 hardening | not started |
@@ -164,23 +164,42 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
 - **Live-update channel** for the APK's web bundle: needs a choice of self-hosted service; until then, updates ship as new APKs.
 - **Broadcast delay** on live links: plan §7 default is off.
 
-## Next — M7: Tournaments, statistics and player profiles
+**M7**
+- **Tournament logic (sports package, pure):**
+  - Deterministic round-robin (circle method) and single-elimination fixtures, with standard seeding and byes for top seeds.
+  - Standings with configurable tie-breaks from each sport's catalogue: wins, net run rate (ICC all-out rule), game/set/point difference or ratio, Sonneborn-Berger, and head-to-head among tied entries.
+  - Leaderboards and player awards summed by roster member across matches.
+- **API:**
+  - Tournaments with team or roster-member entries, and fixtures with nullable sides and byes (ADR 0023).
+  - A match created for a fixture is checked against its entries and the tournament's settings, then linked.
+  - Results flow back: knockout winners advance, and a level knockout match waits for an organizer's decision.
+  - Standings and leaderboards come from the matches' cached state.
+  - Awards (champion, runner-up and the sport's player awards) are published on completion. A later correction marks them stale until an admin republishes.
+  - Player, team and personal (cross-workspace) statistics, filterable by tournament or dates.
+- **Client:**
+  - Tournament list, create (sport settings reused) and detail: entries, fixtures by round with Score and Open, the standings table, leaderboards, awards with republish, and decisions on level knockout matches.
+  - Scoring a fixture opens the match wizard pre-filled from it.
+  - Player pages, team records and My statistics.
+- **Playwright:** a league from entries through fixtures, scoring, standings and awards; a correction makes the awards stale; republishing names the new champion; the player page shows the corrected record.
 
-1. **Schema (ADR 0023):**
-   - `tournaments`.
-   - `tournament_entries`: a team or a roster member.
-   - `tournament_fixtures`: nullable sides and match, with byes.
-   - Standings snapshots.
-   - Tournament-scope awards.
-2. **Fixture generation:** deterministic round-robin and single-elimination, with seeding and byes. Each fixture becomes a normal match, claimed by a scorer device (ADR 0008).
-3. **Standings:** a strategy per sport with configured tie-breaks; recalculated when a match changes.
-4. **Statistics and awards:**
-   - Tournament statistics and leaderboards.
-   - Tournament awards that go stale and are reviewed after corrections.
-5. **Profiles:**
-   - Player and team statistics pages (match, tournament, career), filtered by workspace and privacy.
-   - An optional public tournament page via share link.
-6. **Exit (e2e):** create tournament → fixtures → score → standings → awards → correct a match → award stale → republished.
+**Not built in M7:**
+- **Public tournament page via share link** (optional in the plan).
+- **Organizer overrides of tournament awards:** republishing is supported; manual choice is not yet.
+- **Standings snapshots:** standings are computed on read, which is fast enough at pilot scale.
+
+## Next — M8: Rules builder (trigger, condition, action)
+
+1. **engine-kit:**
+   - A rule DSL schema and evaluator: typed operators; priority, then stable ID; depth and cycle limits.
+   - Rule effects become derived events run back through `engine.apply`, carrying the rule ID and version (D16b).
+2. **Rule catalogues** for the five pilot sports. Triggers are engine facts; actions are commands the engine declares.
+3. **Rulesets:** immutable versions; a match references a preset or a ruleset version (D15).
+4. **Builder UI:** preset → duplicate → trigger → conditions → engine command → priority → preview against sample events → save as a new version.
+5. **Exit:**
+   - The cricket consecutive-wide example works end-to-end.
+   - Invalid combinations are blocked.
+   - Replay is deterministic, including derived events.
+   - Rule effects appear in stats.
 
 ## Needs the owner
 
