@@ -33,12 +33,24 @@ export class DeviceMatch {
   readonly header: MatchHeader;
   readonly config: Record<string, unknown>;
   readonly presetKey: string;
+  /** Rules and their ruleset version, carried in CREATED (ADR 0032). */
+  readonly extra: Record<string, unknown>;
 
   constructor(
     workspaceId: string,
     rosterMemberIds: [string | null, string | null] = [null, null],
-    options: { config?: Record<string, unknown>; presetKey?: string; fixtureId?: string } = {},
+    options: {
+      config?: Record<string, unknown>;
+      presetKey?: string;
+      fixtureId?: string;
+      rules?: unknown[];
+      rulesetVersionId?: string;
+    } = {},
   ) {
+    this.extra = {
+      ...(options.rules ? { rules: options.rules } : {}),
+      ...(options.rulesetVersionId ? { rulesetVersionId: options.rulesetVersionId } : {}),
+    };
     this.config = options.config ?? singles21;
     this.presetKey = options.presetKey ?? 'bwf-3x21';
     this.header = {
@@ -86,6 +98,7 @@ export class DeviceMatch {
             { side: 1, participantIds: [this.players[1]] },
           ],
         },
+        ...this.extra,
       },
     });
   }

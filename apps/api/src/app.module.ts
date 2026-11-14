@@ -20,6 +20,7 @@ import { MediaModule } from './media/media.module';
 import { OpsModule } from './ops/ops.module';
 import { PeopleModule } from './people/people.module';
 import { PersonsModule } from './people/persons.service';
+import { RulesetsModule } from './rulesets/rulesets.module';
 import { StatsModule } from './stats/stats.module';
 import { SyncModule } from './sync/sync.module';
 import { TeamsModule } from './teams/teams.module';
@@ -51,6 +52,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module';
     SyncModule,
     MatchesModule,
     TournamentsModule,
+    RulesetsModule,
     StatsModule,
     LiveModule,
     AccountModule,

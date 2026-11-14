@@ -289,7 +289,14 @@ export class TournamentsService {
   async linkFixture(
     tx: Transaction,
     header: MatchHeader,
-    match: { id: string; sport: string; engineVersion: number; presetKey: string; config: unknown },
+    match: {
+      id: string;
+      sport: string;
+      engineVersion: number;
+      presetKey: string;
+      config: unknown;
+      rules: readonly unknown[];
+    },
   ): Promise<void> {
     if (!header.fixtureId) return;
     const [fixture] = await tx
@@ -318,7 +325,9 @@ export class TournamentsService {
       t.sport !== match.sport ||
       t.engineVersion !== match.engineVersion ||
       t.presetKey !== match.presetKey ||
-      canonical(t.config) !== canonical(match.config)
+      canonical(t.config) !== canonical(match.config) ||
+      // Tournaments have no custom rules yet, so every fixture plays the same settings.
+      match.rules.length > 0
     ) {
       throw invalid(
         'match.fixtureId',

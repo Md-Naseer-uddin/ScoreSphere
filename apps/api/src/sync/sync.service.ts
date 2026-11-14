@@ -2,8 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { ReferenceSync, TeamMember } from '@scoresphere/contracts';
 import { and, eq, gt, inArray, isNull, sql } from 'drizzle-orm';
 import { DB, type Database } from '../database/database.module';
-import { rosterMembers, teamMemberships, teams } from '../database/schema';
+import { rosterMembers, rulesets, teamMemberships, teams } from '../database/schema';
 import { selectRosterMembers } from '../people/roster-mapper';
+import { selectRulesets } from '../rulesets/rulesets.service';
 import { selectTeams } from '../teams/teams.service';
 import { WorkspacesService } from '../workspaces/workspaces.service';
 
@@ -36,10 +37,11 @@ export class SyncService {
         teams: [],
         teamMembers: [],
         rosterMembers: [],
+        rulesets: [],
       };
 
     // A full sync skips archived rows; an incremental one includes them so the device can drop them.
-    const [teamRows, rosterRows, memberRows] = await Promise.all([
+    const [teamRows, rosterRows, memberRows, rulesetRows] = await Promise.all([
       selectTeams(
         this.db,
         and(
@@ -64,6 +66,13 @@ export class SyncService {
             since ? gt(teamMemberships.updatedAt, since) : isNull(teamMemberships.leftAt),
           ),
         ),
+      selectRulesets(
+        this.db,
+        and(
+          inArray(rulesets.workspaceId, ids),
+          since ? gt(rulesets.updatedAt, since) : isNull(rulesets.archivedAt),
+        ),
+      ),
     ]);
 
     const teamMembers: TeamMember[] = memberRows.map(({ membership: m }) => ({
@@ -80,6 +89,7 @@ export class SyncService {
       teams: teamRows,
       teamMembers,
       rosterMembers: rosterRows,
+      rulesets: rulesetRows,
     };
   }
 }

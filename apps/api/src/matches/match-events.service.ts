@@ -26,6 +26,7 @@ import {
 } from '../database/schema';
 import type { Transaction } from '../database/types';
 import { AwardsService } from '../awards/awards.service';
+import { matchRulesetVersion } from '../rulesets/rulesets.service';
 import { TournamentsService } from '../tournaments/tournaments.service';
 import { requireWorkspaceRole } from '../workspaces/workspace-access';
 import { type MatchRow, toLedgerEvent } from './match-mapper';
@@ -197,6 +198,10 @@ export class MatchEventsService {
         engineVersion: first.engineVersion,
         presetKey: created.presetKey,
         presetVersion: created.presetVersion,
+        rulesetVersionId: await matchRulesetVersion(tx, header.workspaceId, {
+          ...created,
+          config: check.value.created.config,
+        }),
         title: header.title,
         resolvedConfig: check.value.created.config,
         currentState: null,
@@ -216,6 +221,7 @@ export class MatchEventsService {
         engineVersion: first.engineVersion,
         presetKey: created.presetKey,
         config: check.value.created.config,
+        rules: created.rules ?? [],
       });
       await tx
         .insert(matchSides)

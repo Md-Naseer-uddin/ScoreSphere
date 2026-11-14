@@ -4,6 +4,7 @@ export * from './awards';
 export * from './identity';
 export * from './matches';
 export * from './people';
+export * from './rulesets';
 export * from './teams';
 export * from './tournaments';
 export * from './workspaces';

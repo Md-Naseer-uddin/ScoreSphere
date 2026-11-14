@@ -15,6 +15,7 @@ import {
 import { createdAt, id, tstz, updatedAt } from './columns';
 import { users } from './identity';
 import { rosterMembers } from './people';
+import { rulesetVersions } from './rulesets';
 import { teams } from './teams';
 import { workspaces } from './workspaces';
 
@@ -35,6 +36,10 @@ export const matches = pgTable(
     engineVersion: integer('engine_version').notNull(),
     presetKey: varchar('preset_key', { length: 60 }).notNull(),
     presetVersion: integer('preset_version').notNull(),
+    /** The saved ruleset version the match's rules came from, if any (ADR 0032). */
+    rulesetVersionId: uuid('ruleset_version_id').references(() => rulesetVersions.id, {
+      onDelete: 'set null',
+    }),
     title: varchar('title', { length: 80 }),
     resolvedConfig: jsonb('resolved_config').notNull(),
     /** Engine state after the last accepted event. */

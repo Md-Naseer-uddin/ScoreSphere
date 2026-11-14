@@ -43,6 +43,13 @@
       "when": 1794619912528,
       "tag": "0005_tournaments",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794621499247,
+      "tag": "0006_rulesets",
+      "breakpoints": true
     }
   ]
 }

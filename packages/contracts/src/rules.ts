@@ -41,21 +41,12 @@ export type Rule = z.infer<typeof ruleSchema>;
 
 export const rulesSchema = z.array(ruleSchema).max(30);
 
-/** A saved ruleset; every save is a new immutable version (spec sports §5). */
-export const rulesetSchema = z.object({
-  id: idSchema,
-  workspaceId: idSchema,
-  sport: sportKeySchema,
-  name: z.string(),
-  latestVersion: z.int(),
-  updatedAt: z.iso.datetime(),
-});
-export type Ruleset = z.infer<typeof rulesetSchema>;
-
 export const rulesetVersionSchema = z.object({
   id: idSchema,
   rulesetId: idSchema,
   version: z.int(),
+  /** The engine version the rules were checked against. */
+  engineVersion: z.int(),
   /** Based on this preset; the settings are stored resolved. */
   basePresetKey: z.string(),
   config: z.record(z.string(), z.unknown()),
@@ -63,6 +54,18 @@ export const rulesetVersionSchema = z.object({
   createdAt: z.iso.datetime(),
 });
 export type RulesetVersion = z.infer<typeof rulesetVersionSchema>;
+
+/** A saved ruleset; every save is a new immutable version (spec sports §5, ADR 0032). */
+export const rulesetSchema = z.object({
+  id: idSchema,
+  workspaceId: idSchema,
+  sport: sportKeySchema,
+  name: z.string(),
+  latest: rulesetVersionSchema,
+  archivedAt: z.iso.datetime().nullable(),
+  updatedAt: z.iso.datetime(),
+});
+export type Ruleset = z.infer<typeof rulesetSchema>;
 
 export const saveRulesetRequestSchema = z.object({
   name: z.string().trim().min(1, 'REQUIRED').max(80, 'TOO_LONG'),
@@ -72,3 +75,7 @@ export const saveRulesetRequestSchema = z.object({
   rules: rulesSchema,
 });
 export type SaveRulesetRequest = z.infer<typeof saveRulesetRequestSchema>;
+
+/** A new version of an existing ruleset; the sport cannot change. */
+export const saveRulesetVersionRequestSchema = saveRulesetRequestSchema.omit({ sport: true });
+export type SaveRulesetVersionRequest = z.infer<typeof saveRulesetVersionRequestSchema>;
