@@ -17,7 +17,7 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
 | M8 — Rules builder | done |
 | M9 — Football, Field Hockey, Basketball | done (award criteria pending owner sign-off) |
 | M10 — Kabaddi, Kho-Kho, Wrestling, Carrom | done (rule editions and award criteria pending owner sign-off) |
-| M11 — v1.0 hardening | next |
+| M11 — v1.0 hardening | done (device matrix and v1.0 release pending owner) |
 
 ## Done so far
 
@@ -296,15 +296,30 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
 - **Wrestling:** passivity is scored as ordinary points, and there's no shot clock.
 - **Carrom:** recording coin by coin.
 
-## Next — M11: v1.0 hardening and release
+**M11**
+- **Accessibility** (`accessibility.spec.ts`): axe (WCAG 2.1 A and AA) on:
+  - every main page and the rules builder;
+  - all 12 scoring screens and match pages;
+  - three screens in dark mode.
 
-1. **Accessibility audit:** screen-reader labels on scoring controls, contrast, reduced motion and tap targets, across all twelve scoring screens.
-2. **Load and stress:**
-   - k6 scripts for event ingestion and SSE fan-out.
-   - Offline stress (long ledgers) and replay performance.
-3. **Security review and the release checklist:** dependency audit, headers, rate limits, authorization-matrix coverage for the new endpoints, and log scan.
-4. **The spec's MVP acceptance criteria:** walk through each one and record the evidence.
-5. **For the owner:** the Android device matrix, Hindi localisation (if the pilot asks for it), and the v1.0 release itself.
+  It found one serious issue: links inside sentences relied on colour alone, and they are now underlined. Animations and transitions also respect "reduce motion".
+- **Performance:**
+  - Long ledgers replay in milliseconds: a full 50-over-a-side cricket match takes 11 ms, a 1,000-event basketball game 4 ms.
+  - A dependency-free load script ([infra/load/load-test.mjs](../infra/load/load-test.mjs)) covers event ingestion and live fan-out. It is written in Node rather than k6, because k6 isn't installed here; the [results](runbooks/load-testing.md) are in a runbook.
+- **Security review and release checklist:** [security-review.md](security-review.md). Production dependencies have no advisories; the four in development tools are accepted.
+- **MVP acceptance criteria:** [acceptance.md](acceptance.md). 12 of 13 are met with automated evidence. The APK criterion is partly met: it needs the keystore and the on-device checks.
+
+## Next
+
+Everything in plan.md that can be built without the owner is built. What remains is listed under **Needs the owner** below:
+- the pilot launch;
+- device checks;
+- rule-edition and award sign-offs;
+- real scoresheets;
+- legal review;
+- hosting.
+
+After that, if the pilot asks for them, the follow-ups noted under each milestone's "Not built" list, and Hindi.
 
 ## Needs the owner
 
@@ -332,6 +347,10 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
   - Hockey and basketball rules help cite the "current edition" of the FIH and FIBA rules; please confirm the edition to cite.
   - Basketball standings give 2 for a win and 1 for a loss; FIBA gives 0 for a forfeit, which isn't separated yet.
   - A hockey shoot-out winner gets the 3 points of a win; some FIH events give 2 and 1 instead.
+- **M11 / v1.0:**
+  - The Android device matrix: install the APK, upgrade from the previous version without losing data, and test kill/restart and background timers on a few low-end phones.
+  - Whether to add Hindi before v1.0 (plan §5 M11: only if the pilot asks for it).
+  - An independent penetration test once a staging environment exists.
 - **M10 sign-off (kabaddi, kho-kho, wrestling, carrom):**
   - Kabaddi and kho-kho presets are marked casual until you confirm which match the current AKFI/KKFI rules. Please also confirm the source links.
   - Kabaddi standings: 2 for a win and 1 for a draw (the Pro Kabaddi system differs).
