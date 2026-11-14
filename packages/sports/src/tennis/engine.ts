@@ -10,6 +10,7 @@ import {
   type SportEngine,
 } from '@scoresphere/engine-kit';
 import { z } from 'zod';
+import { tennisRuleCatalogue, tennisRuleVariables } from './rules.js';
 import { tennisPresets, type TennisSettings, tennisSettingsSchema } from './settings.js';
 
 /**
@@ -404,4 +405,6 @@ export const tennisEngine: SportEngine<TennisState, TennisSettings, TennisComman
   isComplete: (state) => state.phase === 'complete',
   result,
   stats,
+  ruleCatalogue: tennisRuleCatalogue,
+  ruleVariables: tennisRuleVariables,
 };

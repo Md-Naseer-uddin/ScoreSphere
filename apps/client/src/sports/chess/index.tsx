@@ -327,6 +327,11 @@ function describe(entry: Entry, sides: SideView[]): string {
       return tr('chess.timeline.flag', { name: sideName(sides, cmd.side as number) });
     case 'result':
       return tr(`chess.ending.${cmd.ending as string}`);
+    case 'add_time':
+      return tr('chess.timeline.addTime', {
+        name: sideName(sides, cmd.side as number),
+        seconds: cmd.seconds as number,
+      });
     default:
       return cmd.type;
   }

@@ -746,7 +746,8 @@
     "timeline": {
       "start": "{{name}} has White; clock started",
       "press": "{{name}} moved ({{time}})",
-      "flag": "{{name}}'s flag fell"
+      "flag": "{{name}}'s flag fell",
+      "addTime": "{{seconds}} s added for {{name}}"
     }
   },
   "awards": {

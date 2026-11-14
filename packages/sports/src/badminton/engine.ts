@@ -8,6 +8,7 @@ import {
   type SportEngine,
 } from '@scoresphere/engine-kit';
 import { z } from 'zod';
+import { badmintonRuleCatalogue, badmintonRuleVariables } from './rules.js';
 import { badmintonPresets, badmintonSettingsSchema, type BadmintonSettings } from './settings.js';
 
 /**
@@ -453,4 +454,6 @@ export const badmintonEngine: SportEngine<BadmintonState, BadmintonSettings, Bad
   isComplete: (state) => state.phase === 'complete',
   result,
   stats,
+  ruleCatalogue: badmintonRuleCatalogue,
+  ruleVariables: badmintonRuleVariables,
 };

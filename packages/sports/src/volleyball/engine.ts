@@ -10,6 +10,7 @@ import {
   type SportEngine,
 } from '@scoresphere/engine-kit';
 import { z } from 'zod';
+import { volleyballRuleCatalogue, volleyballRuleVariables } from './rules.js';
 import {
   volleyballPresets,
   type VolleyballSettings,
@@ -416,4 +417,6 @@ export const volleyballEngine: SportEngine<VolleyballState, VolleyballSettings, 
     isComplete: (state) => state.phase === 'complete',
     result,
     stats,
+    ruleCatalogue: volleyballRuleCatalogue,
+    ruleVariables: volleyballRuleVariables,
   };

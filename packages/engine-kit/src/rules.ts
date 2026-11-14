@@ -8,6 +8,8 @@ export interface RuleField {
   type: 'number' | 'string' | 'boolean';
   /** Allowed values, when the field is an enumeration. */
   options?: readonly (string | number)[];
+  /** How to show each option, in the same order (defaults to the value itself). */
+  optionLabels?: readonly string[];
   min?: number;
   max?: number;
 }

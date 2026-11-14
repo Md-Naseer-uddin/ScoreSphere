@@ -11,6 +11,7 @@ import {
   type SportEngine,
 } from '@scoresphere/engine-kit';
 import { z } from 'zod';
+import { chessRuleCatalogue, chessRuleVariables } from './rules.js';
 import { chessPresets, type ChessSettings, chessSettingsSchema } from './settings.js';
 
 /**
@@ -53,6 +54,8 @@ export const chessCommandSchema = z.discriminatedUnion('type', [
     /** The winner, for a decisive ending. */
     winner: sideSchema.optional(),
   }),
+  /** Extra time on a player's clock, e.g. after an opponent's illegal move (FIDE 7.5.5). */
+  z.object({ type: z.literal('add_time'), side: sideSchema, seconds: z.int().min(1).max(3600) }),
 ]);
 export type ChessCommand = z.infer<typeof chessCommandSchema>;
 
@@ -167,6 +170,9 @@ function validate(
       }
       return ok(undefined);
     }
+    case 'add_time':
+      if (state.phase !== 'playing') return fail('NOT_PLAYING', 'The game is not in progress.');
+      return state.config.timeControl ? ok(undefined) : fail('NO_CLOCK', 'This game has no clock.');
     case 'result': {
       if (state.phase === 'complete') return fail('GAME_OVER', 'The game is over.');
       if (state.phase !== 'playing' && cmd.ending !== 'forfeit')
@@ -274,6 +280,18 @@ function apply(
         ],
       };
     }
+    case 'add_time': {
+      const clocks: [ChessClockSide, ChessClockSide] = [
+        { ...state.clocks[0] },
+        { ...state.clocks[1] },
+      ];
+      const addMs = cmd.seconds * 1000;
+      clocks[cmd.side].remainingMs += addMs;
+      return {
+        state: { ...state, clocks },
+        facts: [{ type: 'time_added', data: { side: cmd.side, addMs } }],
+      };
+    }
     case 'result': {
       const winner = cmd.winner ?? null;
       return {
@@ -358,4 +376,6 @@ export const chessEngine: SportEngine<ChessState, ChessSettings, ChessCommand> =
   isComplete: (state) => state.phase === 'complete',
   result,
   stats,
+  ruleCatalogue: chessRuleCatalogue,
+  ruleVariables: chessRuleVariables,
 };
