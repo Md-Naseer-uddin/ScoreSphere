@@ -11,6 +11,7 @@ says how you notice the problem, what to do, and how to confirm it is fixed.
 | [Leaked share link](leaked-share-link.md) | A live link is being passed around where it shouldn't be |
 | [Bad engine release](bad-engine-release.md) | A scoring engine version computes something wrong |
 | [Sync backlog](sync-backlog.md) | Devices aren't getting their events onto the server |
+| [Load testing](load-testing.md) | Before a release that touches ingestion or live streams, or a big event |
 
 ## Alerts
 
