@@ -9,6 +9,7 @@ export * from './matches.js';
 export * from './people.js';
 export * from './phone.js';
 export * from './sports.js';
+export * from './stats.js';
 export * from './sync.js';
 export * from './teams.js';
 export * from './tournaments.js';
