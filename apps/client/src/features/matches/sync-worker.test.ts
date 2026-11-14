@@ -5,7 +5,7 @@ import { mockApi, ok } from '@/test/fetch-mock';
 import { signIn } from '@/test/session';
 import { matchEvents, recordEvent } from './local-store';
 import { newBadmintonMatch } from '@/test/matches';
-import { syncMatch, useSyncState } from './sync-worker';
+import { checkServerCopy, syncMatch, useSyncState } from './sync-worker';
 
 let database: LocalDatabase;
 
@@ -113,5 +113,41 @@ describe('sync worker', () => {
     const { api } = acceptingServer(id);
     await Promise.all([syncMatch(id, database), syncMatch(id, database), syncMatch(id, database)]);
     expect(api.fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('sends events again when the server lost them (restored from a backup)', async () => {
+    const id = await created();
+    acceptingServer(id);
+    await recordEvent(
+      id,
+      { kind: 'COMMAND', payload: { type: 'start_game', servingSide: 0 } },
+      database,
+    );
+    await syncMatch(id, database);
+    expect((await matchEvents(id, database)).every((e) => e.sync === 'synced')).toBe(true);
+
+    // The restored server only has events 1–2.
+    const resent: number[] = [];
+    mockApi({
+      [`POST /matches/${id}/lease`]: ok({ leaseEpoch: 1, leaseDeviceId: 'device', version: 2 }),
+      [`POST /matches/${id}/events`]: (init) => {
+        const body = JSON.parse(init.body as string) as PostMatchEventsRequest;
+        resent.push(...body.events.map((e) => e.seq));
+        return ok({
+          results: body.events.map((e) => ({
+            eventId: e.eventId,
+            seq: e.seq,
+            outcome: 'ACCEPTED',
+            code: null,
+          })),
+          version: 3,
+          leaseEpoch: 1,
+          needsReview: false,
+        });
+      },
+    });
+    await checkServerCopy(id, database);
+    expect(resent).toEqual([3]);
+    expect((await matchEvents(id, database)).every((e) => e.sync === 'synced')).toBe(true);
   });
 });

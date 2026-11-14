@@ -1,7 +1,7 @@
 import type { MatchDetail } from '@scoresphere/contracts';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Download, Radio } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
@@ -34,6 +34,7 @@ import { getMatch, lease, matchKeys } from './matches-api';
 import { AwardsCard } from './AwardsCard';
 import { ShareLinksCard } from './ShareLinksCard';
 import { StatusBadge } from './StatusBadge';
+import { checkServerCopy } from './sync-worker';
 import { SyncBadge } from './SyncBadge';
 import { Timeline } from './Timeline';
 
@@ -82,6 +83,10 @@ export function MatchPage() {
   const projection = useProjection(header?.sport, header?.engineVersion, events);
   const sync = useMatchSyncStatus(local?.match, local?.events);
   const [confirmTakeover, setConfirmTakeover] = useState(false);
+  // A match scored here: make sure the server still has all of it (e.g. after a restore).
+  useEffect(() => {
+    if (scoredHere && online && authenticated) void checkServerCopy(matchId).catch(() => undefined);
+  }, [matchId, scoredHere, online, authenticated]);
   const [claiming, setClaiming] = useState(false);
 
   if (local === undefined || (!local && remote.isPending && authenticated))

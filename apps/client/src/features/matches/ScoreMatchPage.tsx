@@ -23,7 +23,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { FullScreenSpinner } from '@/features/auth/RequireAuth';
-import { ApiClientError } from '@/lib/api';
 import { db } from '@/lib/db';
 import { isNative } from '@/lib/platform';
 import { sportUi } from '@/sports/registry';
@@ -31,7 +30,7 @@ import { useLocalMatch, useMatchSyncStatus, useProjection } from './hooks';
 import { recordEvent, type NewEvent } from './local-store';
 import { lease } from './matches-api';
 import { SyncBadge } from './SyncBadge';
-import { syncMatch } from './sync-worker';
+import { checkServerCopy, syncMatch } from './sync-worker';
 import { Timeline } from './Timeline';
 
 const HEARTBEAT_MS = 30_000;
@@ -65,12 +64,7 @@ function useWakeLock(active: boolean) {
 function useScorerHeartbeat(matchId: string, active: boolean) {
   useEffect(() => {
     if (!active) return;
-    const beat = () =>
-      void lease(matchId, 'HEARTBEAT').catch(async (error: unknown) => {
-        if (error instanceof ApiClientError && error.status === 409) {
-          await db.matches.update(matchId, { holdsLease: false });
-        }
-      });
+    const beat = () => void checkServerCopy(matchId).catch(() => undefined);
     beat();
     const timer = window.setInterval(beat, HEARTBEAT_MS);
     return () => window.clearInterval(timer);

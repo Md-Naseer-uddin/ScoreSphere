@@ -9,6 +9,7 @@ import { useSession } from '@/features/auth/session';
 import { ApiClientError, apiFetch, json } from '@/lib/api';
 import { db, getDeviceId, type LocalDatabase, type LocalMatchEvent } from '@/lib/db';
 import { matchHeader } from './local-store';
+import { lease } from './matches-api';
 
 const BATCH = 200;
 const RETRY_MS = 15_000;
@@ -132,6 +133,50 @@ async function pushOnce(
     (r) => r.outcome === 'ACCEPTED' || r.outcome === 'ALREADY_PROCESSED',
   );
   return allAccepted && pending.length > BATCH ? 'more' : 'done';
+}
+
+/**
+ * Checks that the server still has everything this device had acknowledged for a match it
+ * scores, and tells spectators the scorer is still here. After a server restore from backup
+ * the server may be behind; the events it lost are queued and sent again.
+ */
+export async function checkServerCopy(
+  matchId: string,
+  database: LocalDatabase = db,
+): Promise<void> {
+  const match = await database.matches.get(matchId);
+  if (!match?.holdsLease || !match.serverKnown) return;
+  let serverVersion: number | null;
+  try {
+    serverVersion = (await lease(matchId, 'HEARTBEAT')).version;
+  } catch (error) {
+    if (!(error instanceof ApiClientError)) return;
+    if (error.status === 409) {
+      await database.matches.update(matchId, { holdsLease: false });
+      return;
+    }
+    if (error.status !== 404) return;
+    serverVersion = null;
+  }
+  const requeued = await database.transaction(
+    'rw',
+    database.matches,
+    database.matchEvents,
+    async () => {
+      const synced = await database.matchEvents
+        .where('[matchId+sync]')
+        .equals([matchId, 'synced'])
+        .toArray();
+      const lost = synced.filter((e) => e.seq > (serverVersion ?? 0));
+      for (const e of lost) {
+        await database.matchEvents.update([matchId, e.seq], { sync: 'pending', code: null });
+      }
+      // The server has no record of the match at all: create it again with the header.
+      if (serverVersion === null) await database.matches.update(matchId, { serverKnown: false });
+      return lost.length;
+    },
+  );
+  if (requeued > 0) await syncMatch(matchId, database);
 }
 
 /** Every match of this account that still has events to send. */

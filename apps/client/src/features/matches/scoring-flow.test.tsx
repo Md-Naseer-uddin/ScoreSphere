@@ -33,7 +33,9 @@ function server() {
     }),
     'POST /matches/*': (init) => {
       if (init.url.endsWith('/lease')) {
-        return ok({ leaseEpoch: 1, leaseDeviceId: 'this-device', version: 0 });
+        // The server's version is the highest seq it has received.
+        const version = Math.max(0, ...received.flatMap((b) => b.events.map((e) => e.seq)));
+        return ok({ leaseEpoch: 1, leaseDeviceId: 'this-device', version });
       }
       const body = JSON.parse(init.body as string) as PostMatchEventsRequest;
       received.push(body);
