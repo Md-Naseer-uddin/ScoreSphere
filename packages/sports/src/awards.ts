@@ -5,6 +5,7 @@ import { basketballMatchAwards } from './basketball/awards.js';
 import { cricketMatchAwards } from './cricket/awards.js';
 import { hockeyMatchAwards } from './field-hockey/awards.js';
 import { footballMatchAwards } from './football/awards.js';
+import { kabaddiMatchAwards } from './kabaddi/awards.js';
 import { tennisPlayerOfTheMatch } from './tennis/awards.js';
 import { volleyballMatchAwards } from './volleyball/awards.js';
 
@@ -18,6 +19,7 @@ const byEngine: Partial<Record<SportKey, Record<number, readonly AnyAward[]>>> =
   cricket: { 1: cricketMatchAwards },
   football: { 1: footballMatchAwards },
   'field-hockey': { 1: hockeyMatchAwards },
+  kabaddi: { 1: kabaddiMatchAwards },
   tennis: { 1: [tennisPlayerOfTheMatch] },
   volleyball: { 1: volleyballMatchAwards },
   // Chess records a result only; there is no match award (spec scoring §5).

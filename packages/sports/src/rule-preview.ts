@@ -137,6 +137,32 @@ const SAMPLES: Partial<Record<SportKey, RuleSample>> = {
       ];
     },
   },
+  kabaddi: {
+    playersPerSide: (config) => Number(config.playersOnMat),
+    commands: (config, ids) => {
+      const bonus = config.bonusLine === true && Number(config.bonusMinDefenders) <= 6;
+      const raid = (side: 0 | 1, touches: number, result = 'safe', withBonus = false): Command => ({
+        type: 'raid',
+        side,
+        raiderId: ids[side][touches % ids[side].length],
+        touches,
+        bonus: withBonus && bonus,
+        result,
+      });
+      return [
+        { type: 'start_period', firstRaid: 0 },
+        raid(0, 2),
+        raid(1, 0),
+        raid(0, 0, 'tackled'),
+        raid(1, 1, 'safe', true),
+        raid(0, 0),
+        raid(1, 0),
+        raid(0, 3),
+        raid(1, 0, 'tackled'),
+        { type: 'end_period' },
+      ];
+    },
+  },
   chess: {
     playersPerSide: () => 1,
     commands: () => [

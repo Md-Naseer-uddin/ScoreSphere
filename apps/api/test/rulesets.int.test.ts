@@ -125,8 +125,8 @@ describe('rulesets', () => {
       { field: 'rules.0.conditions.0.value', code: 'BAD_VALUE' },
     ]);
     await save('SCORER', { config: { ...gully, oversPerInnings: 0 } }, 400);
-    const kabaddi = await save('SCORER', { sport: 'kabaddi' }, 400);
-    expect(kabaddi.body.error.details).toEqual([{ field: 'sport', code: 'NOT_SUPPORTED' }]);
+    const carrom = await save('SCORER', { sport: 'carrom' }, 400);
+    expect(carrom.body.error.details).toEqual([{ field: 'sport', code: 'NOT_SUPPORTED' }]);
   });
 
   it('keeps names unique in a workspace', async () => {

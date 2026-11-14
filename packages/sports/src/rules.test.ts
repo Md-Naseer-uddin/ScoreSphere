@@ -15,6 +15,7 @@ const PILOT = [
   'cricket',
   'field-hockey',
   'football',
+  'kabaddi',
   'tennis',
   'volleyball',
 ] as const;

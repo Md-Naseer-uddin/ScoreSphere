@@ -18,3 +18,5 @@ export * from './field-hockey/golden/logs.js';
 export * from './field-hockey/golden/run.js';
 export * from './basketball/golden/logs.js';
 export * from './basketball/golden/run.js';
+export * from './kabaddi/golden/logs.js';
+export * from './kabaddi/golden/run.js';

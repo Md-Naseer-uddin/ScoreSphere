@@ -5,6 +5,7 @@ import type { BasketballState } from '../basketball/engine.js';
 import type { CricketState } from '../cricket/engine.js';
 import type { HockeyState } from '../field-hockey/engine.js';
 import type { FootballState } from '../football/engine.js';
+import type { KabaddiState } from '../kabaddi/engine.js';
 import type { TennisState } from '../tennis/engine.js';
 import type { VolleyballState } from '../volleyball/engine.js';
 import type { StandingsPoints } from './standings.js';
@@ -280,6 +281,45 @@ const RULES: Partial<Record<SportKey, TournamentRules>> = {
         name: 'Assists Leader',
         criteria: 'Most assists; still level, shared. Needs assists recorded.',
         metric: 'assists',
+      },
+    ],
+  },
+  kabaddi: {
+    points: { win: 2, draw: 1, loss: 0 },
+    tieBreaks: ['point_difference'],
+    allowedTieBreaks: ['point_difference', 'wins'],
+    allowsDraws: true,
+    totals: (state: KabaddiState, side) => ({
+      pointsFor: state.score[side],
+      pointsAgainst: state.score[side === 0 ? 1 : 0],
+    }),
+    derive: (t) => ({ total_points: (t.raid_points ?? 0) + (t.tackle_points ?? 0) }),
+    leaderboards: [
+      { metric: 'raid_points', label: 'Most raid points' },
+      { metric: 'tackle_points', label: 'Most tackle points' },
+      { metric: 'super_raids', label: 'Most super raids' },
+      { metric: 'super_tackles', label: 'Most super tackles' },
+    ],
+    playerAwards: [
+      {
+        key: 'player-of-the-tournament',
+        name: 'Player of the Tournament',
+        criteria: 'Most raid points plus tackle points over the tournament; still level, shared.',
+        metric: 'total_points',
+      },
+      {
+        key: 'best-raider',
+        name: 'Best Raider',
+        criteria: 'Most raid points; then most super raids; still level, shared.',
+        metric: 'raid_points',
+        tieBreak: { metric: 'super_raids', lowerIsBetter: false },
+      },
+      {
+        key: 'best-defender',
+        name: 'Best Defender',
+        criteria: 'Most tackle points; then most super tackles; still level, shared.',
+        metric: 'tackle_points',
+        tieBreak: { metric: 'super_tackles', lowerIsBetter: false },
       },
     ],
   },
