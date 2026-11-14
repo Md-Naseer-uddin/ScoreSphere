@@ -6,6 +6,7 @@ Mobile-first, offline-capable scoring for 12 sports: Cricket, Badminton, Tennis,
 - **Architecture decision records:** [docs/adr/](docs/adr/)
 - **Original specification pack:** [docs/spec/](docs/spec/)
 - **Progress:** [docs/progress.md](docs/progress.md)
+- **Release readiness:** [MVP acceptance criteria](docs/acceptance.md), [security review and release checklist](docs/security-review.md), [runbooks](docs/runbooks/)
 
 ## Development
 
