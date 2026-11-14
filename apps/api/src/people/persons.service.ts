@@ -24,7 +24,7 @@ export class PersonsService {
       .select({ phoneIdentityId: users.phoneIdentityId })
       .from(users)
       .where(eq(users.id, userId));
-    if (!user) throw new Error(`User ${userId} not found`);
+    if (!user?.phoneIdentityId) throw new Error(`User ${userId} not found`);
 
     const [pending] = await executor
       .select({ id: persons.id })

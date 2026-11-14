@@ -105,7 +105,7 @@ export class UsersService {
         await tx
           .update(phoneIdentities)
           .set({ phoneE164: newPhone })
-          .where(eq(phoneIdentities.id, user.phoneIdentityId));
+          .where(eq(phoneIdentities.id, user.phoneIdentityId!));
         await this.audit.record(
           {
             action: 'user.phone_changed',

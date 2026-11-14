@@ -23,6 +23,8 @@ export const userStatus = pgEnum('user_status', [
   'LOCKED',
   'DISABLED',
   'DELETION_PENDING',
+  /** Anonymised at the user's request; kept only so organisations' records stay intact. */
+  'DELETED',
 ]);
 export const clientPlatform = pgEnum('client_platform', ['WEB', 'ANDROID']);
 
@@ -38,8 +40,8 @@ export const users = pgTable(
   'users',
   {
     id: id(),
+    /** Null only for deleted accounts, whose number is erased and free to register again. */
     phoneIdentityId: uuid('phone_identity_id')
-      .notNull()
       .unique()
       .references(() => phoneIdentities.id, { onDelete: 'restrict' }),
     passwordHash: text('password_hash').notNull(),

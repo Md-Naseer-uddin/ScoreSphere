@@ -61,3 +61,7 @@ export const deviceSchema = z.object({
   current: z.boolean(),
 });
 export type Device = z.infer<typeof deviceSchema>;
+
+/** Deleting an account needs the password again (DPDP right to erasure). */
+export const deleteAccountRequestSchema = z.object({ password: z.string().min(1).max(200) });
+export type DeleteAccountRequest = z.infer<typeof deleteAccountRequestSchema>;

@@ -3,6 +3,7 @@ import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
 import { ZodValidationPipe } from 'nestjs-zod';
+import { AccountModule } from './account/account.module';
 import { AuditModule } from './audit/audit.module';
 import { AuthGuard } from './auth/auth.guard';
 import { AuthModule } from './auth/auth.module';
@@ -47,6 +48,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module';
     SyncModule,
     MatchesModule,
     LiveModule,
+    AccountModule,
   ],
   controllers: [HealthController],
   providers: [
