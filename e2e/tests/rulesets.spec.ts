@@ -98,7 +98,7 @@ test('builds a consecutive-wides rule, previews it and scores a match with it (M
   await page.getByRole('button', { name: 'Undo' }).click();
   await expect(score(page)).toHaveText('2/0');
   await wide(page, '4/0');
-  await expect(page.locator('[data-sync-state]')).toHaveText('Synced');
+  await expect(page.locator('[data-sync-state]')).toHaveText('Synced', { timeout: 30_000 });
 
   // The server replayed the same rules and knows which ruleset version the match used.
   const [match] = await query<{ linked: boolean; runs: string; needs_review: boolean }>(

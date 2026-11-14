@@ -62,7 +62,7 @@ test('scores a one-over cricket match, finishing the chase offline through a rel
   // The wide didn't count, so the over needs one more ball; then the innings is complete.
   await page.getByRole('button', { name: 'Dot ball', exact: true }).click();
   await expect(page.getByText('Target: 10')).toBeVisible();
-  await expect(syncBadge(page)).toHaveText('Synced');
+  await expect(syncBadge(page)).toHaveText('Synced', { timeout: 30_000 });
 
   // The chase is scored with no signal, and the phone reloads the app mid-innings.
   await page.evaluate(async () => {

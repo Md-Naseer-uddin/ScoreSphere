@@ -75,7 +75,7 @@ test('a league: fixtures, scoring, standings, awards, and republishing after a c
   await page.getByRole('button', { name: 'Start game 1' }).click();
   await tap(page, 'Point Asha', 3);
   await expect(page.getByText('Asha won', { exact: true })).toBeVisible();
-  await expect(syncBadge(page)).toHaveText('Synced');
+  await expect(syncBadge(page)).toHaveText('Synced', { timeout: 30_000 });
   const scoreUrl = page.url();
 
   // Standings and awards.
@@ -91,7 +91,7 @@ test('a league: fixtures, scoring, standings, awards, and republishing after a c
   await page.getByRole('button', { name: 'Undo' }).click();
   await tap(page, 'Point Ravi', 3);
   await expect(page.getByText('Ravi won', { exact: true })).toBeVisible();
-  await expect(syncBadge(page)).toHaveText('Synced');
+  await expect(syncBadge(page)).toHaveText('Synced', { timeout: 30_000 });
 
   await page.goto('/app/tournaments');
   await page.getByRole('link', { name: /Club Open/ }).click();

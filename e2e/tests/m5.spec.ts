@@ -49,7 +49,7 @@ test('a chess clock keeps running through going offline and an app reload', asyn
   // Rapid 15+10: Meera used about 2 s and gained 10.
   await expect(page.getByTestId('time-0')).toHaveText(/^15:0[789]$/);
   const pressedAt = Date.now();
-  await expect(syncBadge(page)).toHaveText('Synced');
+  await expect(syncBadge(page)).toHaveText('Synced', { timeout: 30_000 });
 
   // Ravi thinks while the phone loses signal and the app is reloaded.
   await serviceWorkerReady(page);

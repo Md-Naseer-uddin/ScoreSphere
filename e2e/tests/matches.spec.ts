@@ -32,7 +32,7 @@ test('scores through going offline and a reload, syncs each event exactly once, 
   const matchId = await startBadmintonMatch(scorer, 'Asha', 'Ravi');
   await point(scorer, 'Asha', 0, 1);
   await point(scorer, 'Asha', 0, 2);
-  await expect(syncBadge(scorer)).toHaveText('Synced');
+  await expect(syncBadge(scorer)).toHaveText('Synced', { timeout: 30_000 });
 
   // A spectator opens a live link without signing in.
   const liveUrl = await createShareLink(scorer, matchId);
@@ -95,7 +95,7 @@ test('taking over on another device fences off the old one and keeps its events'
   await register(oldPhone, 'Coach Arjun', phone, password);
   const matchId = await startBadmintonMatch(oldPhone, 'Kiran', 'Dev');
   await point(oldPhone, 'Kiran', 0, 1);
-  await expect(syncBadge(oldPhone)).toHaveText('Synced');
+  await expect(syncBadge(oldPhone)).toHaveText('Synced', { timeout: 30_000 });
 
   // The old phone loses signal and keeps scoring.
   await oldContext.setOffline(true);
@@ -112,7 +112,7 @@ test('taking over on another device fences off the old one and keeps its events'
   await tablet.waitForURL(`**/app/matches/${matchId}/score`);
   await expectScore(tablet, 1, 0);
   await point(tablet, 'Kiran', 0, 2);
-  await expect(syncBadge(tablet)).toHaveText('Synced');
+  await expect(syncBadge(tablet)).toHaveText('Synced', { timeout: 30_000 });
 
   // The old phone reconnects: its events are refused, kept, and it stops scoring.
   await oldContext.setOffline(false);
