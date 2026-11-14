@@ -19,6 +19,7 @@ import {
   type SportEngine,
 } from '@scoresphere/engine-kit';
 import { z } from 'zod';
+import { shootoutNext, shootoutTally, shootoutWinner } from '../shootout.js';
 import { footballRuleCatalogue, footballRuleVariables } from './rules.js';
 import { footballPresets, type FootballSettings, footballSettingsSchema } from './settings.js';
 
@@ -184,36 +185,14 @@ export function shootoutScore(state: FootballState): {
   goals: [number, number];
   taken: [number, number];
 } {
-  const goals: [number, number] = [0, 0];
-  const taken: [number, number] = [0, 0];
-  for (const k of state.shootout?.kicks ?? []) {
-    taken[k.side] += 1;
-    if (k.scored) goals[k.side] += 1;
-  }
-  return { goals, taken };
+  return shootoutTally(state.shootout?.kicks ?? []);
 }
 
 /** The side to take the next kick: teams alternate, starting with `firstSide` (Law 10). */
 export function nextKicker(state: FootballState): Side | null {
-  if (!state.shootout) return null;
-  const n = state.shootout.kicks.length;
-  return n % 2 === 0 ? state.shootout.firstSide : other(state.shootout.firstSide);
-}
-
-/** The shootout winner once it is decided: early when one side can't catch up. */
-function shootoutWinner(
-  kicks: number,
-  goals: [number, number],
-  taken: [number, number],
-): Side | null {
-  if (taken[0] <= kicks && taken[1] <= kicks) {
-    if (goals[0] + (kicks - taken[0]) < goals[1]) return 1;
-    if (goals[1] + (kicks - taken[1]) < goals[0]) return 0;
-    if (taken[0] < kicks || taken[1] < kicks) return null;
-  }
-  // Sudden death: decided after both have taken the same number of kicks.
-  if (taken[0] === taken[1] && goals[0] !== goals[1]) return goals[0] > goals[1] ? 0 : 1;
-  return null;
+  return state.shootout
+    ? shootoutNext(state.shootout.firstSide, state.shootout.kicks.length)
+    : null;
 }
 
 function init(config: FootballSettings, roster: MatchRoster): FootballState {
@@ -549,8 +528,7 @@ function apply(
       const facts: DomainFact[] = [
         { type: 'shootout_kick', data: { side: cmd.side, scored: cmd.scored } },
       ];
-      const { goals, taken } = shootoutScore(next);
-      const winner = shootoutWinner(state.config.shootout!.kicks, goals, taken);
+      const winner = shootoutWinner(state.config.shootout!.kicks, shootout.kicks);
       if (winner !== null) {
         next = { ...next, phase: 'complete', outcome: { winner, finish: 'shootout' } };
         facts.push({ type: 'match_won', data: { side: winner, finish: 'shootout' } });
