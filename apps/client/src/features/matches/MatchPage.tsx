@@ -31,6 +31,7 @@ import {
 } from './hooks';
 import { adoptServerMatch } from './local-store';
 import { getMatch, lease, matchKeys } from './matches-api';
+import { AwardsCard } from './AwardsCard';
 import { ShareLinksCard } from './ShareLinksCard';
 import { StatusBadge } from './StatusBadge';
 import { SyncBadge } from './SyncBadge';
@@ -199,6 +200,18 @@ export function MatchPage() {
             <ui.Scorecard projection={projection} sides={sides} />
           </CardContent>
         </Card>
+      )}
+
+      {projection && (
+        <AwardsCard
+          matchId={matchId}
+          sport={header.sport}
+          engineVersion={header.engineVersion}
+          workspaceId={local?.match.workspaceId ?? remote.data?.workspaceId ?? null}
+          projection={projection}
+          sides={sides}
+          fromServer={serverKnown && online && authenticated}
+        />
       )}
 
       {projection && ui && (

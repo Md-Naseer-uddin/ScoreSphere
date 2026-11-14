@@ -3,14 +3,12 @@ import {
   type BadmintonSettings,
   type BadmintonState,
   badmintonEngine,
-  badmintonPlayerOfTheMatch,
   badmintonPresets,
   currentGame,
   gamesWon,
   serviceView,
 } from '@scoresphere/sports';
 import i18next from 'i18next';
-import { Award } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChoiceGroup } from '@/components/ChoiceGroup';
@@ -270,7 +268,6 @@ function Scorecard({ projection, sides }: MatchViewProps) {
   const games = state.games.filter((g) => g.winner !== null || g.points[0] + g.points[1] > 0);
   const metric = (name: string, side: number) =>
     stats.find((s) => s.metric === name && s.side === side && !s.participantId)?.value ?? 0;
-  const award = badmintonPlayerOfTheMatch.compute(state, stats);
   const rows = ['points_won', 'service_points_won', 'receiving_points_won', 'longest_streak'];
 
   return (
@@ -317,20 +314,6 @@ function Scorecard({ projection, sides }: MatchViewProps) {
           ))}
         </tbody>
       </table>
-      {award && (
-        <div className="flex items-start gap-3 rounded-xl border p-3">
-          <Award aria-hidden className="mt-0.5 size-5 text-primary" />
-          <div>
-            <p className="font-medium">
-              {badmintonPlayerOfTheMatch.name}:{' '}
-              {award.recipients.map((r) => nameOf(sides, r.participantId)).join(' & ')}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {t('matches.awardAuto')} · {badmintonPlayerOfTheMatch.criteria}
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

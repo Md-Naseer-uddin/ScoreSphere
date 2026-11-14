@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 import { Badge } from '@/components/ui/badge';
 import { FullScreenSpinner } from '@/features/auth/RequireAuth';
+import { AwardsCard } from '@/features/matches/AwardsCard';
 import { STALE_AFTER_MS, useLiveStream, useNow, useProjection } from '@/features/matches/hooks';
 import { StatusBadge } from '@/features/matches/StatusBadge';
 import { Timeline } from '@/features/matches/Timeline';
@@ -82,7 +83,18 @@ export function LivePage() {
               clockOffsetMs={view.clockOffsetMs}
             />
             {view.status === 'completed' && (
-              <ui.Scorecard projection={projection} sides={snapshot.sides} />
+              <>
+                <ui.Scorecard projection={projection} sides={snapshot.sides} />
+                <AwardsCard
+                  matchId={snapshot.matchId}
+                  sport={snapshot.sport}
+                  engineVersion={snapshot.engineVersion}
+                  workspaceId={null}
+                  projection={projection}
+                  sides={snapshot.sides}
+                  fromServer={false}
+                />
+              </>
             )}
             <Timeline entries={projection.timeline} sides={snapshot.sides} ui={ui} limit={20} />
           </>

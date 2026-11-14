@@ -3,13 +3,11 @@ import {
   gameCall,
   tennisCurrentServer,
   tennisEngine,
-  tennisPlayerOfTheMatch,
   tennisPresets,
   type TennisSettings,
   type TennisState,
 } from '@scoresphere/sports';
 import i18next from 'i18next';
-import { Award } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChoiceGroup } from '@/components/ChoiceGroup';
@@ -218,7 +216,6 @@ function Scorecard({ projection, sides }: MatchViewProps) {
   const stats = tennisEngine.stats(state);
   const metric = (m: string, side: number) =>
     stats.find((s) => s.metric === m && s.side === side)?.value ?? 0;
-  const award = tennisPlayerOfTheMatch.compute(state, stats);
   const pct = (side: number) => {
     const played = metric('service_points_played', side);
     return played ? `${Math.round((metric('service_points_won', side) / played) * 100)}%` : '–';
@@ -253,20 +250,6 @@ function Scorecard({ projection, sides }: MatchViewProps) {
           ))}
         </tbody>
       </table>
-      {award && (
-        <div className="flex items-start gap-3 rounded-xl border p-3">
-          <Award aria-hidden className="mt-0.5 size-5 text-primary" />
-          <div>
-            <p className="font-medium">
-              {tennisPlayerOfTheMatch.name}:{' '}
-              {award.recipients.map((r) => nameOf(sides, r.participantId)).join(' & ')}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {t('matches.awardAuto')} · {tennisPlayerOfTheMatch.criteria}
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

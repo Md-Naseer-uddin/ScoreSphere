@@ -1,4 +1,6 @@
 import {
+  type AwardRecord,
+  awardRecordSchema,
   type CreatedShareLink,
   createdShareLinkSchema,
   type LeaseResponse,
@@ -21,6 +23,7 @@ export const matchKeys = {
   list: (workspaceId: string) => ['matches', workspaceId] as const,
   detail: (matchId: string) => ['match', matchId] as const,
   shareLinks: (matchId: string) => ['match', matchId, 'share-links'] as const,
+  awards: (matchId: string) => ['match', matchId, 'awards'] as const,
 };
 
 export function listMatches(workspaceId: string): Promise<MatchSummary[]> {
@@ -67,5 +70,30 @@ export function getLiveSnapshot(token: string): Promise<LiveSnapshot> {
     '/public/live',
     { auth: false, headers: { [SHARE_TOKEN_HEADER]: token } },
     liveSnapshotSchema,
+  );
+}
+
+export function listAwards(matchId: string): Promise<AwardRecord[]> {
+  return apiFetch(`/matches/${matchId}/awards`, {}, z.array(awardRecordSchema));
+}
+
+export function selectAward(
+  matchId: string,
+  awardKey: string,
+  participantIds: string[],
+  reason: string | null,
+): Promise<AwardRecord[]> {
+  return apiFetch(
+    `/matches/${matchId}/awards/${awardKey}`,
+    { method: 'PUT', ...json({ participantIds, reason }) },
+    z.array(awardRecordSchema),
+  );
+}
+
+export function revertAward(matchId: string, awardKey: string): Promise<AwardRecord[]> {
+  return apiFetch(
+    `/matches/${matchId}/awards/${awardKey}`,
+    { method: 'DELETE' },
+    z.array(awardRecordSchema),
   );
 }

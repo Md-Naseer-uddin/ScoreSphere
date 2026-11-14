@@ -1,10 +1,7 @@
 import type { SideIndex } from '@scoresphere/contracts';
 import {
-  volleyballBestBlocker,
-  volleyballBestSpiker,
   volleyballCurrentSet,
   volleyballEngine,
-  volleyballMvp,
   volleyballNextFirstServer,
   volleyballPresets,
   volleyballServer,
@@ -13,7 +10,6 @@ import {
   type VolleyballState,
 } from '@scoresphere/sports';
 import i18next from 'i18next';
-import { Award } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChoiceGroup } from '@/components/ChoiceGroup';
@@ -419,9 +415,6 @@ function Scorecard({ projection, sides }: MatchViewProps) {
   const credited = Object.keys(state.credits);
   const metric = (m: string, id: string) =>
     stats.find((s) => s.metric === m && s.participantId === id)?.value ?? 0;
-  const awards = [volleyballMvp, volleyballBestSpiker, volleyballBestBlocker]
-    .map((award) => ({ award, result: award.compute(state, stats) }))
-    .filter((a) => a.result);
   return (
     <div className="space-y-4">
       <p className="font-medium tabular-nums">{volleyballEngine.result(state).summary}</p>
@@ -448,20 +441,6 @@ function Scorecard({ projection, sides }: MatchViewProps) {
           </tbody>
         </table>
       )}
-      {awards.map(({ award, result }) => (
-        <div key={award.key} className="flex items-start gap-3 rounded-xl border p-3">
-          <Award aria-hidden className="mt-0.5 size-5 text-primary" />
-          <div>
-            <p className="font-medium">
-              {award.name}:{' '}
-              {result!.recipients.map((r) => nameOf(sides, r.participantId)).join(' & ')}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {t('matches.awardAuto')} · {award.criteria}
-            </p>
-          </div>
-        </div>
-      ))}
     </div>
   );
 }

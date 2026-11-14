@@ -3,10 +3,7 @@ import {
   availableBatters,
   ballText,
   type CricketCommand,
-  cricketBestBatter,
-  cricketBestBowler,
   cricketEngine,
-  cricketPlayerOfTheMatch,
   cricketPresets,
   type CricketSettings,
   type CricketState,
@@ -19,7 +16,6 @@ import {
   oversText,
 } from '@scoresphere/sports';
 import i18next from 'i18next';
-import { Award } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type Choice, ChoiceGroup } from '@/components/ChoiceGroup';
@@ -1051,30 +1047,11 @@ function InningsCard({
 }
 
 function Scorecard({ projection, sides }: MatchViewProps) {
-  const { t } = useTranslation();
   const state = projection.state as CricketState;
-  const name = names(sides);
-  const stats = cricketEngine.stats(state);
-  const awards = [cricketPlayerOfTheMatch, cricketBestBatter, cricketBestBowler]
-    .map((a) => ({ award: a, result: a.compute(state, stats) }))
-    .filter((a) => a.result);
   return (
     <div className="space-y-6">
       {state.innings.map((inn) => (
         <InningsCard key={inn.number} inn={inn} state={state} sides={sides} />
-      ))}
-      {awards.map(({ award, result }) => (
-        <div key={award.key} className="flex items-start gap-3 rounded-xl border p-3">
-          <Award aria-hidden className="mt-0.5 size-5 text-primary" />
-          <div>
-            <p className="font-medium">
-              {award.name}: {result!.recipients.map((r) => name(r.participantId)).join(' & ')}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {t('matches.awardAuto')} · {award.criteria}
-            </p>
-          </div>
-        </div>
       ))}
     </div>
   );

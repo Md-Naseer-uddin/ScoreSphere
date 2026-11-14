@@ -738,5 +738,33 @@
       "press": "{{name}} moved ({{time}})",
       "flag": "{{name}}'s flag fell"
     }
+  },
+  "awards": {
+    "title": "Awards",
+    "provisional": "Worked out on this device; final once the match has synced.",
+    "byOrganizer": "Selected by organizer",
+    "stale": "Match changed since this choice: please review",
+    "none": "Not awarded",
+    "reason": "Reason: {{reason}}",
+    "choose": "Choose recipient",
+    "useAutomatic": "Use automatic",
+    "recipients": "Recipients",
+    "reasonLabel": "Reason (needed to override the automatic award)",
+    "saved": "Award saved",
+    "metric": {
+      "games_won": "Games",
+      "points_won": "Points",
+      "longest_streak": "Longest run",
+      "runs": "Runs",
+      "balls_faced": "Balls",
+      "wickets": "Wickets",
+      "runs_conceded": "Runs conceded",
+      "impact_points": "Impact points",
+      "sets_won": "Sets",
+      "breaks": "Breaks",
+      "points_scored": "Points scored",
+      "attack_points": "Attack points",
+      "block_points": "Block points"
+    }
   }
 }

@@ -105,6 +105,19 @@ test('scores a one-over cricket match, finishing the chase offline through a rel
   await expect(page.getByText('won by 1 run').first()).toBeVisible();
   await expect(page.getByText('b Asha')).toBeVisible();
 
+  // Awards come from the server once synced: Asha's wicket and run make her Player of the Match.
+  await expect(page.getByTestId('award-player-of-the-match')).toContainText('Asha');
+  const bestBatter = page.getByTestId('award-best-batter');
+  await expect(bestBatter).toContainText('Ravi');
+  // The organizer overrides it, with a reason.
+  await bestBatter.getByRole('button', { name: 'Choose recipient' }).click();
+  await bestBatter.getByLabel('Ravi').uncheck();
+  await bestBatter.getByLabel('Bina').check();
+  await bestBatter.getByLabel(/^Reason/).fill('Held the innings together');
+  await bestBatter.getByRole('button', { name: 'Save' }).click();
+  await expect(bestBatter).toContainText('Selected by organizer');
+  await expect(bestBatter).toContainText('Reason: Held the innings together');
+
   const [ledger] = await query<{ events: number; distinct_ids: number; status: string }>(
     `select count(*)::int as events, count(distinct e.event_id)::int as distinct_ids, m.status
        from match_events e join matches m on m.id = e.match_id
