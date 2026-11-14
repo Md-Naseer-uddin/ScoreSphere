@@ -185,6 +185,20 @@ const SAMPLES: Partial<Record<SportKey, RuleSample>> = {
       ];
     },
   },
+  wrestling: {
+    playersPerSide: () => 1,
+    commands: () => [
+      { type: 'start_period' },
+      { type: 'points', side: 0, value: 2, kind: 'takedown' },
+      { type: 'points', side: 1, value: 1, kind: 'step_out' },
+      { type: 'caution', side: 1, penalty: 1 },
+      { type: 'points', side: 0, value: 2, kind: 'exposure' },
+      { type: 'end_period' },
+      { type: 'start_period' },
+      { type: 'points', side: 1, value: 4, kind: 'throw' },
+      { type: 'end_period' },
+    ],
+  },
   chess: {
     playersPerSide: () => 1,
     commands: () => [

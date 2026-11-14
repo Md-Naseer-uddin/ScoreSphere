@@ -9,6 +9,7 @@ import {
   khoKhoEngine,
   tennisEngine,
   volleyballEngine,
+  wrestlingEngine,
 } from '@scoresphere/sports';
 import {
   badmintonGoldenLogs,
@@ -29,8 +30,10 @@ import {
   runGoldenLog,
   runTennisGoldenLog,
   runVolleyballGoldenLog,
+  runWrestlingGoldenLog,
   tennisGoldenLogs,
   volleyballGoldenLogs,
+  wrestlingGoldenLogs,
 } from '@scoresphere/sports/golden';
 import { describe, expect, it } from 'vitest';
 
@@ -66,6 +69,12 @@ const suites = [
   },
   { sport: 'kabaddi', logs: kabaddiGoldenLogs, run: runKabaddiGoldenLog, engine: kabaddiEngine },
   { sport: 'kho-kho', logs: khoKhoGoldenLogs, run: runKhoKhoGoldenLog, engine: khoKhoEngine },
+  {
+    sport: 'wrestling',
+    logs: wrestlingGoldenLogs,
+    run: runWrestlingGoldenLog,
+    engine: wrestlingEngine,
+  },
 ] as const;
 
 for (const suite of suites) {

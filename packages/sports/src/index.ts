@@ -14,4 +14,5 @@ export * from './kho-kho/index.js';
 export * from './tennis/index.js';
 export * from './tournaments/index.js';
 export * from './volleyball/index.js';
+export * from './wrestling/index.js';
 export * from './rule-preview.js';

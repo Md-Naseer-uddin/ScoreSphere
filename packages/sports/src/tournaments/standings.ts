@@ -77,6 +77,11 @@ export const TIE_BREAKS: Record<string, TieBreakDefinition> = {
     label: 'Goals scored',
     value: (r) => sum(r.totals, 'goalsFor'),
   },
+  classification_points: {
+    key: 'classification_points',
+    label: 'Classification points',
+    value: (r) => sum(r.totals, 'classificationPoints'),
+  },
   set_difference: {
     key: 'set_difference',
     label: 'Set difference',

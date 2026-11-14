@@ -10,6 +10,7 @@ import { khoKhoEngine } from './kho-kho/engine.js';
 import { footballEngine } from './football/engine.js';
 import { tennisEngine } from './tennis/engine.js';
 import { volleyballEngine } from './volleyball/engine.js';
+import { wrestlingEngine } from './wrestling/engine.js';
 
 /**
  * Engines are frozen once released: a new rule changes the version (`badminton@2`) and
@@ -31,6 +32,7 @@ const registry: readonly AnySportEngine[] = [
   khoKhoEngine,
   tennisEngine,
   volleyballEngine,
+  wrestlingEngine,
 ];
 
 export function getEngine(sport: SportKey, version: number): AnySportEngine | undefined {

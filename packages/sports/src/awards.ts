@@ -26,6 +26,8 @@ const byEngine: Partial<Record<SportKey, Record<number, readonly AnyAward[]>>> =
   volleyball: { 1: volleyballMatchAwards },
   // Chess records a result only; there is no match award (spec scoring §5).
   chess: { 1: [] },
+  // Wrestling recognises the bout winner through the result (spec scoring §5).
+  wrestling: { 1: [] },
 };
 
 /** The match awards for a sport's engine version (awards are versioned with the engine). */

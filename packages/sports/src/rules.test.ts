@@ -19,6 +19,7 @@ const PILOT = [
   'kho-kho',
   'tennis',
   'volleyball',
+  'wrestling',
 ] as const;
 
 /** A valid value for a field: its first option, or its minimum. */

@@ -9,6 +9,7 @@ import type { KabaddiState } from '../kabaddi/engine.js';
 import type { KhoKhoState } from '../kho-kho/engine.js';
 import type { TennisState } from '../tennis/engine.js';
 import type { VolleyballState } from '../volleyball/engine.js';
+import { classificationPoints, type WrestlingState } from '../wrestling/engine.js';
 import type { StandingsPoints } from './standings.js';
 
 /** A player award decided by one summed statistic over the tournament. */
@@ -347,6 +348,23 @@ const RULES: Partial<Record<SportKey, TournamentRules>> = {
         tieBreak: { metric: 'pole_dives', lowerIsBetter: false },
       },
     ],
+  },
+  wrestling: {
+    // Pools rank by wins, then UWW classification points (5 for a fall, 4 or 3 otherwise).
+    points: { win: 1, draw: 0, loss: 0 },
+    tieBreaks: ['classification_points', 'point_difference'],
+    allowedTieBreaks: ['classification_points', 'point_difference'],
+    allowsDraws: false,
+    totals: (state: WrestlingState, side) => ({
+      classificationPoints: classificationPoints(state)?.[side] ?? 0,
+      pointsFor: state.score[side],
+      pointsAgainst: state.score[side === 0 ? 1 : 0],
+    }),
+    leaderboards: [
+      { metric: 'wins_by_fall', label: 'Most wins by fall' },
+      { metric: 'technical_points', label: 'Most technical points' },
+    ],
+    playerAwards: [],
   },
   chess: {
     points: { win: 1, draw: 0.5, loss: 0 },

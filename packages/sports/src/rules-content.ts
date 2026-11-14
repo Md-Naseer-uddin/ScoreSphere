@@ -10,6 +10,7 @@ import { kabaddiRules } from './kabaddi/content.js';
 import { khoKhoRules } from './kho-kho/content.js';
 import { tennisRules } from './tennis/content.js';
 import { volleyballRules } from './volleyball/content.js';
+import { wrestlingRules } from './wrestling/content.js';
 
 const RULES_CONTENT: Partial<Record<SportKey, RulesContent>> = {
   badminton: badmintonRules,
@@ -22,6 +23,7 @@ const RULES_CONTENT: Partial<Record<SportKey, RulesContent>> = {
   'kho-kho': khoKhoRules,
   tennis: tennisRules,
   volleyball: volleyballRules,
+  wrestling: wrestlingRules,
 };
 
 /** In-app rules help for a sport, when it has been written (spec sports §7). */
