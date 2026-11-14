@@ -332,7 +332,10 @@ After that, if the pilot asks for them, the follow-ups noted under each mileston
 - **On-device check of the CI-built APK:** IndexedDB persists across kill/restart, plus keep-awake.
   - Download it from the latest CI run's `scoresphere-debug-apk` artifact.
   - The APK can't reach an API until one is deployed: it needs `VITE_API_URL` and `VITE_PUBLIC_APP_URL` at build time.
-- **Render demo:** create the Blueprint from `render.yaml` and set `SUPPORT_EMAIL`, then set the GitHub variables `SCORESPHERE_API_URL` and `SCORESPHERE_PUBLIC_APP_URL` ([deploy runbook](runbooks/deploy.md#render-current)).
+- **Render demo:**
+  - Live since 14 November 2026 at https://scoresphere-web.onrender.com, from `render.yaml` ([deploy runbook](runbooks/deploy.md#render-current)).
+  - Its free database expires on **14 December 2026**; upgrade it before then to keep the data.
+  - Still to do: set the GitHub variables `SCORESPHERE_API_URL` and `SCORESPHERE_PUBLIC_APP_URL`.
 - **Android developer verification** for sideloaded apps, before the pilot.
 - **M3 on-device check:** on the CI-built APK, score a badminton match offline, kill and reopen the app, reconnect, and check the screen stays awake while scoring.
 - **Badminton rules sign-off:**
