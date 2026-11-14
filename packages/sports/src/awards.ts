@@ -1,6 +1,7 @@
 import type { SportKey } from '@scoresphere/contracts';
 import type { MatchAwardDefinition } from '@scoresphere/engine-kit';
 import { badmintonMatchAwards } from './badminton/awards.js';
+import { basketballMatchAwards } from './basketball/awards.js';
 import { cricketMatchAwards } from './cricket/awards.js';
 import { hockeyMatchAwards } from './field-hockey/awards.js';
 import { footballMatchAwards } from './football/awards.js';
@@ -13,6 +14,7 @@ type AnyAward = MatchAwardDefinition<any>;
 
 const byEngine: Partial<Record<SportKey, Record<number, readonly AnyAward[]>>> = {
   badminton: { 1: badmintonMatchAwards },
+  basketball: { 1: basketballMatchAwards },
   cricket: { 1: cricketMatchAwards },
   football: { 1: footballMatchAwards },
   'field-hockey': { 1: hockeyMatchAwards },

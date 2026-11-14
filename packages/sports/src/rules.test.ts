@@ -10,6 +10,7 @@ import { volleyballPresets } from './volleyball/settings.js';
 
 const PILOT = [
   'badminton',
+  'basketball',
   'chess',
   'cricket',
   'field-hockey',

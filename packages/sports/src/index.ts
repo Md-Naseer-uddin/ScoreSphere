@@ -1,5 +1,6 @@
 export * from './awards.js';
 export * from './badminton/index.js';
+export * from './basketball/index.js';
 export * from './catalogue.js';
 export * from './chess/index.js';
 export * from './cricket/index.js';

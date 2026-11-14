@@ -1,5 +1,6 @@
 import type { SportKey } from '@scoresphere/contracts';
 import { badmintonRules } from './badminton/content.js';
+import { basketballRules } from './basketball/content.js';
 import { chessRules } from './chess/content.js';
 import type { RulesContent } from './content.js';
 import { cricketRules } from './cricket/content.js';
@@ -10,6 +11,7 @@ import { volleyballRules } from './volleyball/content.js';
 
 const RULES_CONTENT: Partial<Record<SportKey, RulesContent>> = {
   badminton: badmintonRules,
+  basketball: basketballRules,
   chess: chessRules,
   cricket: cricketRules,
   football: footballRules,

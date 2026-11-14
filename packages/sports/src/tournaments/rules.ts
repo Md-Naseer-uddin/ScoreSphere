@@ -1,6 +1,7 @@
 import type { SportKey } from '@scoresphere/contracts';
 import type { MetricRecord } from '@scoresphere/engine-kit';
 import type { BadmintonState } from '../badminton/engine.js';
+import type { BasketballState } from '../basketball/engine.js';
 import type { CricketState } from '../cricket/engine.js';
 import type { HockeyState } from '../field-hockey/engine.js';
 import type { FootballState } from '../football/engine.js';
@@ -225,6 +226,60 @@ const RULES: Partial<Record<SportKey, TournamentRules>> = {
         criteria: 'Most goals; then most assists; still level, shared.',
         metric: 'goals',
         tieBreak: { metric: 'assists', lowerIsBetter: false },
+      },
+    ],
+  },
+  basketball: {
+    // FIBA: 2 points for a win, 1 for a loss. Games can't end level.
+    points: { win: 2, draw: 1, loss: 1 },
+    tieBreaks: ['point_difference'],
+    allowedTieBreaks: ['point_difference', 'wins'],
+    allowsDraws: false,
+    totals: (state: BasketballState, side) => ({
+      pointsFor: state.score[side],
+      pointsAgainst: state.score[side === 0 ? 1 : 0],
+    }),
+    derive: (t) => ({
+      efficiency:
+        (t.points ?? 0) +
+        (t.rebounds ?? 0) +
+        (t.assists ?? 0) +
+        (t.steals ?? 0) +
+        (t.blocks ?? 0) -
+        (t.turnovers ?? 0) -
+        (t.missed_shots ?? 0),
+    }),
+    leaderboards: [
+      { metric: 'points', label: 'Top scorers' },
+      { metric: 'rebounds', label: 'Most rebounds' },
+      { metric: 'assists', label: 'Most assists' },
+      { metric: 'three_pointers', label: 'Most three-pointers' },
+    ],
+    playerAwards: [
+      {
+        key: 'mvp',
+        name: 'Tournament MVP',
+        criteria:
+          'Highest efficiency over the tournament (points + rebounds + assists + steals + blocks − turnovers − missed shots); still level, shared.',
+        metric: 'efficiency',
+      },
+      {
+        key: 'top-scorer',
+        name: 'Top Scorer',
+        criteria: 'Most points; still level, shared.',
+        metric: 'points',
+      },
+      {
+        key: 'rebounds-leader',
+        name: 'Rebounds Leader',
+        criteria: 'Most rebounds; still level, shared. Needs rebounds recorded.',
+        metric: 'rebounds',
+      },
+      {
+        key: 'assists-leader',
+        name: 'Assists Leader',
+        criteria: 'Most assists; still level, shared. Needs assists recorded.',
+        metric: 'assists',
       },
     ],
   },

@@ -113,6 +113,30 @@ const SAMPLES: Partial<Record<SportKey, RuleSample>> = {
       ];
     },
   },
+  basketball: {
+    playersPerSide: () => 2,
+    commands: (_config, ids) => {
+      const score = (side: 0 | 1, points: number, player: number): Command => ({
+        type: 'score',
+        side,
+        points,
+        playerId: ids[side][player],
+      });
+      return [
+        { type: 'start_period' },
+        score(0, 2, 0),
+        score(1, 3, 0),
+        { type: 'foul', side: 0, kind: 'personal', playerId: ids[0][1] },
+        score(1, 1, 1),
+        score(0, 3, 1),
+        { type: 'timeout', side: 1 },
+        { type: 'start_clock' },
+        score(1, 2, 0),
+        score(0, 2, 0),
+        { type: 'end_period' },
+      ];
+    },
+  },
   chess: {
     playersPerSide: () => 1,
     commands: () => [

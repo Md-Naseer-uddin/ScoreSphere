@@ -1,6 +1,7 @@
 import type { SportKey } from '@scoresphere/contracts';
 import type { SportEngine } from '@scoresphere/engine-kit';
 import { badmintonEngine } from './badminton/engine.js';
+import { basketballEngine } from './basketball/engine.js';
 import { chessEngine } from './chess/engine.js';
 import { cricketEngine } from './cricket/engine.js';
 import { hockeyEngine } from './field-hockey/engine.js';
@@ -19,6 +20,7 @@ export type AnySportEngine = SportEngine<any, any, any>;
 
 const registry: readonly AnySportEngine[] = [
   badmintonEngine,
+  basketballEngine,
   chessEngine,
   cricketEngine,
   footballEngine,
