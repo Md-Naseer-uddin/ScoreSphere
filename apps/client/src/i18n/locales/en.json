@@ -1189,5 +1189,63 @@
       "penalty": "{{name}} in the penalty",
       "overtime": "Level: overtime"
     }
+  },
+  "kabaddi": {
+    "setup": {
+      "playersOnMat": "Players on the mat",
+      "halfMinutes": "Minutes per half",
+      "raidSeconds": "Raid timer, seconds (blank: none)",
+      "allOutPoints": "Extra points for an all out",
+      "timeoutsPerHalf": "Timeouts per half",
+      "bonusLine": "Bonus line",
+      "doOrDie": "Do-or-die raid after two empty raids",
+      "superTackle": "Super tackle (3 or fewer defenders score 2)"
+    },
+    "onMat_one": "{{count}} player on the mat",
+    "onMat_other": "{{count}} players on the mat",
+    "raidTimer": "Raid",
+    "startRaid": "Start",
+    "restartRaid": "Restart",
+    "raidBy": "Raid: {{name}}",
+    "doOrDie": "Do-or-die",
+    "raider": "Raider",
+    "touches": "Defenders touched",
+    "fewerTouches": "One fewer touch",
+    "moreTouches": "One more touch",
+    "bonus": "Bonus point",
+    "noBonus": "Bonus line doesn’t count (too few defenders)",
+    "bonusShort": "bonus",
+    "tackler": "Tackled by",
+    "result": {
+      "safe": "Back safely",
+      "tackled": "Tackled",
+      "out": "Raider out"
+    },
+    "other": "Player out or technical point",
+    "playerOut": "Player out",
+    "technicalPoint": "Technical point",
+    "firstRaid": "Who raids first?",
+    "allOut": "all out",
+    "superTackle": "super tackle",
+    "teamLine": "{{raids}} raids, {{successful}} successful, {{tackles}} tackles, {{allOuts}} all outs",
+    "box": {
+      "raid": "Raid pts",
+      "tackle": "Tackle pts",
+      "raids": "Raids"
+    },
+    "timeline": {
+      "raid": "{{name}} raid",
+      "tackled": "tackled{{by}}",
+      "out": "raider out",
+      "points_one": "{{count}} point",
+      "points_other": "{{count}} points",
+      "playerOut": "{{name}} player out{{player}}",
+      "technical_one": "Technical point to {{name}}",
+      "technical_other": "{{count}} technical points to {{name}}"
+    },
+    "announce": {
+      "allOut": "All out! Points to {{name}}",
+      "superTackle": "Super tackle by {{name}}!"
+    }
   }
 }
