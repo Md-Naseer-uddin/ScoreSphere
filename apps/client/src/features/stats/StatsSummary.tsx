@@ -19,6 +19,9 @@ const HEADLINE: Record<string, string[]> = {
   tennis: ['sets_won', 'games_won', 'points_won', 'breaks'],
   volleyball: ['points_scored', 'attack_points', 'block_points', 'service_aces', 'sets_won'],
   chess: ['moves'],
+  football: ['goals', 'assists', 'appearances', 'yellow_cards', 'red_cards'],
+  'field-hockey': ['goals', 'penalty_corner_goals', 'assists', 'green_cards', 'yellow_cards'],
+  basketball: ['points', 'three_pointers', 'rebounds', 'assists', 'steals', 'blocks', 'fouls'],
 };
 
 /** A record per sport, key statistics and recent results (plan M7). */

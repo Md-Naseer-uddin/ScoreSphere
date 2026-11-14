@@ -791,7 +791,22 @@
       "catches": "Catches",
       "service_points_won": "Points won on serve",
       "service_aces": "Aces",
-      "moves": "Moves"
+      "moves": "Moves",
+      "goals": "Goals",
+      "assists": "Assists",
+      "appearances": "Appearances",
+      "yellow_cards": "Yellow cards",
+      "red_cards": "Red cards",
+      "green_cards": "Green cards",
+      "penalty_corner_goals": "Penalty-corner goals",
+      "points": "Points",
+      "three_pointers": "Three-pointers",
+      "rebounds": "Rebounds",
+      "steals": "Steals",
+      "blocks": "Blocks",
+      "turnovers": "Turnovers",
+      "fouls": "Fouls",
+      "efficiency": "Efficiency"
     }
   },
   "legal": {
@@ -1104,6 +1119,75 @@
     },
     "announce": {
       "shootout": "Level: shoot-out"
+    }
+  },
+  "basketball": {
+    "setup": {
+      "periods": "Periods",
+      "periodMinutes": "Minutes per period",
+      "overtimeMinutes": "Overtime minutes",
+      "foulLimit": "Fouls to foul out (blank: none)",
+      "teamFoulLimit": "Team fouls before the penalty (blank: none)",
+      "timeoutsFirstHalf": "Timeouts, first half",
+      "timeoutsSecondHalf": "Timeouts, second half"
+    },
+    "overtime": "Overtime {{n}}",
+    "game": "Game",
+    "preGame": "Before tip-off",
+    "final": "Final",
+    "fouls_one": "{{count}} team foul",
+    "fouls_other": "{{count}} team fouls",
+    "penalty": "Penalty",
+    "timeoutsLeft_one": "{{count}} timeout left",
+    "timeoutsLeft_other": "{{count}} timeouts left",
+    "outOfGame": "Out of the game: {{names}}",
+    "shotClock": "Shot clock",
+    "tipOff": "Tip off",
+    "startClock": "Start clock",
+    "pointsFor": "{{points}} points {{name}}",
+    "scorer": "Scorer",
+    "record": "Record",
+    "recordPlayers": "Record who scored",
+    "choosePlayer": "Choose a player",
+    "miss": "Missed shot",
+    "missed": {
+      "1": "Missed free throw",
+      "2": "Missed 2",
+      "3": "Missed 3"
+    },
+    "foul": "Foul",
+    "foulKind": {
+      "personal": "Personal foul",
+      "technical": "Technical foul",
+      "unsportsmanlike": "Unsportsmanlike foul",
+      "disqualifying": "Disqualifying foul"
+    },
+    "stats": "Rebound, steal…",
+    "play": {
+      "rebound": "Rebound",
+      "steal": "Steal",
+      "block": "Block",
+      "turnover": "Turnover"
+    },
+    "byPeriod": "Score by period",
+    "box": {
+      "points": "PTS",
+      "rebounds": "REB",
+      "assists": "AST",
+      "steals": "STL",
+      "blocks": "BLK",
+      "turnovers": "TO",
+      "fouls": "PF"
+    },
+    "timeline": {
+      "clockStarted": "Clock started",
+      "clockStopped": "Clock stopped",
+      "score": "{{name}} +{{points}}"
+    },
+    "announce": {
+      "playerOut": "{{name}} player out of the game",
+      "penalty": "{{name}} in the penalty",
+      "overtime": "Level: overtime"
     }
   }
 }

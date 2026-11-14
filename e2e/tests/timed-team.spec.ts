@@ -153,3 +153,60 @@ test('hockey: the clock stops after a goal, a green card runs on playing time, a
   );
   expect(match).toEqual({ status: 'completed', summary: '1–0' });
 });
+
+test('basketball: scored offline through a reload, level at the end, won in overtime', async ({
+  browser,
+}) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.goto('/auth/register');
+  await register(page, 'Coach Tanvi', newPhone(), 'basketball password 1');
+
+  await page.goto('/app/matches/new?sport=basketball');
+  await page.getByRole('radio', { name: /3 v 3 pickup/ }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByLabel('Side A name').fill('Bulls');
+  await page.getByLabel('Side B name').fill('Sharks');
+  await players(page, { A: ['Vikas', 'Wasim'], B: ['Yamini', 'Zoya'] });
+  await page.getByRole('button', { name: 'Start match' }).click();
+  await page.waitForURL(/\/score$/);
+  const matchId = page.url().split('/').at(-2)!;
+
+  await page.getByRole('button', { name: 'Tip off' }).click();
+  await expect(page.getByTestId('basketball-status')).toContainText('Game · ');
+  await page.getByRole('button', { name: '2 points Bulls' }).click();
+  await expect(page.getByTestId('points-0')).toHaveText('2');
+  await page.getByLabel('Record who scored').click();
+  await page.getByRole('button', { name: '3 points Sharks' }).click();
+  await page.getByLabel('Scorer').selectOption({ label: 'Zoya' });
+  await page.getByRole('button', { name: 'Record', exact: true }).click();
+  await expect(page.getByTestId('points-1')).toHaveText('3');
+  await page.getByLabel('Record who scored').click();
+
+  await serviceWorkerReady(page);
+  await context.setOffline(true);
+  await page.getByRole('button', { name: 'Foul', exact: true }).click();
+  await page.getByLabel('Player').selectOption({ label: 'Wasim' });
+  await page.getByRole('button', { name: 'Personal foul' }).click();
+  await expect(page.getByText('Personal foul – Bulls – Wasim')).toBeVisible();
+  await page.getByRole('button', { name: 'Timeout Sharks' }).click();
+  await expect(page.getByTestId('basketball-status')).toContainText('clock stopped');
+  await page.reload();
+  await expect(page.getByTestId('points-1')).toHaveText('3');
+  await page.getByRole('button', { name: 'Start clock' }).click();
+  await page.getByRole('button', { name: '1 points Bulls' }).click();
+  await expect(page.getByTestId('points-0')).toHaveText('3');
+  await page.getByRole('button', { name: 'End Game' }).click();
+  await page.getByRole('button', { name: 'Start Overtime 1' }).click();
+  await page.getByRole('button', { name: '2 points Bulls' }).click();
+  await page.getByRole('button', { name: 'End Overtime 1' }).click();
+  await expect(page.getByTestId('basketball-status')).toHaveText('Final');
+
+  await context.setOffline(false);
+  await expect(syncBadge(page)).toHaveText('Synced', { timeout: 30_000 });
+  const [match] = await query<{ status: string; summary: string }>(
+    `select status, result->>'summary' as summary from matches where id = $1`,
+    [matchId],
+  );
+  expect(match).toEqual({ status: 'completed', summary: '5–3 (OT)' });
+});
