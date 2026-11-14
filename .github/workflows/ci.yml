@@ -66,6 +66,11 @@ jobs:
   android:
     name: Android debug APK
     runs-on: ubuntu-latest
+    # Once these repository variables are set, the debug APK talks to the deployed API, so
+    # it can be tested on a phone. Without them it builds as before (web-relative API).
+    env:
+      VITE_API_URL: ${{ vars.SCORESPHERE_API_URL }}
+      VITE_PUBLIC_APP_URL: ${{ vars.SCORESPHERE_PUBLIC_APP_URL }}
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
