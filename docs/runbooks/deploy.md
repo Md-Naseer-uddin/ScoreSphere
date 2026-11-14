@@ -8,7 +8,9 @@ the refresh cookie stays first-party. Put a TLS-terminating load balancer in fro
 
 1. Copy `infra/.env.example` to `infra/.env` and fill it in. `JWT_SECRET` must be at least 32
    random characters (`openssl rand -base64 48`). The API refuses to start in production
-   without `CORS_ORIGINS`, rate limits, and an `https` `PUBLIC_APP_URL`.
+   without `CORS_ORIGINS`, rate limits, and an `https` `PUBLIC_APP_URL`. Include
+   `https://localhost` in `CORS_ORIGINS`: that is the Android app's origin, and it calls the API
+   from there.
 2. `docker compose -f infra/docker-compose.prod.yml up -d --build`
 3. Check `GET https://<host>/api/v1/health/ready` returns `ok`.
 4. Schedule [backups](backup-restore.md) and the metrics scrape ([alerts](README.md#alerts)).

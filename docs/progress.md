@@ -319,7 +319,11 @@ Everything in plan.md that can be built without the owner is built. What remains
 - legal review;
 - hosting.
 
-After that, if the pilot asks for them, the follow-ups noted under each milestone's "Not built" list, and Hindi.
+After that, if the pilot asks for them, the follow-ups noted under each milestone's "Not built" list.
+
+**Owner decisions (14 November 2026):**
+- No Hindi for v1.0; the app stays English-only. i18n is still in place if this changes.
+- Hosting is Render, for both the web app and the API.
 
 ## Needs the owner
 
@@ -349,7 +353,6 @@ After that, if the pilot asks for them, the follow-ups noted under each mileston
   - A hockey shoot-out winner gets the 3 points of a win; some FIH events give 2 and 1 instead.
 - **M11 / v1.0:**
   - The Android device matrix: install the APK, upgrade from the previous version without losing data, and test kill/restart and background timers on a few low-end phones.
-  - Whether to add Hindi before v1.0 (plan §5 M11: only if the pilot asks for it).
   - An independent penetration test once a staging environment exists.
 - **M10 sign-off (kabaddi, kho-kho, wrestling, carrom):**
   - Kabaddi and kho-kho presets are marked casual until you confirm which match the current AKFI/KKFI rules. Please also confirm the source links.
