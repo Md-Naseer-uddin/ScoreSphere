@@ -24,3 +24,5 @@ export * from './kho-kho/golden/logs.js';
 export * from './kho-kho/golden/run.js';
 export * from './wrestling/golden/logs.js';
 export * from './wrestling/golden/run.js';
+export * from './carrom/golden/logs.js';
+export * from './carrom/golden/run.js';

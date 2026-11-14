@@ -199,6 +199,18 @@ const SAMPLES: Partial<Record<SportKey, RuleSample>> = {
       { type: 'end_period' },
     ],
   },
+  carrom: {
+    playersPerSide: (config) => (config.discipline === 'doubles' ? 2 : 1),
+    commands: () => [
+      { type: 'start_match', firstBreak: 0 },
+      { type: 'board', winner: 0, coinsLeft: 5, queenCoveredBy: 0 },
+      { type: 'foul', side: 1 },
+      { type: 'board', winner: 1, coinsLeft: 3, queenCoveredBy: null },
+      { type: 'board', winner: 0, coinsLeft: 7, queenCoveredBy: 1 },
+      { type: 'board', winner: 1, coinsLeft: 2, queenCoveredBy: 1 },
+      { type: 'board', winner: 0, coinsLeft: 4, queenCoveredBy: null },
+    ],
+  },
   chess: {
     playersPerSide: () => 1,
     commands: () => [

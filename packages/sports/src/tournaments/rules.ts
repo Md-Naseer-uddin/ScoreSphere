@@ -2,6 +2,7 @@ import type { SportKey } from '@scoresphere/contracts';
 import type { MetricRecord } from '@scoresphere/engine-kit';
 import type { BadmintonState } from '../badminton/engine.js';
 import type { BasketballState } from '../basketball/engine.js';
+import type { CarromState } from '../carrom/engine.js';
 import type { CricketState } from '../cricket/engine.js';
 import type { HockeyState } from '../field-hockey/engine.js';
 import type { FootballState } from '../football/engine.js';
@@ -363,6 +364,18 @@ const RULES: Partial<Record<SportKey, TournamentRules>> = {
     leaderboards: [
       { metric: 'wins_by_fall', label: 'Most wins by fall' },
       { metric: 'technical_points', label: 'Most technical points' },
+    ],
+    playerAwards: [],
+  },
+  carrom: {
+    points: { win: 1, draw: 0, loss: 0 },
+    tieBreaks: ['game_difference', 'point_difference'],
+    allowedTieBreaks: ['game_difference', 'point_difference'],
+    allowsDraws: false,
+    totals: (state: CarromState, side) => gamesAndPoints(state.games, side, 'games'),
+    leaderboards: [
+      { metric: 'boards_won', label: 'Most boards won' },
+      { metric: 'queens_covered', label: 'Most queens covered' },
     ],
     playerAwards: [],
   },

@@ -28,6 +28,8 @@ const byEngine: Partial<Record<SportKey, Record<number, readonly AnyAward[]>>> =
   chess: { 1: [] },
   // Wrestling recognises the bout winner through the result (spec scoring §5).
   wrestling: { 1: [] },
+  // Carrom recognises the board and match winners through the result.
+  carrom: { 1: [] },
 };
 
 /** The match awards for a sport's engine version (awards are versioned with the engine). */

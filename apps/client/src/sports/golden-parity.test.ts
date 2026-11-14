@@ -1,6 +1,7 @@
 import {
   badmintonEngine,
   basketballEngine,
+  carromEngine,
   chessEngine,
   cricketEngine,
   footballEngine,
@@ -14,6 +15,7 @@ import {
 import {
   badmintonGoldenLogs,
   basketballGoldenLogs,
+  carromGoldenLogs,
   chessGoldenLogs,
   cricketGoldenLogs,
   footballGoldenLogs,
@@ -21,6 +23,7 @@ import {
   kabaddiGoldenLogs,
   khoKhoGoldenLogs,
   runBasketballGoldenLog,
+  runCarromGoldenLog,
   runChessGoldenLog,
   runCricketGoldenLog,
   runFootballGoldenLog,
@@ -75,6 +78,7 @@ const suites = [
     run: runWrestlingGoldenLog,
     engine: wrestlingEngine,
   },
+  { sport: 'carrom', logs: carromGoldenLogs, run: runCarromGoldenLog, engine: carromEngine },
 ] as const;
 
 for (const suite of suites) {
