@@ -324,13 +324,15 @@ After that, if the pilot asks for them, the follow-ups noted under each mileston
 **Owner decisions (14 November 2026):**
 - No Hindi for v1.0; the app stays English-only. i18n is still in place if this changes.
 - Hosting is Render, for both the web app and the API.
+- Start on Render's free plans as a demo: one container in Singapore (`render.yaml`). Move to
+  paid plans before pilot users (`docs/runbooks/deploy.md`).
 
 ## Needs the owner
 
 - **On-device check of the CI-built APK:** IndexedDB persists across kill/restart, plus keep-awake.
   - Download it from the latest CI run's `scoresphere-debug-apk` artifact.
   - The APK can't reach an API until one is deployed: it needs `VITE_API_URL` and `VITE_PUBLIC_APP_URL` at build time.
-- **Staging deploy target.** Nothing is deployed until a hosting provider is chosen; storage stays on local disk until then.
+- **Render demo:** create the Blueprint from `render.yaml` and set `SUPPORT_EMAIL`, then set the GitHub variables `SCORESPHERE_API_URL` and `SCORESPHERE_PUBLIC_APP_URL` ([deploy runbook](runbooks/deploy.md#render-current)).
 - **Android developer verification** for sideloaded apps, before the pilot.
 - **M3 on-device check:** on the CI-built APK, score a badminton match offline, kill and reopen the app, reconnect, and check the screen stays awake while scoring.
 - **Badminton rules sign-off:**

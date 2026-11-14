@@ -1,0 +1,47 @@
+# Render Blueprint, free demo, in Singapore: one web service runs the web app and the API
+# together (free services can't reach each other privately), plus a free Postgres.
+# Free limits: it sleeps after 15 idle minutes and takes about a minute to wake, profile
+# photos are lost when it sleeps or redeploys, and the database expires 30 days after it is
+# created. The paid layout (private API, disk, backups) is in docs/runbooks/deploy.md.
+databases:
+  - name: scoresphere-db
+    region: singapore
+    plan: free
+    postgresMajorVersion: '18'
+    # Only services on Render's private network may connect.
+    ipAllowList: []
+
+services:
+  - type: web
+    name: scoresphere-web
+    runtime: docker
+    region: singapore
+    plan: free
+    dockerfilePath: ./infra/docker/demo.Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/v1/health
+    # Redeploy on pushes to main once CI passes.
+    autoDeployTrigger: checksPass
+    buildFilter:
+      ignoredPaths: [e2e/**, docs/**, '**/*.md']
+    envVars:
+      # nginx's port; the API listens on 3300 inside the container.
+      - key: PORT
+        value: '8080'
+      - key: DATABASE_URL
+        fromDatabase:
+          name: scoresphere-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PUBLIC_APP_URL
+        value: https://scoresphere-web.onrender.com
+      # The web app, and https://localhost for the Android app.
+      - key: CORS_ORIGINS
+        value: https://scoresphere-web.onrender.com,https://localhost
+      # Render's proxy, then nginx.
+      - key: TRUST_PROXY
+        value: '2'
+      # Entered in the dashboard when the Blueprint is created.
+      - key: SUPPORT_EMAIL
+        sync: false
