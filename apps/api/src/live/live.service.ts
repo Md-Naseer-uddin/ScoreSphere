@@ -63,6 +63,9 @@ function toShareLink(row: LinkRow, now = new Date()): ShareLink {
  */
 @Injectable()
 export class LiveService {
+  /** Live streams open on this instance, for metrics. */
+  openStreams = 0;
+
   constructor(
     @Inject(DB) private readonly db: Database,
     private readonly listener: MatchUpdatesListener,
@@ -221,9 +224,11 @@ export class LiveService {
         `event: ${type}\n${id !== undefined ? `id: ${id}\n` : ''}data: ${JSON.stringify(data)}\n\n`,
       );
     };
+    this.openStreams += 1;
     const close = () => {
       if (closed) return;
       closed = true;
+      this.openStreams -= 1;
       clearInterval(heartbeat);
       subscription?.unsubscribe();
       res.end();

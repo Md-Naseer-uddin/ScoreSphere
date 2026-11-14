@@ -17,6 +17,7 @@ import { HealthController } from './health/health.controller';
 import { LiveModule } from './live/live.module';
 import { MatchesModule } from './matches/matches.module';
 import { MediaModule } from './media/media.module';
+import { OpsModule } from './ops/ops.module';
 import { PeopleModule } from './people/people.module';
 import { PersonsModule } from './people/persons.service';
 import { SyncModule } from './sync/sync.module';
@@ -49,6 +50,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module';
     MatchesModule,
     LiveModule,
     AccountModule,
+    OpsModule,
   ],
   controllers: [HealthController],
   providers: [

@@ -33,3 +33,27 @@ describe('loadEnv', () => {
     expect(loadEnv({ ...base, RATE_LIMIT_ENABLED: 'false' }).RATE_LIMIT_ENABLED).toBe(false);
   });
 });
+
+describe('production safety', () => {
+  const production = {
+    NODE_ENV: 'production',
+    DATABASE_URL: 'postgres://u:p@db:5432/scoresphere',
+    JWT_SECRET: 'a-production-secret-of-at-least-32-chars',
+    CORS_ORIGINS: 'https://app.example.in',
+    PUBLIC_APP_URL: 'https://app.example.in',
+  };
+
+  it('accepts a complete production configuration', () => {
+    expect(() => loadEnv(production)).not.toThrow();
+  });
+
+  it('refuses production without CORS origins, rate limits or https links', () => {
+    expect(() => loadEnv({ ...production, CORS_ORIGINS: '' })).toThrow(/CORS_ORIGINS/);
+    expect(() => loadEnv({ ...production, RATE_LIMIT_ENABLED: 'false' })).toThrow(
+      /RATE_LIMIT_ENABLED/,
+    );
+    expect(() => loadEnv({ ...production, PUBLIC_APP_URL: 'http://app.example.in' })).toThrow(
+      /https/,
+    );
+  });
+});

@@ -10,6 +10,7 @@ import type { Request, Response } from 'express';
 import { ZodValidationException } from 'nestjs-zod';
 import type { ZodError } from 'zod';
 import { PinoLogger } from 'nestjs-pino';
+import { ErrorReporter } from '../ops/error-reporter';
 import { ApiError } from './api-error';
 
 const CODE_BY_STATUS: Partial<Record<number, ErrorCode>> = {
@@ -28,7 +29,10 @@ const CODE_BY_STATUS: Partial<Record<number, ErrorCode>> = {
  */
 @Catch()
 export class ApiExceptionFilter implements ExceptionFilter {
-  constructor(private readonly logger: PinoLogger) {
+  constructor(
+    private readonly logger: PinoLogger,
+    private readonly reporter: ErrorReporter,
+  ) {
     logger.setContext(ApiExceptionFilter.name);
   }
 
@@ -40,6 +44,12 @@ export class ApiExceptionFilter implements ExceptionFilter {
 
     if (status >= 500) {
       this.logger.error({ err: exception }, 'Unhandled error');
+      const route = (req.route as { path?: string } | undefined)?.path ?? 'unknown';
+      this.reporter.capture(exception, {
+        requestId: String(req.id ?? ''),
+        method: req.method,
+        route,
+      });
     }
 
     const body: ErrorEnvelope = { error, meta: { requestId: String(req.id ?? '') } };

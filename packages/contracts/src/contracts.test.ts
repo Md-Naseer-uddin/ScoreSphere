@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { errorEnvelopeSchema, idSchema, newId, SPORT_KEYS } from './index.js';
+import { compareVersions, errorEnvelopeSchema, idSchema, newId, SPORT_KEYS } from './index.js';
 
 describe('ids', () => {
   it('generates UUIDv7 values that validate', () => {
@@ -36,5 +36,13 @@ describe('sport keys', () => {
   it('lists the 12 launch sports', () => {
     expect(SPORT_KEYS).toHaveLength(12);
     expect(new Set(SPORT_KEYS).size).toBe(12);
+  });
+});
+
+describe('versions', () => {
+  it('compares numerically, not as text', () => {
+    expect(compareVersions('0.10.0', '0.9.9')).toBeGreaterThan(0);
+    expect(compareVersions('1.0.0', '1.0.0')).toBe(0);
+    expect(compareVersions('0.1.2', '0.2.0')).toBeLessThan(0);
   });
 });

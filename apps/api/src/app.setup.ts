@@ -11,6 +11,8 @@ import type { Env } from './config/env';
 export function configureApp(app: INestApplication): void {
   const env = app.get<Env>(ENV);
   app.useLogger(app.get(Logger));
+  // Behind a load balancer, trust its X-Forwarded-For so rate limits apply per client.
+  app.getHttpAdapter().getInstance().set('trust proxy', env.TRUST_PROXY);
   app.use(helmet());
   app.use(cookieParser());
   app.enableCors({ origin: env.CORS_ORIGINS, credentials: true });

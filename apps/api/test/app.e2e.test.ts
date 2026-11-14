@@ -26,6 +26,7 @@ describe('HTTP pipeline', () => {
     process.env.LOG_LEVEL = 'silent';
     process.env.JWT_SECRET = 'unit-test-secret-unit-test-secret-unit';
     process.env.RATE_LIMIT_ENABLED = 'false';
+    process.env.CORS_ORIGINS = 'https://app.scoresphere.test';
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
       .overrideProvider(PG_POOL)
       .useValue(fakePool)
@@ -82,5 +83,24 @@ describe('HTTP pipeline', () => {
   it('sets security headers', async () => {
     const res = await request(app.getHttpServer()).get('/api/v1/health');
     expect(res.headers['x-content-type-options']).toBe('nosniff');
+    expect(res.headers['referrer-policy']).toBe('no-referrer');
+    expect(res.headers['x-frame-options']).toBe('SAMEORIGIN');
+    expect(res.headers['strict-transport-security']).toMatch(/max-age=\d+/);
+    expect(res.headers['content-security-policy']).toContain("default-src 'self'");
+    expect(res.headers['x-powered-by']).toBeUndefined();
+  });
+
+  it('allows credentialed CORS only from configured origins', async () => {
+    const allowed = await request(app.getHttpServer())
+      .options('/api/v1/auth/refresh')
+      .set('Origin', 'https://app.scoresphere.test')
+      .set('Access-Control-Request-Method', 'POST');
+    expect(allowed.headers['access-control-allow-origin']).toBe('https://app.scoresphere.test');
+    expect(allowed.headers['access-control-allow-credentials']).toBe('true');
+    const denied = await request(app.getHttpServer())
+      .options('/api/v1/auth/refresh')
+      .set('Origin', 'https://evil.example')
+      .set('Access-Control-Request-Method', 'POST');
+    expect(denied.headers['access-control-allow-origin']).toBeUndefined();
   });
 });

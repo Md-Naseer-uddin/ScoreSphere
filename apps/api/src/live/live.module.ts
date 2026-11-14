@@ -8,5 +8,6 @@ import { MatchUpdatesListener } from './match-updates.listener';
   imports: [MatchesModule],
   controllers: [LiveController, PublicLiveController],
   providers: [LiveService, MatchUpdatesListener],
+  exports: [LiveService],
 })
 export class LiveModule {}
