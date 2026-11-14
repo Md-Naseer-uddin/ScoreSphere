@@ -941,6 +941,8 @@
     "saveVersion": "Save new version",
     "saved": "Saved as version {{version}}",
     "readOnly": "Only scorers and admins can change rulesets.",
+    "duplicate": "Duplicate as a new ruleset",
+    "copyName": "{{name}} (copy)",
     "archive": "Archive ruleset",
     "archiveConfirm": "Tap again to archive",
     "choose": "Rules",

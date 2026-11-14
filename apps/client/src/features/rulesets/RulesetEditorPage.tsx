@@ -43,43 +43,59 @@ function nextRuleId(rules: Rule[]): string {
 export function RulesetEditorPage() {
   const { t } = useTranslation();
   const { rulesetId } = useParams();
-  const existing = useLiveQuery(
-    async () => (rulesetId ? ((await db.rulesets.get(rulesetId)) ?? null) : null),
-    [rulesetId],
+  const [params] = useSearchParams();
+  // A new ruleset can start as a copy of another one ("duplicate").
+  const id = rulesetId ?? params.get('from');
+  const loaded = useLiveQuery(
+    async () => (id ? ((await db.rulesets.get(id)) ?? null) : null),
+    [id],
   );
-  if (rulesetId && existing === undefined) return <Skeleton className="h-40 w-full" />;
-  if (rulesetId && !existing) {
+  if (id && loaded === undefined) return <Skeleton className="h-40 w-full" />;
+  if (id && !loaded) {
     return <p className="py-10 text-center text-muted-foreground">{t('rulesets.notFound')}</p>;
   }
-  return <RulesetForm key={existing?.id ?? 'new'} existing={existing ?? null} />;
+  const existing = rulesetId ? (loaded ?? null) : null;
+  const source = loaded ?? null;
+  return (
+    <RulesetForm
+      key={`${rulesetId ?? 'new'}:${source?.id ?? ''}`}
+      existing={existing}
+      source={source}
+    />
+  );
 }
 
-/** Editing starts from the latest version; a new ruleset from the sport's default settings. */
-function RulesetForm({ existing }: { existing: Ruleset | null }) {
+/**
+ * Editing starts from the latest version; a copy from the ruleset it duplicates; a new
+ * ruleset from the sport's default settings.
+ */
+function RulesetForm({ existing, source }: { existing: Ruleset | null; source: Ruleset | null }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const workspace = useCurrentWorkspace();
 
-  const initialSport = existing?.sport ?? (params.get('sport') as SportKey | null);
+  const initialSport = source?.sport ?? (params.get('sport') as SportKey | null);
   const [sport, setSport] = useState<SportKey | null>(
     initialSport && ruleSports.includes(initialSport) ? initialSport : null,
   );
-  const [name, setName] = useState(existing?.name ?? '');
+  const [name, setName] = useState(() =>
+    existing ? existing.name : source ? t('rulesets.copyName', { name: source.name }) : '',
+  );
   const [setup, setSetup] = useState<SportSetup | null>(() => {
-    if (existing) {
-      const preset = latestEngine(existing.sport)?.presets.find(
-        (p) => p.key === existing.latest.basePresetKey,
+    if (source) {
+      const preset = latestEngine(source.sport)?.presets.find(
+        (p) => p.key === source.latest.basePresetKey,
       );
       return {
-        presetKey: existing.latest.basePresetKey,
+        presetKey: source.latest.basePresetKey,
         presetVersion: preset?.version ?? 1,
-        config: existing.latest.config,
+        config: source.latest.config,
       };
     }
     return sport ? (sportUi(sport)?.defaultSetup() ?? null) : null;
   });
-  const [rules, setRules] = useState<Rule[]>(existing?.latest.rules ?? []);
+  const [rules, setRules] = useState<Rule[]>(source?.latest.rules ?? []);
   const [confirmArchive, setConfirmArchive] = useState(false);
 
   const ui = sport ? sportUi(sport) : undefined;
@@ -130,7 +146,7 @@ function RulesetForm({ existing }: { existing: Ruleset | null }) {
         </h1>
       </div>
 
-      {!existing && (
+      {!source && (
         <ChoiceGroup
           label={t('matches.new.sport')}
           value={sport}
@@ -218,6 +234,11 @@ function RulesetForm({ existing }: { existing: Ruleset | null }) {
             </Button>
           ) : (
             <p className="text-sm text-muted-foreground">{t('rulesets.readOnly')}</p>
+          )}
+          {existing && canEdit && (
+            <Button asChild variant="outline" className="w-full">
+              <Link to={`/app/rulesets/new?from=${existing.id}`}>{t('rulesets.duplicate')}</Link>
+            </Button>
           )}
           {existing && canArchive && (
             <Button

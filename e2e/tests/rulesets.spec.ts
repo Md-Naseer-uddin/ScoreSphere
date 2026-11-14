@@ -108,4 +108,15 @@ test('builds a consecutive-wides rule, previews it and scores a match with it (M
     [matchId],
   );
   expect(match).toEqual({ linked: true, runs: '4', needs_review: false });
+
+  // Duplicating starts a new ruleset from a copy of the rules.
+  await page.goto('/app/rulesets');
+  await page.getByRole('link', { name: /Gully rules/ }).click();
+  await page.getByRole('link', { name: 'Duplicate as a new ruleset' }).click();
+  await expect(page.getByLabel('Ruleset name')).toHaveValue('Gully rules (copy)');
+  await expect(page.getByRole('group', { name: 'Rule 1' }).getByLabel('Rule 1 name')).toHaveValue(
+    'Three wides in a row',
+  );
+  await page.getByRole('button', { name: 'Save ruleset' }).click();
+  await expect(page.getByRole('link', { name: /Gully rules \(copy\)/ })).toBeVisible();
 });
