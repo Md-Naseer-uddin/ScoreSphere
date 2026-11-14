@@ -177,6 +177,8 @@ describe('tournaments', () => {
       rk.match.rally(kiran),
       rk.match.rally(kiran),
     ]);
+    // Completing the corrected match does not republish on its own: an organizer reviews first.
+    expect((await awards()).every((a) => a.status === 'STALE')).toBe(true);
 
     await http().post(`/api/v1/tournaments/${t.id}/awards/publish`).set(as(scorer())).expect(403);
     const republished = await http()

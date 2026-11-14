@@ -470,11 +470,30 @@ export class TournamentsService {
     const status = done ? 'completed' : 'active';
     if (status !== t.status)
       await tx.update(tournaments).set({ status }).where(eq(tournaments.id, t.id));
-    const published = await tx
+    const current = await tx
       .select()
       .from(awardRecords)
-      .where(and(eq(awardRecords.tournamentId, t.id), eq(awardRecords.status, 'PUBLISHED')));
-    if (published.length) {
+      .where(
+        and(
+          eq(awardRecords.tournamentId, t.id),
+          inArray(awardRecords.status, ['PUBLISHED', 'STALE']),
+        ),
+      );
+    const published = current.filter((r) => r.status === 'PUBLISHED');
+    if (current.length > published.length) {
+      // Already waiting for an organizer's review: never republish on our own (ADR 0023).
+      if (published.length) {
+        await tx
+          .update(awardRecords)
+          .set({ status: 'STALE' })
+          .where(
+            inArray(
+              awardRecords.id,
+              published.map((p) => p.id),
+            ),
+          );
+      }
+    } else if (published.length) {
       // ADR 0023: a correction after publishing sends the awards back for review.
       await tx
         .update(awardRecords)
