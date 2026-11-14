@@ -2,6 +2,7 @@ import type { SportKey } from '@scoresphere/contracts';
 import { badmintonUi } from './badminton';
 import { chessUi } from './chess';
 import { cricketUi } from './cricket';
+import { footballUi } from './football';
 import { tennisUi } from './tennis';
 import type { SportUi } from './types';
 import { volleyballUi } from './volleyball';
@@ -11,6 +12,7 @@ const registry: Partial<Record<SportKey, SportUi>> = {
   badminton: badmintonUi,
   chess: chessUi,
   cricket: cricketUi,
+  football: footballUi,
   tennis: tennisUi,
   volleyball: volleyballUi,
 };

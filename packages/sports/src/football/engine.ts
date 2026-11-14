@@ -160,6 +160,12 @@ export function periodInfo(c: FootballSettings, n: number) {
   };
 }
 
+/** How many periods of each kind the match has, so a period can be named from its facts. */
+const shape = (c: FootballSettings) => ({
+  regularPeriods: c.periods,
+  extraPeriods: c.extraTime?.periods ?? 0,
+});
+
 /** The match minute at `now` in the current period. */
 export function footballMinute(state: FootballState, now: number) {
   const n = Math.max(1, state.periods.number);
@@ -411,14 +417,22 @@ function apply(
           onField,
           appeared: lineups ? [...lineups[0], ...lineups[1]] : state.appeared,
         },
-        facts: [{ type: 'period_started', data: { period: periods.number, extra } }],
+        facts: [
+          {
+            type: 'period_started',
+            data: { period: periods.number, extra, ...shape(state.config) },
+          },
+        ],
       };
     }
     case 'end_period': {
       const n = state.periods.number;
       const next = { ...state, periods: endPeriod(state.periods, at) };
       const facts: DomainFact[] = [
-        { type: 'period_ended', data: { period: n, extra: periodInfo(state.config, n).extra } },
+        {
+          type: 'period_ended',
+          data: { period: n, extra: periodInfo(state.config, n).extra, ...shape(state.config) },
+        },
       ];
       const regular = regularPeriods(state.config);
       if (n < regular) return { state: { ...next, phase: 'break' }, facts };

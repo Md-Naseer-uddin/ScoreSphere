@@ -24,7 +24,15 @@
       "team": "Team",
       "either": "Singles or teams"
     },
-    "timed": "Timed"
+    "timed": "Timed",
+    "notFound": "Sport not found.",
+    "startMatch": "Start a match",
+    "comingSoon": "Scoring for this sport is coming soon.",
+    "formats": "Formats",
+    "sources": "Sources",
+    "edition": "edition {{edition}}",
+    "reviewed": "checked {{date}}",
+    "summaryNote": "This is a summary in our own words. The governing body’s rules are the authority."
   },
   "auth": {
     "loginTitle": "Sign in",
@@ -957,6 +965,91 @@
       "without": "Without",
       "side": "Side {{side}}",
       "player": "Player {{side}}{{n}}"
+    }
+  },
+  "football": {
+    "setup": {
+      "playersOnField": "Players on the field",
+      "periods": "Periods",
+      "periodMinutes": "Minutes per period",
+      "maxSubstitutions": "Substitutions (blank: no limit)",
+      "rollingSubstitutions": "Substituted players may come back on",
+      "extraTime": "Extra time if level (2 × 15 minutes)",
+      "shootout": "Penalties if still level (5 kicks each)"
+    },
+    "period": {
+      "half1": "First half",
+      "half2": "Second half",
+      "match": "Match",
+      "numbered": "Period {{n}}",
+      "extra": "Extra time",
+      "extraHalf1": "Extra time, first half",
+      "extraHalf2": "Extra time, second half"
+    },
+    "status": {
+      "preMatch": "Before kick-off",
+      "break": "End of {{period}}",
+      "shootout": "Penalties",
+      "fullTime": "Full time"
+    },
+    "redCards_one": "{{count}} player sent off",
+    "redCards_other": "{{count}} players sent off",
+    "pens": "Penalties",
+    "lineupHint": "Choose up to {{size}} starting players.",
+    "startingPlayers": "Starting players",
+    "kickOff": "Kick off",
+    "start": "Start {{period}}",
+    "end": "End {{period}}",
+    "goalFor": "Goal {{name}}",
+    "goalsFor": "Goals for {{name}}",
+    "goalKind": "Kind of goal",
+    "kind": {
+      "regular": "Goal",
+      "penalty": "Penalty",
+      "own_goal": "Own goal"
+    },
+    "scorer": "Scorer",
+    "ownGoalBy": "Own goal by",
+    "assist": "Assist",
+    "assistBy": "assist {{name}}",
+    "noAssist": "No assist",
+    "notRecorded": "Not recorded",
+    "recordGoal": "Record goal",
+    "card": "Card",
+    "player": "Player",
+    "booked": "Already booked",
+    "cardColor": {
+      "yellow": "Yellow card",
+      "red": "Red card"
+    },
+    "subLimit_one": "This team has used its {{count}} substitution.",
+    "subLimit_other": "This team has used all {{count}} substitutions.",
+    "kicksFirst": "Who kicks first?",
+    "startShootout": "Start penalties",
+    "toKick": "{{name}} to kick",
+    "kicker": "Kicker",
+    "scored": "Scored",
+    "missed": "Missed",
+    "timeline": {
+      "periodStarted": "Next period started",
+      "started": "{{period}} started",
+      "periodEnded": "End of period",
+      "goal": "Goal {{name}}",
+      "ownGoal": "Own goal by {{player}}, for {{name}}{{minute}}",
+      "yellow": "Yellow card: {{name}}",
+      "red": "Red card: {{name}}",
+      "secondYellow": "Second yellow card: {{name}} is sent off",
+      "shootout": "Penalties: {{name}} kick first",
+      "penScored": "{{name}} penalty scored",
+      "penMissed": "{{name}} penalty missed",
+      "finalWhistle": "Final whistle"
+    },
+    "announce": {
+      "goal": "Goal {{name}}!",
+      "sentOff": "{{name}} player sent off",
+      "extraTime": "Level: extra time",
+      "shootout": "Level: penalties",
+      "draw": "Full time: a draw"
     }
   }
 }
