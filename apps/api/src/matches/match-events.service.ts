@@ -26,6 +26,7 @@ import {
 } from '../database/schema';
 import type { Transaction } from '../database/types';
 import { AwardsService } from '../awards/awards.service';
+import { TournamentsService } from '../tournaments/tournaments.service';
 import { requireWorkspaceRole } from '../workspaces/workspace-access';
 import { type MatchRow, toLedgerEvent } from './match-mapper';
 import { notifyMatchUpdate } from './match-notify';
@@ -47,6 +48,7 @@ export class MatchEventsService {
   constructor(
     @Inject(DB) private readonly db: Database,
     private readonly awards: AwardsService,
+    private readonly tournaments: TournamentsService,
   ) {}
 
   async ingest(
@@ -149,6 +151,11 @@ export class MatchEventsService {
           { ...match, status: projection.status, needsReview, version },
           projection,
         );
+        await this.tournaments.onMatchChanged(tx, {
+          id: matchId,
+          status: projection.status,
+          result: resultOf(engine, projection),
+        });
         await notifyMatchUpdate(tx, matchId, version);
       } else if (holdsLease) {
         await tx.update(matches).set({ scorerSeenAt: new Date() }).where(eq(matches.id, matchId));
@@ -203,6 +210,13 @@ export class MatchEventsService {
       .onConflictDoNothing()
       .returning({ id: matches.id });
     if (inserted.length) {
+      await this.tournaments.linkFixture(tx, header, {
+        id: matchId,
+        sport: created.sport,
+        engineVersion: first.engineVersion,
+        presetKey: created.presetKey,
+        config: check.value.created.config,
+      });
       await tx
         .insert(matchSides)
         .values(

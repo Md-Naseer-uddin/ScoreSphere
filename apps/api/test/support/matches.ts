@@ -8,7 +8,7 @@ import {
 import request from 'supertest';
 import { bearer, type TestUser } from './app';
 
-const singles21 = {
+export const singles21 = {
   discipline: 'singles',
   pointsToWin: 21,
   winBy: 2,
@@ -31,11 +31,20 @@ export class DeviceMatch {
   epoch = 1;
   seq = 0;
   readonly header: MatchHeader;
+  readonly config: Record<string, unknown>;
+  readonly presetKey: string;
 
-  constructor(workspaceId: string, rosterMemberIds: [string | null, string | null] = [null, null]) {
+  constructor(
+    workspaceId: string,
+    rosterMemberIds: [string | null, string | null] = [null, null],
+    options: { config?: Record<string, unknown>; presetKey?: string; fixtureId?: string } = {},
+  ) {
+    this.config = options.config ?? singles21;
+    this.presetKey = options.presetKey ?? 'bwf-3x21';
     this.header = {
       workspaceId,
       title: null,
+      ...(options.fixtureId ? { fixtureId: options.fixtureId } : {}),
       sides: [0, 1].map((side) => ({
         side: side as 0 | 1,
         name: side === 0 ? 'Asha' : 'Ravi',
@@ -68,9 +77,9 @@ export class DeviceMatch {
       kind: 'CREATED',
       payload: {
         sport: 'badminton',
-        presetKey: 'bwf-3x21',
+        presetKey: this.presetKey,
         presetVersion: 1,
-        config: singles21,
+        config: this.config,
         roster: {
           sides: [
             { side: 0, participantIds: [this.players[0]] },

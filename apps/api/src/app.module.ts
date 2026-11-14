@@ -22,6 +22,7 @@ import { PeopleModule } from './people/people.module';
 import { PersonsModule } from './people/persons.service';
 import { SyncModule } from './sync/sync.module';
 import { TeamsModule } from './teams/teams.module';
+import { TournamentsModule } from './tournaments/tournaments.module';
 import { UsersModule } from './users/users.module';
 import { WorkspacesModule } from './workspaces/workspaces.module';
 
@@ -48,6 +49,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module';
     TeamsModule,
     SyncModule,
     MatchesModule,
+    TournamentsModule,
     LiveModule,
     AccountModule,
     OpsModule,

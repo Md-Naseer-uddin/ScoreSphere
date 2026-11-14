@@ -106,6 +106,8 @@ export const matchHeaderSchema = z.object({
   workspaceId: idSchema,
   title: z.string().trim().max(80, 'TOO_LONG').nullable(),
   sides: z.array(matchSideSnapshotSchema).length(2),
+  /** A tournament fixture this match is played for (side 0 = the fixture's first entry). */
+  fixtureId: idSchema.nullable().optional(),
 });
 export type MatchHeader = z.infer<typeof matchHeaderSchema>;
 

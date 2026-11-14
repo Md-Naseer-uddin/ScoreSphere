@@ -11,5 +11,6 @@ export * from './phone.js';
 export * from './sports.js';
 export * from './sync.js';
 export * from './teams.js';
+export * from './tournaments.js';
 export * from './users.js';
 export * from './workspaces.js';
