@@ -15,8 +15,8 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
 | M6 — Pilot release | built; launch pending owner (hosting, keystore, legal review, pilot users) |
 | M7 — Tournaments, statistics, profiles | done |
 | M8 — Rules builder | done |
-| M9 — Football, Field Hockey, Basketball | next |
-| M10 — Kabaddi, Kho-Kho, Wrestling, Carrom | not started |
+| M9 — Football, Field Hockey, Basketball | done (award criteria pending owner sign-off) |
+| M10 — Kabaddi, Kho-Kho, Wrestling, Carrom | next |
 | M11 — v1.0 hardening | not started |
 
 ## Done so far
@@ -215,33 +215,67 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
 - **Penalty runs to the fielding side** (Law 41's five-run penalties carried into their innings). Rule-given penalty runs go to the batting side.
 - **Translated rule labels:** catalogue labels are English only.
 
-## Next — M9: Football, Field Hockey, Basketball
+**M9**
+- **Shared helpers:**
+  - Period clocks in engine-kit (device time, holds and restarts, football-style minutes with added time).
+  - Shoot-out logic shared by football and hockey: alternate attempts, early finish, then sudden death.
+- **Football:**
+  - Kick-off lineups, goals (penalty, own goal, optional scorer and assist), and cards (a second yellow sends a player off).
+  - Substitutions with a limit or rolling, extra time, and kicks from the penalty mark.
+  - Minutes like 45+2′.
+  - Awards: Player of the Match and Top Scorer.
+- **Field hockey:**
+  - Field and penalty-corner goals, penalty corners and strokes.
+  - Green and yellow cards as suspensions in playing time; red cards exclude a player.
+  - The FIH clock stops after a goal and for a penalty corner (a setting), and shoot-outs.
+  - Substitutes roll, so who is on the pitch isn't tracked.
+- **Basketball:**
+  - 1, 2 and 3-point scoring with optional scorer and assist, and missed shots.
+  - Fouls: personal limit, disqualification on two technical or unsportsmanlike fouls, team fouls per quarter with the penalty, and overtime fouls counting with the fourth quarter.
+  - Timeouts per half and per overtime; overtime until there is a winner.
+  - Optional rebounds, steals, blocks and turnovers.
+  - The shot clock is a display aid on the scoring device only.
+  - Awards: MVP (efficiency), Top Scorer, Rebounds and Assists leaders.
+- **Each of the three sports has:**
+  - presets;
+  - a rule catalogue (e.g. golden goal as a rule);
+  - rules help;
+  - tournament standings with goal or point difference;
+  - leaderboards;
+  - golden logs and property tests on both builds;
+  - scoring screens with a live clock;
+  - a scorecard or box score;
+  - an offline-and-reload e2e test.
+- **Sports pages:** each sport now has a page with its rules help, the sources and edition, its formats, and a start button. The rules help written in earlier milestones wasn't shown anywhere until now.
 
-Each sport must meet the full definition of done in [plan.md §4](../plan.md):
-- settings and presets;
-- engine;
-- scoring UI;
-- undo and corrections;
-- timers;
-- result and scorecard;
-- stats and awards;
-- rules help content;
-- a rule catalogue;
-- golden logs and property tests;
-- an offline e2e smoke test;
-- the spectator view;
-- tournament standings rules.
+**Not built in M9:**
+- **Football:** sin bins (temporary dismissals) and minutes played.
+- **Hockey:** who is on the pitch, and a goal by a suspended player isn't blocked.
+- **Basketball:**
+  - FIBA's limit of two timeouts in the last two minutes.
+  - On-court tracking and minutes.
+  - The shot clock is not recorded.
 
-1. **Timed-period helpers in engine-kit:** period clock, stoppage time, extra time, using the device-owned clock model from M5.
-2. **Football:**
-   - Goals (own goals, penalties), cards, substitutions, extra time and penalty shoot-out.
-   - Stats: goals, assists, cards.
-3. **Field Hockey:**
-   - Quarters, field goals and penalty corners/strokes, green/yellow/red cards with timed suspensions, and shoot-outs.
-4. **Basketball:**
-   - Quarters, 1/2/3-point scoring, personal and team fouls (bonus), timeouts, the shot clock as a display aid, and overtime.
-   - Stats: points, rebounds and assists where recorded.
-5. **Owner sign-off:** award criteria and tie-breaks for each sport.
+## Next — M10: Kabaddi, Kho-Kho, Wrestling, Carrom
+
+Each sport must meet the same definition of done as M9 (plan §4).
+
+1. **Kabaddi:**
+   - Raids with a raid timer, touch and bonus points, tackles, and all-outs.
+   - Revival of out players, the do-or-die raid and the super tackle.
+   - Stats: raid and tackle points.
+   - Awards: Best Raider and Best Defender.
+2. **Kho-Kho:**
+   - Chasing and defending turns with a turn timer, dismissals and points.
+   - Side changes between turns.
+3. **Wrestling:**
+   - Style and weight metadata, periods, scoring actions and cautions.
+   - Technical superiority, fall, and the criteria for level scores.
+   - Weight categories run as separate tournaments.
+4. **Carrom:**
+   - Boards, coins, the queen and her cover, fouls and penalty coins.
+   - Board points and the match target.
+5. **Owner sign-off:** the rule edition and award criteria for each sport.
 
 ## Needs the owner
 
@@ -259,6 +293,16 @@ Each sport must meet the full definition of done in [plan.md §4](../plan.md):
   - Proposed award criteria (impact points; most runs, then fewest balls; most wickets, then fewest runs).
   - Super-over stats are left out of player totals.
   - One tip one hand is credited to the bowler like a catch.
+- **M9 sign-off (football, hockey, basketball):**
+  - Proposed awards:
+    - Player of the Match: 2 per goal and 1 per assist.
+    - Basketball MVP: efficiency.
+    - Leaders: most of a statistic, then the winning team.
+    - No goalkeeper award, since saves aren't recorded.
+  - Football rules help follows the 2025/26 Laws; please confirm against the edition now in force.
+  - Hockey and basketball rules help cite the "current edition" of the FIH and FIBA rules; please confirm the edition to cite.
+  - Basketball standings give 2 for a win and 1 for a loss; FIBA gives 0 for a forfeit, which isn't separated yet.
+  - A hockey shoot-out winner gets the 3 points of a win; some FIH events give 2 and 1 instead.
 
 - **M5 on-device check:** on the APK, run a chess clock, lock the screen and kill the app, then reopen; the displayed time should be within ±1 s.
 - **Pilot launch:**
