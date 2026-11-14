@@ -1,3 +1,4 @@
+export * from './awards.js';
 export * from './badminton/index.js';
 export * from './catalogue.js';
 export * from './chess/index.js';

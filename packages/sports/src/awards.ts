@@ -1,0 +1,24 @@
+import type { SportKey } from '@scoresphere/contracts';
+import type { MatchAwardDefinition } from '@scoresphere/engine-kit';
+import { badmintonMatchAwards } from './badminton/awards.js';
+import { cricketMatchAwards } from './cricket/awards.js';
+import { tennisPlayerOfTheMatch } from './tennis/awards.js';
+import { volleyballMatchAwards } from './volleyball/awards.js';
+
+// Award definitions are typed by each sport's state; the registry erases that.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyAward = MatchAwardDefinition<any>;
+
+const byEngine: Partial<Record<SportKey, Record<number, readonly AnyAward[]>>> = {
+  badminton: { 1: badmintonMatchAwards },
+  cricket: { 1: cricketMatchAwards },
+  tennis: { 1: [tennisPlayerOfTheMatch] },
+  volleyball: { 1: volleyballMatchAwards },
+  // Chess records a result only; there is no match award (spec scoring §5).
+  chess: { 1: [] },
+};
+
+/** The match awards for a sport's engine version (awards are versioned with the engine). */
+export function matchAwardDefinitions(sport: SportKey, engineVersion: number): readonly AnyAward[] {
+  return byEngine[sport]?.[engineVersion] ?? [];
+}

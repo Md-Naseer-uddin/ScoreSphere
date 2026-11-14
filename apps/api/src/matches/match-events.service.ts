@@ -25,6 +25,7 @@ import {
   teams,
 } from '../database/schema';
 import type { Transaction } from '../database/types';
+import { AwardsService } from '../awards/awards.service';
 import { requireWorkspaceRole } from '../workspaces/workspace-access';
 import { type MatchRow, toLedgerEvent } from './match-mapper';
 import { notifyMatchUpdate } from './match-notify';
@@ -43,7 +44,10 @@ const invalidRequest = (code: string, message: string, field = 'events') =>
  */
 @Injectable()
 export class MatchEventsService {
-  constructor(@Inject(DB) private readonly db: Database) {}
+  constructor(
+    @Inject(DB) private readonly db: Database,
+    private readonly awards: AwardsService,
+  ) {}
 
   async ingest(
     user: AuthUser,
@@ -140,6 +144,11 @@ export class MatchEventsService {
             scorerSeenAt: new Date(),
           })
           .where(eq(matches.id, matchId));
+        await this.awards.refresh(
+          tx,
+          { ...match, status: projection.status, needsReview, version },
+          projection,
+        );
         await notifyMatchUpdate(tx, matchId, version);
       } else if (holdsLease) {
         await tx.update(matches).set({ scorerSeenAt: new Date() }).where(eq(matches.id, matchId));
