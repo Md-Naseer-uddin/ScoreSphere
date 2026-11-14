@@ -21,6 +21,7 @@ export class VersionController {
       latestVersion: e.LATEST_CLIENT_VERSION ?? null,
       apk: e.APK_URL && e.APK_SHA256 ? { url: e.APK_URL, sha256: e.APK_SHA256 } : null,
       releaseNotesUrl: e.RELEASE_NOTES_URL ?? null,
+      supportEmail: e.SUPPORT_EMAIL ?? null,
     };
   }
 }

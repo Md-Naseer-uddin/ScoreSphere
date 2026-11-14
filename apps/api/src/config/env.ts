@@ -53,6 +53,8 @@ export const envSchema = z.object({
     .regex(/^[0-9a-f]{64}$/)
     .optional(),
   RELEASE_NOTES_URL: z.url().optional(),
+  /** Support and grievance-officer address, shown on the download and legal pages (DPDP). */
+  SUPPORT_EMAIL: z.email().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

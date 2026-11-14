@@ -15,6 +15,7 @@ describe('operations endpoints', () => {
     app = await createTestApp({
       METRICS_TOKEN,
       MIN_CLIENT_VERSION: '0.2.0',
+      SUPPORT_EMAIL: 'support@scoresphere.test',
       LATEST_CLIENT_VERSION: '0.3.1',
       APK_URL: 'https://downloads.scoresphere.test/scoresphere-0.3.1.apk',
       APK_SHA256: 'a'.repeat(64),
@@ -59,6 +60,7 @@ describe('operations endpoints', () => {
         sha256: 'a'.repeat(64),
       },
       releaseNotesUrl: null,
+      supportEmail: 'support@scoresphere.test',
     });
   });
 });

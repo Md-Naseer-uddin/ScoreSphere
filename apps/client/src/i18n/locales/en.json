@@ -817,7 +817,10 @@
     "updated": "Last updated {{date}}",
     "draft": "This is the pilot version of this notice. It will be reviewed by a lawyer before ScoreSphere is publicly launched.",
     "consentBefore": "By creating an account you agree to the",
-    "consentMiddle": "and have read the"
+    "consentMiddle": "and have read the",
+    "contact": "Contact",
+    "contactBody": "Questions, requests about your data and complaints go to the grievance officer:",
+    "contactMissing": "The contact address will be published here before launch."
   },
   "yourData": {
     "title": "Your data",
@@ -849,7 +852,8 @@
     "iphone": "iPhone and iPad (Safari)",
     "iphoneSteps": "Tap Share, then Add to Home Screen, and open ScoreSphere from the home screen.",
     "iphoneOffline": "On iPhone, offline scoring needs the home-screen app: Safari can clear data for websites that aren't installed.",
-    "thisVersion": "You are using version {{version}}."
+    "thisVersion": "You are using version {{version}}.",
+    "support": "Support and grievances:"
   },
   "tournaments": {
     "title": "Tournaments",

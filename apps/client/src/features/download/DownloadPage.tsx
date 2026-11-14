@@ -77,6 +77,17 @@ export function DownloadPage() {
         </CardContent>
       </Card>
 
+      {info?.supportEmail && (
+        <p className="text-sm">
+          {t('download.support')}{' '}
+          <a
+            href={`mailto:${info.supportEmail}`}
+            className="text-primary underline underline-offset-4"
+          >
+            {info.supportEmail}
+          </a>
+        </p>
+      )}
       <p className="text-xs text-muted-foreground">
         {t('download.thisVersion', { version: APP_VERSION })}
       </p>

@@ -55,7 +55,7 @@ export const privacySections: LegalSection[] = [
       'Download a copy of your data at any time from Profile → Your data.',
       'Correct your details from your profile.',
       'Delete your account from Profile → Your data. Your number and personal details are erased; organisations keep their own match records, no longer linked to you.',
-      'For anything else, or to complain, contact the ScoreSphere grievance officer through the support address on the download page.',
+      'For anything else, or to complain, contact the ScoreSphere grievance officer at the address below.',
     ],
   },
 ];

@@ -1,10 +1,12 @@
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
+import { useAppVersionInfo } from '@/lib/app-version';
 import { LEGAL_UPDATED, type LegalSection, privacySections, termsSections } from './content';
 
 function LegalPage({ title, sections }: { title: string; sections: LegalSection[] }) {
   const { t } = useTranslation();
+  const { data: info } = useAppVersionInfo();
   return (
     <div className="mx-auto max-w-2xl space-y-6 px-4 py-8">
       <Link to="/" className="inline-flex items-center gap-1 text-sm text-primary">
@@ -27,6 +29,24 @@ function LegalPage({ title, sections }: { title: string; sections: LegalSection[
           </ul>
         </section>
       ))}
+      <section className="space-y-2">
+        <h2 className="text-lg font-medium">{t('legal.contact')}</h2>
+        <p className="text-sm">
+          {info?.supportEmail ? (
+            <>
+              {t('legal.contactBody')}{' '}
+              <a
+                href={`mailto:${info.supportEmail}`}
+                className="text-primary underline underline-offset-4"
+              >
+                {info.supportEmail}
+              </a>
+            </>
+          ) : (
+            t('legal.contactMissing')
+          )}
+        </p>
+      </section>
     </div>
   );
 }

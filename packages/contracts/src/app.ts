@@ -8,6 +8,8 @@ export const appVersionInfoSchema = z.object({
   latestVersion: semver.nullable(),
   apk: z.object({ url: z.url(), sha256: z.string().regex(/^[0-9a-f]{64}$/) }).nullable(),
   releaseNotesUrl: z.url().nullable(),
+  /** Where users reach support and the grievance officer (DPDP); absent from older servers. */
+  supportEmail: z.email().nullish(),
 });
 export type AppVersionInfo = z.infer<typeof appVersionInfoSchema>;
 
