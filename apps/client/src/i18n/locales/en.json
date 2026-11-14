@@ -810,5 +810,53 @@
     "iphoneSteps": "Tap Share, then Add to Home Screen, and open ScoreSphere from the home screen.",
     "iphoneOffline": "On iPhone, offline scoring needs the home-screen app: Safari can clear data for websites that aren't installed.",
     "thisVersion": "You are using version {{version}}."
+  },
+  "tournaments": {
+    "title": "Tournaments",
+    "new": "New tournament",
+    "empty": "No tournaments yet.",
+    "needsOnline": "Connect to the internet to see tournaments.",
+    "notFound": "Tournament not found.",
+    "name": "Tournament name",
+    "formatLabel": "Format",
+    "format": {
+      "round_robin": "League (everyone plays everyone)",
+      "single_elimination": "Knockout"
+    },
+    "status": {
+      "draft": "Taking entries",
+      "active": "In progress",
+      "completed": "Finished"
+    },
+    "create": "Create tournament",
+    "entries_one": "{{count}} entry",
+    "entries_other": "{{count}} entries",
+    "pickTeam": "Choose a team",
+    "pickPlayer": "Choose a player",
+    "addEntry": "Add",
+    "removeEntry": "Remove {{name}}",
+    "seedingHint": "Entries are seeded in the order you add them: add the strongest first.",
+    "makeFixtures": "Make fixtures",
+    "round": "Round {{round}}",
+    "tbd": "To be decided",
+    "bye": "bye",
+    "score": "Score",
+    "openMatch": "Open",
+    "fixtureStatus": {
+      "waiting": "Waiting for earlier results",
+      "ready": "Ready to play",
+      "live": "In progress",
+      "completed": "Completed",
+      "bye": "Advances on a bye"
+    },
+    "needsDecision": "This match ended level. An organizer decides who advances.",
+    "advance": "{{name}} advances",
+    "standings": "Standings",
+    "entry": "Entry",
+    "leaderboards": "Leaderboards",
+    "awardsStale": "A match changed after the awards were published. Review the results, then publish again.",
+    "needsReview": "Needs review",
+    "republish": "Publish awards",
+    "awardsPublished": "Awards published"
   }
 }

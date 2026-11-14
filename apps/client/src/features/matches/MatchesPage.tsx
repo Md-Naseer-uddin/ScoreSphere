@@ -78,6 +78,9 @@ export function MatchesPage() {
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-2">
         <h1 className="text-2xl font-semibold">{t('matches.title')}</h1>
+        <Button asChild variant="outline" className="ml-auto">
+          <Link to="/app/tournaments">{t('tournaments.title')}</Link>
+        </Button>
         <Button asChild>
           <Link to="/app/matches/new">
             <Plus aria-hidden /> {t('matches.new.title')}

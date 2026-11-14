@@ -6,7 +6,7 @@ import {
 } from '@scoresphere/contracts';
 import { SPORTS } from '@scoresphere/sports';
 import { ArrowLeft, Minus, Plus } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { toast } from 'sonner';
@@ -16,6 +16,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useSession } from '@/features/auth/session';
 import { useQuickGuests, useRoster, useTeams } from '@/features/teams/local-data';
+import { getTournament, tournamentKeys } from '@/features/tournaments/tournaments-api';
+import { useQuery } from '@tanstack/react-query';
 import { useCurrentWorkspace } from '@/features/workspaces/current-workspace';
 import { isBelowMinimum, useAppVersionInfo } from '@/lib/app-version';
 import { db } from '@/lib/db';
@@ -67,6 +69,14 @@ export function NewMatchPage() {
   const guests = useQuickGuests();
   const teams = useTeams(workspace?.id);
   const { data: versionInfo } = useAppVersionInfo();
+  const fixtureId = params.get('fixture');
+  const tournamentId = params.get('tournament');
+  const { data: tournament } = useQuery({
+    queryKey: tournamentKeys.detail(tournamentId ?? ''),
+    queryFn: () => getTournament(tournamentId!),
+    enabled: Boolean(fixtureId && tournamentId),
+  });
+  const fixture = tournament?.fixtures.find((f) => f.id === fixtureId);
   const defaultName = (letter: string) => t('matches.new.defaultSideName', { side: letter });
 
   const initialSport = params.get('sport') as SportKey | null;
@@ -139,6 +149,39 @@ export function NewMatchPage() {
     updateSide(index, { teamId, name: team?.name ?? '', slots });
   };
 
+  // A tournament fixture: its sport, settings and sides are fixed by the tournament.
+  const prefilled = useRef(false);
+  useEffect(() => {
+    if (prefilled.current || !tournament || !fixture) return;
+    prefilled.current = true;
+    const nextUi = sportUi(tournament.sport);
+    const fixtureSetup = {
+      presetKey: tournament.presetKey,
+      presetVersion: tournament.presetVersion,
+      config: tournament.config,
+    };
+    setSport(tournament.sport);
+    setSetup(fixtureSetup);
+    const size = nextUi?.sideSize(fixtureSetup.config) ?? { min: 1, max: 1, initial: 1 };
+    void Promise.all(
+      [fixture.side1EntryId, fixture.side2EntryId].map(async (entryId) => {
+        const entry = tournament.entries.find((e) => e.id === entryId)!;
+        if (entry.teamId) {
+          const members = await db.teamMembers.where('teamId').equals(entry.teamId).toArray();
+          const slots: Slot[] = members
+            .slice(0, size.max)
+            .map((m) => ({ pick: `roster:${m.rosterMemberId}`, name: '' }));
+          while (slots.length < size.min) slots.push(emptySlot());
+          return { name: entry.displayName, teamId: entry.teamId, slots };
+        }
+        const slots: Slot[] = [{ pick: `roster:${entry.rosterMemberId}`, name: '' }];
+        while (slots.length < size.min) slots.push(emptySlot());
+        return { name: '', teamId: null, slots };
+      }),
+    ).then((drafts) => setSides(drafts));
+    setStep('players');
+  }, [tournament, fixture]);
+
   const slotName = (slot: Slot) =>
     slot.pick ? (options.find((o) => o.value === slot.pick)?.label ?? '') : slot.name.trim();
   const picks = sides.flatMap((s) => s.slots.map((x) => x.pick)).filter(Boolean);
@@ -175,8 +218,9 @@ export function NewMatchPage() {
       presetKey: setup.presetKey,
       presetVersion: setup.presetVersion,
       config: setup.config,
-      title: title.trim() || null,
+      title: title.trim() || (tournament ? tournament.name : null),
       sides: snapshot,
+      fixtureId: fixture?.id ?? null,
     }).catch(() => null);
     setSaving(false);
     if (!created?.ok) {

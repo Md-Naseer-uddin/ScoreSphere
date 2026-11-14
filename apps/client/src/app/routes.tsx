@@ -21,6 +21,8 @@ import { TeamDetailPage } from '@/features/teams/TeamDetailPage';
 import { TeamsPage } from '@/features/teams/TeamsPage';
 import { CreateOrganizationPage } from '@/features/workspaces/CreateOrganizationPage';
 import { JoinPage } from '@/features/workspaces/JoinPage';
+import { TournamentPage } from '@/features/tournaments/TournamentPage';
+import { NewTournamentPage, TournamentsPage } from '@/features/tournaments/TournamentsPage';
 import { WorkspaceSettingsPage } from '@/features/workspaces/WorkspaceSettingsPage';
 import { AppShell } from './AppShell';
 import { RouteError } from './RouteError';
@@ -63,6 +65,9 @@ export const routes: RouteObject[] = [
           { path: 'matches', element: <MatchesPage /> },
           { path: 'matches/new', element: <NewMatchPage /> },
           { path: 'matches/:matchId', element: <MatchPage /> },
+          { path: 'tournaments', element: <TournamentsPage /> },
+          { path: 'tournaments/new', element: <NewTournamentPage /> },
+          { path: 'tournaments/:tournamentId', element: <TournamentPage /> },
           { path: 'teams', element: <TeamsPage /> },
           { path: 'teams/roster', element: <RosterPage /> },
           { path: 'teams/:teamId', element: <TeamDetailPage /> },

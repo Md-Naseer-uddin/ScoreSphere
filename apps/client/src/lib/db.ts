@@ -52,6 +52,8 @@ export interface LocalMatch {
   needsReview: boolean;
   /** A sync attempt failed in a way retrying won't fix; shown as "action required". */
   syncError: string | null;
+  /** The tournament fixture this match is played for, sent with the header (plan M7). */
+  fixtureId?: string | null;
   createdAt: string;
   updatedAt: string;
 }

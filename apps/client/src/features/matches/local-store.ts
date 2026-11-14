@@ -59,7 +59,12 @@ export function matchEvents(matchId: string, database: LocalDatabase = db) {
 }
 
 export function matchHeader(match: LocalMatch): MatchHeader {
-  return { workspaceId: match.workspaceId, title: match.title, sides: match.sides };
+  return {
+    workspaceId: match.workspaceId,
+    title: match.title,
+    sides: match.sides,
+    ...(match.fixtureId ? { fixtureId: match.fixtureId } : {}),
+  };
 }
 
 function summary(engine: AnySportEngine, p: AnyProjection) {
@@ -82,6 +87,7 @@ export interface NewLocalMatch {
   config: Record<string, unknown>;
   title: string | null;
   sides: MatchSideSnapshot[];
+  fixtureId?: string | null;
 }
 
 /**
@@ -149,6 +155,7 @@ export async function createLocalMatch(
       presetVersion: input.presetVersion,
       title: input.title,
       sides: input.sides,
+      fixtureId: input.fixtureId ?? null,
       leaseEpoch: 1,
       holdsLease: true,
       serverKnown: false,
