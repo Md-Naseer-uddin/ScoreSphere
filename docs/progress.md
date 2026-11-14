@@ -14,8 +14,8 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
 | M5 — Rally family + Chess | done (Android screen-lock/kill check pending) |
 | M6 — Pilot release | built; launch pending owner (hosting, keystore, legal review, pilot users) |
 | M7 — Tournaments, statistics, profiles | done |
-| M8 — Rules builder | next |
-| M9 — Football, Field Hockey, Basketball | not started |
+| M8 — Rules builder | done |
+| M9 — Football, Field Hockey, Basketball | next |
 | M10 — Kabaddi, Kho-Kho, Wrestling, Carrom | not started |
 | M11 — v1.0 hardening | not started |
 
@@ -187,19 +187,61 @@ Tracks where implementation of [plan.md](../plan.md) stands. A resumed session r
 - **Organizer overrides of tournament awards:** republishing is supported; manual choice is not yet.
 - **Standings snapshots:** standings are computed on read, which is fast enough at pilot scale.
 
-## Next — M8: Rules builder (trigger, condition, action)
+**M8**
+- **Rules engine (engine-kit, ADR 0032):**
+  - Trigger → condition → action rules as data, in `contracts`. Conditions compare the event's fields or the match's state variables; actions are commands the engine declares.
+  - `validateRules` checks rules against the sport's catalogue. It blocks unknown triggers, fields and commands, operators that don't fit a field, bad values, and missing or unknown settings.
+  - Rules are pinned in `CREATED`. Their effects are computed in the fold and never stored, so undo and corrections apply to them, and client and server agree.
+  - Firing order is priority, then ID. Each rule fires at most once per event, chains stop at depth 3, and there are at most 20 effects per event. An effect the engine refuses is shown and skipped.
+- **Catalogues for the five pilot sports:**
+  - Cricket adds `penalty_runs` and `reset_wide_count` commands, with state such as wides in a row.
+  - In the rally sports, a rule's point is a rally won.
+  - Chess adds `add_time` (also FIDE 7.5.5).
+  - A golden log reproduces the gully wide penalty as a rule, and its scorecard matches the setting-based one. It runs on both the client and server builds.
+- **Preview:** a short sample game per sport, replayed with and without the rules.
+- **API:**
+  - `rulesets` and immutable `ruleset_versions`. Scorers save; viewers read; admins archive.
+  - Rulesets are included in the reference sync for offline use.
+  - A match records which ruleset version it came from, only when its rules and settings match that version exactly.
+- **Client:**
+  - Rulesets list.
+  - Builder: sport → settings from a preset → rules from the catalogue only → priority → live check → preview → save as a new version. Duplicating starts a new ruleset from a copy.
+  - The match wizard offers the workspace's rulesets.
+  - The timeline shows each rule's effect under the event that caused it.
+- **Playwright:** build the three-wides rule, preview it, score with it (penalty run on the third wide, removed on undo), the server agrees and links the version, then duplicate the ruleset.
 
-1. **engine-kit:**
-   - A rule DSL schema and evaluator: typed operators; priority, then stable ID; depth and cycle limits.
-   - Rule effects become derived events run back through `engine.apply`, carrying the rule ID and version (D16b).
-2. **Rule catalogues** for the five pilot sports. Triggers are engine facts; actions are commands the engine declares.
-3. **Rulesets:** immutable versions; a match references a preset or a ruleset version (D15).
-4. **Builder UI:** preset → duplicate → trigger → conditions → engine command → priority → preview against sample events → save as a new version.
-5. **Exit:**
-   - The cricket consecutive-wide example works end-to-end.
-   - Invalid combinations are blocked.
-   - Replay is deterministic, including derived events.
-   - Rule effects appear in stats.
+**Not built in M8:**
+- **Tournaments with a ruleset:** fixture matches must use the tournament's settings and no custom rules.
+- **Penalty runs to the fielding side** (Law 41's five-run penalties carried into their innings). Rule-given penalty runs go to the batting side.
+- **Translated rule labels:** catalogue labels are English only.
+
+## Next — M9: Football, Field Hockey, Basketball
+
+Each sport must meet the full definition of done in [plan.md §4](../plan.md):
+- settings and presets;
+- engine;
+- scoring UI;
+- undo and corrections;
+- timers;
+- result and scorecard;
+- stats and awards;
+- rules help content;
+- a rule catalogue;
+- golden logs and property tests;
+- an offline e2e smoke test;
+- the spectator view;
+- tournament standings rules.
+
+1. **Timed-period helpers in engine-kit:** period clock, stoppage time, extra time, using the device-owned clock model from M5.
+2. **Football:**
+   - Goals (own goals, penalties), cards, substitutions, extra time and penalty shoot-out.
+   - Stats: goals, assists, cards.
+3. **Field Hockey:**
+   - Quarters, field goals and penalty corners/strokes, green/yellow/red cards with timed suspensions, and shoot-outs.
+4. **Basketball:**
+   - Quarters, 1/2/3-point scoring, personal and team fouls (bonus), timeouts, the shot clock as a display aid, and overtime.
+   - Stats: points, rebounds and assists where recorded.
+5. **Owner sign-off:** award criteria and tie-breaks for each sport.
 
 ## Needs the owner
 
