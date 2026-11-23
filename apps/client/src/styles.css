@@ -89,6 +89,10 @@
   html {
     -webkit-tap-highlight-color: transparent;
   }
+  /* Fieldsets default to their content's minimum width, which can push a phone page sideways. */
+  fieldset {
+    min-width: 0;
+  }
   body {
     @apply bg-background text-foreground antialiased;
     font-family:

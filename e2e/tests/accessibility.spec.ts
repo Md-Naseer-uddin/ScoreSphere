@@ -2,8 +2,17 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
 import { newPhone, register } from './helpers';
 
+/** Nothing may push a phone screen sideways (WCAG 1.4.10 reflow). */
+async function expectNoSidewaysScroll(page: Page, label: string) {
+  const overflow = await page.evaluate<number>(
+    'document.documentElement.scrollWidth - document.documentElement.clientWidth',
+  );
+  expect(overflow, `${label} scrolls sideways by ${overflow}px`).toBeLessThanOrEqual(0);
+}
+
 /** WCAG 2.1 A and AA; serious and critical violations fail the test (plan M11). */
 async function audit(page: Page, label: string) {
+  await expectNoSidewaysScroll(page, label);
   const results = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
     .analyze();
@@ -39,6 +48,7 @@ async function startMatch(page: Page, sport: string) {
   for (const box of await page.getByRole('textbox').all()) {
     if ((await box.inputValue()) === '') await box.fill(`Player ${++n}`);
   }
+  await expectNoSidewaysScroll(page, `${sport} setup`);
   await page.getByRole('button', { name: 'Start match' }).click();
   await page.waitForURL(/\/score$/);
 }

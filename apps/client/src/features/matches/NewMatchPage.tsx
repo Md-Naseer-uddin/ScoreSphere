@@ -435,7 +435,7 @@ export function NewMatchPage() {
                   onAdd={(players) => addSaved(sideIndex, players)}
                 />
                 {size.max > size.min && (
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <Button
                       variant="outline"
                       size="sm"
