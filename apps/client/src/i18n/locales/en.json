@@ -75,6 +75,14 @@
     "fullName": "Full name",
     "city": "City",
     "bio": "About you",
+    "appearance": {
+      "title": "Appearance",
+      "body": "Saved on this device.",
+      "light": "Light",
+      "lightHint": "High contrast, easiest to read outdoors",
+      "dark": "Dark",
+      "system": "Match phone"
+    },
     "changePhoto": "Change photo",
     "removePhoto": "Remove",
     "uploading": "Uploading…",

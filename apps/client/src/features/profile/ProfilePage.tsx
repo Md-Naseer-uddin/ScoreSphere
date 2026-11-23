@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { logout } from '@/features/auth/auth-api';
 import { MyStatsCard } from '@/features/stats/TeamStatsCard';
+import { AppearanceCard } from './AppearanceCard';
 import { AvatarSection } from './AvatarSection';
 import { DevicesCard } from './DevicesCard';
 import { getMe, profileKeys } from './profile-api';
@@ -30,6 +31,7 @@ export function ProfilePage() {
       <RosterLinksCard />
       <MyStatsCard />
       <ProfileDetailsCard me={me} />
+      <AppearanceCard />
       <SecurityCard me={me} />
       <YourDataCard />
       <DevicesCard />

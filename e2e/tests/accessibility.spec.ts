@@ -88,9 +88,12 @@ test.describe('in dark mode', () => {
   test.use({ colorScheme: 'dark' });
 
   test('home, the new-match wizard and scoring keep enough contrast', async ({ page }) => {
+    // Light is the default (built for sunlight); dark is chosen in Profile.
+    await page.addInitScript(() => localStorage.setItem('scoresphere.theme', 'dark'));
     await page.goto('/auth/register');
     await register(page, 'Coach Chitra', newPhone(), 'access password 3');
     await page.goto('/app');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     await audit(page, 'dark home');
     await page.goto('/app/matches/new');
     await audit(page, 'dark new match');

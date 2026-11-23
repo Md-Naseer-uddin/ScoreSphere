@@ -1,48 +1,59 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-/* Design tokens (shadcn conventions). Colours are OKLCH; dark values follow the OS setting. */
+/* `dark:` utilities follow the app's theme setting (lib/theme.ts), not the phone's. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/*
+ * Design tokens (shadcn conventions), in OKLCH. The default is a high-contrast light theme
+ * for scoring outdoors in direct sunlight: text and buttons reach WCAG AAA (7:1), and inputs
+ * and cards have edges you can still see in glare. Dark is opt-in from Profile.
+ */
 :root {
+  color-scheme: light;
   --radius: 0.75rem;
-  --background: oklch(0.99 0 0);
-  --foreground: oklch(0.2 0.02 160);
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.15 0.01 160);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.02 160);
-  --primary: oklch(0.42 0.1 158);
-  --primary-foreground: oklch(0.98 0.01 158);
-  --secondary: oklch(0.95 0.01 158);
-  --secondary-foreground: oklch(0.25 0.03 160);
-  --muted: oklch(0.96 0.005 160);
-  --muted-foreground: oklch(0.5 0.02 160);
+  --card-foreground: oklch(0.15 0.01 160);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.01 160);
+  --primary: oklch(0.42 0.12 155);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.93 0.03 155);
+  --secondary-foreground: oklch(0.15 0.01 160);
+  --muted: oklch(0.95 0.005 160);
+  --muted-foreground: oklch(0.42 0.01 160);
   --accent: oklch(0.86 0.17 92);
   --accent-foreground: oklch(0.25 0.05 80);
-  --destructive: oklch(0.58 0.22 27);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.91 0.01 160);
-  --input: oklch(0.91 0.01 160);
-  --ring: oklch(0.42 0.1 158);
+  --destructive: oklch(0.5 0.19 27);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.66 0.01 160);
+  --input: oklch(0.52 0.01 160);
+  --ring: oklch(0.42 0.12 155);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: oklch(0.17 0.015 160);
-    --foreground: oklch(0.96 0.01 160);
-    --card: oklch(0.21 0.015 160);
-    --card-foreground: oklch(0.96 0.01 160);
-    --primary: oklch(0.72 0.14 158);
-    --primary-foreground: oklch(0.17 0.02 160);
-    --secondary: oklch(0.26 0.02 160);
-    --secondary-foreground: oklch(0.96 0.01 160);
-    --muted: oklch(0.25 0.015 160);
-    --muted-foreground: oklch(0.72 0.02 160);
-    --accent: oklch(0.86 0.17 92);
-    --accent-foreground: oklch(0.2 0.04 80);
-    --destructive: oklch(0.65 0.2 27);
-    --destructive-foreground: oklch(0.98 0 0);
-    --border: oklch(0.3 0.015 160);
-    --input: oklch(0.3 0.015 160);
-    --ring: oklch(0.72 0.14 158);
-  }
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --background: oklch(0.17 0.015 160);
+  --foreground: oklch(0.96 0.01 160);
+  --card: oklch(0.21 0.015 160);
+  --card-foreground: oklch(0.96 0.01 160);
+  --popover: oklch(0.23 0.015 160);
+  --popover-foreground: oklch(0.96 0.01 160);
+  --primary: oklch(0.75 0.14 158);
+  --primary-foreground: oklch(0.17 0.02 160);
+  --secondary: oklch(0.28 0.03 160);
+  --secondary-foreground: oklch(0.96 0.01 160);
+  --muted: oklch(0.25 0.015 160);
+  --muted-foreground: oklch(0.78 0.02 160);
+  --accent: oklch(0.86 0.17 92);
+  --accent-foreground: oklch(0.2 0.04 80);
+  --destructive: oklch(0.6 0.2 27);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.4 0.015 160);
+  --input: oklch(0.58 0.015 160);
+  --ring: oklch(0.75 0.14 158);
 }
 
 @theme inline {
@@ -54,6 +65,8 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);

@@ -20,7 +20,7 @@ export function AppShell() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background/95 px-4 pt-[env(safe-area-inset-top)] backdrop-blur">
+      <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background px-4 pt-[env(safe-area-inset-top)]">
         <div className="py-2">
           <WorkspaceSwitcher />
         </div>
@@ -40,7 +40,7 @@ export function AppShell() {
 
       <nav
         aria-label="Main"
-        className="sticky bottom-0 border-t bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur"
+        className="sticky bottom-0 border-t bg-background pb-[env(safe-area-inset-bottom)]"
       >
         <ul className="mx-auto grid max-w-3xl grid-cols-5">
           {NAV.map(({ to, key, icon: Icon, end }) => (
