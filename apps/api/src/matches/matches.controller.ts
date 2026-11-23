@@ -1,4 +1,14 @@
-import { Body, Controller, Get, HttpCode, Param, ParseUUIDPipe, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import {
   type LeaseResponse,
   leaseRequestSchema,
@@ -7,6 +17,8 @@ import {
   type MatchSummary,
   type PostMatchEventsResponse,
   postMatchEventsRequestSchema,
+  renameMatchSidesRequestSchema,
+  type RenameMatchSidesResponse,
   type StoredMatchEvent,
 } from '@scoresphere/contracts';
 import { createZodDto } from 'nestjs-zod';
@@ -22,6 +34,7 @@ import { MatchesService } from './matches.service';
 
 class PostMatchEventsDto extends createZodDto(postMatchEventsRequestSchema) {}
 class LeaseDto extends createZodDto(leaseRequestSchema) {}
+class RenameSidesDto extends createZodDto(renameMatchSidesRequestSchema) {}
 class ListMatchesQueryDto extends createZodDto(
   z.object({
     status: matchStatusSchema.optional(),
@@ -81,6 +94,16 @@ export class MatchesController {
     @Body() body: PostMatchEventsDto,
   ): Promise<PostMatchEventsResponse> {
     return this.events.ingest(user, matchId, body);
+  }
+
+  /** Team names only; they live outside the ledger, so scoring is untouched (ADR 0024). */
+  @Patch('matches/:matchId/sides')
+  renameSides(
+    @CurrentUser() user: AuthUser,
+    @Param('matchId', uuid) matchId: string,
+    @Body() body: RenameSidesDto,
+  ): Promise<RenameMatchSidesResponse> {
+    return this.matches.renameSides(user, matchId, body);
   }
 
   @Post('matches/:matchId/lease')

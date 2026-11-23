@@ -11,6 +11,9 @@ import {
   matchDetailSchema,
   type MatchSummary,
   matchSummarySchema,
+  type RenameMatchSidesRequest,
+  type RenameMatchSidesResponse,
+  renameMatchSidesResponseSchema,
   SHARE_TOKEN_HEADER,
   type ShareLink,
   shareLinkSchema,
@@ -32,6 +35,17 @@ export function listMatches(workspaceId: string): Promise<MatchSummary[]> {
 
 export function getMatch(matchId: string): Promise<MatchDetail> {
   return apiFetch(`/matches/${matchId}`, {}, matchDetailSchema);
+}
+
+export function renameSides(
+  matchId: string,
+  body: RenameMatchSidesRequest,
+): Promise<RenameMatchSidesResponse> {
+  return apiFetch(
+    `/matches/${matchId}/sides`,
+    { method: 'PATCH', ...json(body) },
+    renameMatchSidesResponseSchema,
+  );
 }
 
 export async function lease(

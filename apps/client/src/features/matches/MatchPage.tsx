@@ -1,4 +1,4 @@
-import type { MatchDetail } from '@scoresphere/contracts';
+import { hasRole, type MatchDetail } from '@scoresphere/contracts';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Download, Radio } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/dialog';
 import { FullScreenSpinner } from '@/features/auth/RequireAuth';
 import { useSession } from '@/features/auth/session';
+import { useWorkspaceRole } from '@/features/teams/permissions';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { ApiClientError } from '@/lib/api';
 import type { LocalMatchEvent } from '@/lib/db';
@@ -34,6 +35,7 @@ import { getMatch, lease, matchKeys } from './matches-api';
 import { AwardsCard } from './AwardsCard';
 import { ShareLinksCard } from './ShareLinksCard';
 import { StatusBadge } from './StatusBadge';
+import { RenameSidesDialog } from './RenameSidesDialog';
 import { checkServerCopy } from './sync-worker';
 import { SyncBadge } from './SyncBadge';
 import { Timeline } from './Timeline';
@@ -88,6 +90,7 @@ export function MatchPage() {
     if (scoredHere && online && authenticated) void checkServerCopy(matchId).catch(() => undefined);
   }, [matchId, scoredHere, online, authenticated]);
   const [claiming, setClaiming] = useState(false);
+  const role = useWorkspaceRole(local?.match.workspaceId ?? remote.data?.workspaceId);
 
   if (local === undefined || (!local && remote.isPending && authenticated))
     return <FullScreenSpinner />;
@@ -154,6 +157,12 @@ export function MatchPage() {
         {(local?.match.needsReview || remote.data?.needsReview) && (
           <Badge variant="destructive">{t('matches.needsReview')}</Badge>
         )}
+        {ui?.namedSides &&
+          serverKnown &&
+          online &&
+          authenticated &&
+          role &&
+          hasRole(role, 'SCORER') && <RenameSidesDialog matchId={matchId} sides={sides} />}
       </div>
 
       {projection && ui && (

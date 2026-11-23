@@ -230,6 +230,27 @@ export const leaseResponseSchema = z.object({
 });
 export type LeaseResponse = z.infer<typeof leaseResponseSchema>;
 
+/** Renames a match's sides, e.g. to fix a team name left as typed in setup. */
+export const renameMatchSidesRequestSchema = z.object({
+  sides: z
+    .array(
+      z.object({
+        side: sideIndexSchema,
+        name: z.string().trim().min(1, 'REQUIRED').max(60, 'TOO_LONG'),
+      }),
+    )
+    .min(1)
+    .max(2)
+    .refine((sides) => new Set(sides.map((s) => s.side)).size === sides.length, {
+      message: 'DUPLICATE_SIDE',
+    }),
+});
+export type RenameMatchSidesRequest = z.input<typeof renameMatchSidesRequestSchema>;
+export const renameMatchSidesResponseSchema = z.array(
+  z.object({ side: sideIndexSchema, name: z.string() }),
+);
+export type RenameMatchSidesResponse = z.infer<typeof renameMatchSidesResponseSchema>;
+
 /** Read-only share links (ADR 0021). The token is only ever returned once, at creation. */
 export const SHARE_TOKEN_HEADER = 'x-share-token';
 

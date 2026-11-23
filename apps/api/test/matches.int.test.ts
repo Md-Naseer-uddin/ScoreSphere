@@ -289,4 +289,53 @@ describe('match ledger and sync', () => {
       expect(late.results[0]).toMatchObject({ outcome: 'CONFLICT', code: 'NOT_LEASE_HOLDER' });
     });
   });
+
+  describe('renaming sides', () => {
+    const rename = (user: TestUser, matchId: string, body: unknown, status = 200) =>
+      http()
+        .patch(`/api/v1/matches/${matchId}/sides`)
+        .set(as(user))
+        .send(body as object)
+        .expect(status);
+
+    it('lets scorers and above fix team names, without touching the ledger', async () => {
+      const match = await newMatch();
+      await postEvents(app, scorer(), match, [match.rally(0)]);
+      for (const role of ['SCORER', 'ADMIN', 'OWNER'] as const) {
+        const res = await rename(org.users[role], match.matchId, {
+          sides: [{ side: 1, name: `  Rayyan XI ${role} ` }],
+        });
+        expect(res.body.data[1]).toEqual({ side: 1, name: `Rayyan XI ${role}` });
+      }
+      const m = await detail(match);
+      expect(m.sides.map((s: { name: string }) => s.name)).toEqual([
+        m.sides[0].name,
+        'Rayyan XI OWNER',
+      ]);
+      expect(m.version).toBe(4);
+    });
+
+    it('refuses viewers and hides the match from outsiders', async () => {
+      const match = await newMatch();
+      const body = { sides: [{ side: 0, name: 'Lions' }] };
+      await rename(org.users.VIEWER, match.matchId, body, 403);
+      await rename(org.users.OUTSIDER, match.matchId, body, 404);
+    });
+
+    it('rejects empty names and a side named twice', async () => {
+      const match = await newMatch();
+      await rename(scorer(), match.matchId, { sides: [{ side: 0, name: '  ' }] }, 400);
+      await rename(
+        scorer(),
+        match.matchId,
+        {
+          sides: [
+            { side: 0, name: 'A' },
+            { side: 0, name: 'B' },
+          ],
+        },
+        400,
+      );
+    });
+  });
 });

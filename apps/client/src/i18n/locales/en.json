@@ -379,6 +379,13 @@
       "failed": "Sync failed — action required",
       "conflict": "Conflict — local events kept"
     },
+    "rename": {
+      "action": "Rename teams",
+      "title": "Rename teams",
+      "body": "Fixes the names on the scorecard and in match history. Scores don't change.",
+      "side": "Side {{side}} name",
+      "done": "Team names updated"
+    },
     "timeline": {
       "title": "Recent events",
       "corrected": "corrected",

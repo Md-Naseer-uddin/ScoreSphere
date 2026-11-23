@@ -6,6 +6,8 @@ import {
   type MatchDetail,
   type MatchStatus,
   type MatchSummary,
+  type RenameMatchSidesRequest,
+  type RenameMatchSidesResponse,
   type SideIndex,
   type StoredMatchEvent,
 } from '@scoresphere/contracts';
@@ -164,6 +166,30 @@ export class MatchesService {
         leaseDeviceId: row!.leaseDeviceId,
         version: row!.version,
       };
+    });
+  }
+
+  /** Scorers and above may fix a side's name at any time, including after the match. */
+  async renameSides(
+    user: AuthUser,
+    matchId: string,
+    req: RenameMatchSidesRequest,
+  ): Promise<RenameMatchSidesResponse> {
+    return this.db.transaction(async (tx) => {
+      await this.access(user, matchId, 'SCORER', tx);
+      for (const { side, name } of req.sides) {
+        await tx
+          .update(matchSides)
+          .set({ name: name.trim() })
+          .where(and(eq(matchSides.matchId, matchId), eq(matchSides.side, side)));
+      }
+      const rows = await tx
+        .select({ side: matchSides.side, name: matchSides.name })
+        .from(matchSides)
+        .where(eq(matchSides.matchId, matchId));
+      return rows
+        .sort((a, b) => a.side - b.side)
+        .map((r) => ({ side: r.side as SideIndex, name: r.name }));
     });
   }
 

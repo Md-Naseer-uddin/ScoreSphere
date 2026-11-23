@@ -327,6 +327,26 @@ After that, if the pilot asks for them, the follow-ups noted under each mileston
 - Start on Render's free plans as a demo: one container in Singapore (`render.yaml`). Move to
   paid plans before pilot users (`docs/runbooks/deploy.md`).
 
+**Owner feedback from the demo (23 November 2026), done:**
+- **Saved players.** Match setup has one box per player, with saved players suggested as you
+  type, and a "Choose saved players" sheet for each side. The per-player dropdown is gone.
+  - When a match starts, new names are added to the workspace roster, so they are on every
+    device and collect stats. Exact name matches (ignoring case and spaces) reuse the existing
+    member instead of adding a duplicate.
+  - Offline, or if the roster can't be reached within 6 s, new names become guests on the
+    phone instead. Saved guests are promoted to the roster the next time that works.
+- **Team names.** They start empty and are required; the old "Team A"/"Team B" defaults were
+  easy to leave in. Scorers and above can rename a match's teams afterwards from the match
+  page (`PATCH /matches/:id/sides`). Names live outside the ledger, so scores don't change.
+- **Theme.** The default is a high-contrast light theme for sunlight: text and buttons reach
+  WCAG AAA (7:1), and inputs and cards have visible edges. Dark, or following the phone, is a
+  choice under Profile → Appearance, saved per device. Previously the app followed the phone,
+  so a phone in dark mode gave a dark app outdoors.
+- **Display fixes.**
+  - Dropdown menus were transparent: the theme had no popover colour.
+  - Every screen now opens at the top. Before, a new screen or setup step kept the previous
+    one's scroll position.
+
 ## Needs the owner
 
 - **On-device check of the CI-built APK:** IndexedDB persists across kill/restart, plus keep-awake.
