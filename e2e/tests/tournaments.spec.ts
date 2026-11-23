@@ -65,7 +65,8 @@ test('a league: fixtures, scoring, standings, awards, and republishing after a c
 
   // Score the only fixture: the wizard is filled from it.
   await page.getByRole('link', { name: 'Score' }).click();
-  await expect(page.getByRole('combobox', { name: 'Side A player 1' })).toHaveValue(/^roster:/);
+  await expect(page.getByRole('textbox', { name: 'Name for Side A player 1' })).toHaveValue('Asha');
+  await expect(page.getByRole('textbox', { name: 'Name for Side B player 1' })).toHaveValue('Ravi');
   await page.getByRole('button', { name: 'Start match' }).click();
   await page.waitForURL(/\/score$/);
   await page

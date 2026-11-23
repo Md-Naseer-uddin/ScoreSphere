@@ -38,6 +38,24 @@ export const createRosterMember = (workspaceId: string, input: CreateRosterMembe
     ),
   );
 
+/**
+ * Adds several roster members at once (match setup), refreshing the device copy once in the
+ * background rather than after each one. Settles each name separately.
+ */
+export async function createRosterMembers(workspaceId: string, names: string[]) {
+  const results = await Promise.allSettled(
+    names.map((displayName) =>
+      apiFetch(
+        `${ws(workspaceId)}/roster-members`,
+        { method: 'POST', ...json({ displayName }) },
+        rosterMemberSchema,
+      ),
+    ),
+  );
+  void syncReference().catch(() => undefined);
+  return results;
+}
+
 export const updateRosterMember = (
   workspaceId: string,
   id: string,

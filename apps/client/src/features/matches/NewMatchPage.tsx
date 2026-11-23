@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { useRulesets } from '@/features/rulesets/RulesetsPage';
 import { useSession } from '@/features/auth/session';
 import { useQuickGuests, useRoster, useTeams } from '@/features/teams/local-data';
+import { useCanManageRoster } from '@/features/teams/permissions';
 import { getTournament, tournamentKeys } from '@/features/tournaments/tournaments-api';
 import { useQuery } from '@tanstack/react-query';
 import { useCurrentWorkspace } from '@/features/workspaces/current-workspace';
@@ -25,12 +26,9 @@ import { db } from '@/lib/db';
 import { sportUi } from '@/sports/registry';
 import type { SportSetup, SportUi } from '@/sports/types';
 import { createLocalMatch } from './local-store';
-
-/** A player slot: picked from the roster or the device's quick guests, or typed in. */
-interface Slot {
-  pick: string;
-  name: string;
-}
+import { PlayerNameField, SavedPlayersSheet } from './PlayerPicker';
+import { type KnownPlayer, normalizeName, resolveSlot, type Slot } from './players';
+import { savePlayers } from './save-players';
 
 interface SideDraft {
   name: string;
@@ -43,14 +41,11 @@ const isEmpty = (slot: Slot) => !slot.pick && !slot.name.trim();
 const LETTERS = ['A', 'B'] as const;
 type Step = 'sport' | 'format' | 'players';
 
-function draftSides(
-  ui: SportUi | undefined,
-  setup: SportSetup | null,
-  defaultName: (letter: string) => string,
-): SideDraft[] {
+/** Team names start empty: a ready-made "Team A" was easy to leave in by mistake. */
+function draftSides(ui: SportUi | undefined, setup: SportSetup | null): SideDraft[] {
   const size = ui && setup ? ui.sideSize(setup.config).initial : 1;
-  return LETTERS.map((letter) => ({
-    name: ui?.namedSides ? defaultName(letter) : '',
+  return LETTERS.map(() => ({
+    name: '',
     teamId: null,
     slots: Array.from({ length: size }, emptySlot),
   }));
@@ -69,6 +64,7 @@ export function NewMatchPage() {
   const roster = useRoster(workspace?.id);
   const guests = useQuickGuests();
   const teams = useTeams(workspace?.id);
+  const canSaveToRoster = useCanManageRoster(workspace?.id);
   const { data: versionInfo } = useAppVersionInfo();
   const fixtureId = params.get('fixture');
   const tournamentId = params.get('tournament');
@@ -78,7 +74,6 @@ export function NewMatchPage() {
     enabled: Boolean(fixtureId && tournamentId),
   });
   const fixture = tournament?.fixtures.find((f) => f.id === fixtureId);
-  const defaultName = (letter: string) => t('matches.new.defaultSideName', { side: letter });
 
   const initialSport = params.get('sport') as SportKey | null;
   const [sport, setSport] = useState<SportKey | null>(
@@ -87,7 +82,7 @@ export function NewMatchPage() {
   const ui = sport ? sportUi(sport) : undefined;
   const [step, setStep] = useState<Step>(sport ? 'format' : 'sport');
   const [setup, setSetup] = useState<SportSetup | null>(() => ui?.defaultSetup() ?? null);
-  const [sides, setSides] = useState<SideDraft[]>(() => draftSides(ui, setup, defaultName));
+  const [sides, setSides] = useState<SideDraft[]>(() => draftSides(ui, setup));
   const [title, setTitle] = useState('');
   const [saving, setSaving] = useState(false);
   // A saved ruleset fixes the settings and adds its rules (plan M8); null means standard.
@@ -95,8 +90,13 @@ export function NewMatchPage() {
   const [rulesetId, setRulesetId] = useState<string | null>(null);
   const ruleset = rulesets?.find((r) => r.id === rulesetId) ?? null;
 
+  // Each step starts at the top of the page, not where the last one was scrolled to.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [step]);
+
   const size = ui && setup ? ui.sideSize(setup.config) : { min: 1, max: 1, initial: 1 };
-  const options = useMemo(
+  const known = useMemo<KnownPlayer[]>(
     () => [
       ...(roster ?? []).map((m) => ({
         value: `roster:${m.id}`,
@@ -121,7 +121,7 @@ export function NewMatchPage() {
     setSport(key);
     setSetup(defaults);
     setRulesetId(null);
-    setSides(draftSides(next, defaults, defaultName));
+    setSides(draftSides(next, defaults));
     setStep('format');
   };
 
@@ -202,24 +202,48 @@ export function NewMatchPage() {
     setStep('players');
   }, [tournament, fixture]);
 
-  const slotName = (slot: Slot) =>
-    slot.pick ? (options.find((o) => o.value === slot.pick)?.label ?? '') : slot.name.trim();
-  const picks = sides.flatMap((s) => s.slots.map((x) => x.pick)).filter(Boolean);
-  const duplicate = new Set(picks).size !== picks.length;
-  const complete =
-    sides.every(
-      (side) => side.slots.length >= size.min && side.slots.every((s) => slotName(s).length > 0),
-    ) &&
-    (!ui?.namedSides || sides.every((side) => side.name.trim().length > 0));
+  // Who each slot is: a saved player (picked, or typed by name) or a new name.
+  const resolved = sides.map((side) => side.slots.map((slot) => resolveSlot(known, slot)));
+  const keys = resolved.flat().flatMap((r) => (r ? [r.key] : []));
+  const duplicate = new Set(keys).size !== keys.length;
+  const inMatch = new Set(keys);
+  const namesMissing = ui?.namedSides && sides.some((side) => !side.name.trim());
+  const playersMissing = sides.some(
+    (side, i) => side.slots.length < size.min || resolved[i]!.some((r) => r === null),
+  );
+  const complete = !namesMissing && !playersMissing;
+
+  /** Fills empty places first, then adds places up to the most a side can have. */
+  const addSaved = (sideIndex: number, players: KnownPlayer[]) => {
+    const side = sides[sideIndex]!;
+    const slots = [...side.slots];
+    for (const player of players) {
+      const empty = slots.findIndex((s) => !s.pick && !s.name.trim());
+      const slot = { pick: player.value, name: player.label };
+      if (empty >= 0) slots[empty] = slot;
+      else if (slots.length < size.max) slots.push(slot);
+    }
+    updateSide(sideIndex, { slots });
+  };
 
   const start = async () => {
     if (!sport || !setup || !workspace || !userId || !complete || duplicate) return;
     setSaving(true);
+    // New names (and guests on this phone) are kept as saved players for next time.
+    const saved = await savePlayers({
+      workspaceId: workspace.id,
+      ownerUserId: userId,
+      players: resolved
+        .flat()
+        .filter((r) => r !== null && !r.player?.rosterMemberId)
+        .map((r) => ({ name: r!.name, guest: r!.player })),
+      toRoster: canSaveToRoster,
+    }).catch(() => new Map<string, string>());
     const snapshot: MatchSideSnapshot[] = sides.map((side, index) => {
-      const participants = side.slots.map((slot) => ({
+      const participants = resolved[index]!.map((r) => ({
         participantId: newId(),
-        displayName: slotName(slot),
-        rosterMemberId: options.find((o) => o.value === slot.pick)?.rosterMemberId ?? null,
+        displayName: r!.name,
+        rosterMemberId: r!.player?.rosterMemberId ?? saved.get(normalizeName(r!.name)) ?? null,
       }));
       const name = ui?.namedSides
         ? side.name.trim()
@@ -369,49 +393,47 @@ export function NewMatchPage() {
                     <Input
                       id={`side-name-${sideIndex}`}
                       maxLength={60}
+                      autoCapitalize="words"
+                      placeholder={t('matches.new.sideNamePlaceholder')}
                       value={side.name}
                       onChange={(e) => updateSide(sideIndex, { name: e.target.value })}
                     />
                   </div>
                 )}
-                {side.slots.map((slot, slotIndex) => {
-                  const id = `slot-${sideIndex}-${slotIndex}`;
-                  const update = (patch: Partial<Slot>) =>
-                    updateSide(sideIndex, {
-                      slots: side.slots.map((s, i) =>
-                        i === slotIndex ? { ...slot, ...patch } : s,
-                      ),
-                    });
-                  const label = t('matches.new.player', { side: letter, n: slotIndex + 1 });
-                  return (
-                    <div key={slotIndex} className="space-y-2">
-                      <Label htmlFor={`${id}-pick`}>{label}</Label>
-                      <select
-                        id={`${id}-pick`}
-                        className="h-11 w-full rounded-lg border bg-background px-3 text-sm"
-                        value={slot.pick}
-                        onChange={(e) => update({ pick: e.target.value })}
-                      >
-                        <option value="">{t('matches.new.typeName')}</option>
-                        {options.map((o) => (
-                          <option key={o.value} value={o.value}>
-                            {o.label}
-                            {o.rosterMemberId ? '' : ` · ${t('matches.new.guest')}`}
-                          </option>
-                        ))}
-                      </select>
-                      {!slot.pick && (
-                        <Input
-                          aria-label={t('matches.new.nameFor', { player: label })}
-                          placeholder={t('matches.new.namePlaceholder')}
-                          maxLength={60}
-                          value={slot.name}
-                          onChange={(e) => update({ name: e.target.value })}
-                        />
-                      )}
-                    </div>
-                  );
-                })}
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">{t('matches.new.players')}</p>
+                  {side.slots.map((slot, slotIndex) => {
+                    const own = resolved[sideIndex]![slotIndex]?.key;
+                    return (
+                      <PlayerNameField
+                        key={slotIndex}
+                        number={slotIndex + 1}
+                        label={t('matches.new.nameFor', {
+                          player: t('matches.new.player', { side: letter, n: slotIndex + 1 }),
+                        })}
+                        slot={slot}
+                        known={known}
+                        exclude={new Set([...inMatch].filter((k) => k !== own))}
+                        onChange={(next) =>
+                          updateSide(sideIndex, {
+                            slots: side.slots.map((s, i) => (i === slotIndex ? next : s)),
+                          })
+                        }
+                      />
+                    );
+                  })}
+                </div>
+                <SavedPlayersSheet
+                  side={letter}
+                  known={known}
+                  exclude={inMatch}
+                  capacity={
+                    side.slots.filter((s) => !s.pick && !s.name.trim()).length +
+                    size.max -
+                    side.slots.length
+                  }
+                  onAdd={(players) => addSaved(sideIndex, players)}
+                />
                 {size.max > size.min && (
                   <div className="flex gap-2">
                     <Button
@@ -446,6 +468,11 @@ export function NewMatchPage() {
             />
           </div>
           {duplicate && <p className="text-sm text-destructive">{t('matches.new.duplicate')}</p>}
+          {!complete && (
+            <p className="text-sm text-muted-foreground" role="status">
+              {namesMissing ? t('matches.new.needTeamNames') : t('matches.new.needPlayerNames')}
+            </p>
+          )}
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => setStep('format')}>
               {t('common.back')}

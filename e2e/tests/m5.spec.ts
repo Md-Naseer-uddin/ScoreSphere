@@ -101,6 +101,8 @@ test('volleyball rallies scored offline survive a reload and sync', async ({ bro
   await page.goto('/app/matches/new?sport=volleyball');
   await page.getByLabel('Players on court').fill('2');
   await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByLabel('Side A name').fill('Team A');
+  await page.getByLabel('Side B name').fill('Team B');
   for (const [side, players] of [
     ['A', ['Anu', 'Bala']],
     ['B', ['Chitra', 'Deepa']],
