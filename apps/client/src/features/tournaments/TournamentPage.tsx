@@ -9,8 +9,11 @@ import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRoster, useTeams } from '@/features/teams/local-data';
+import { createTeam } from '@/features/teams/teams-api';
 import { useWorkspaces } from '@/features/workspaces/current-workspace';
 import { sportUi } from '@/sports/registry';
 import {
@@ -33,6 +36,7 @@ function EntriesCard({ tournament, canEdit }: { tournament: TournamentDetail; ca
   const teams = useTeams(tournament.workspaceId);
   const roster = useRoster(tournament.workspaceId);
   const [pick, setPick] = useState('');
+  const [newTeam, setNewTeam] = useState('');
   const set = (detail: TournamentDetail) =>
     queryClient.setQueryData(tournamentKeys.detail(tournament.id), detail);
   const add = useMutation({
@@ -43,6 +47,21 @@ function EntriesCard({ tournament, canEdit }: { tournament: TournamentDetail; ca
     onSuccess: (detail) => {
       set(detail);
       setPick('');
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : t('errors.generic')),
+  });
+  // A team can be made right here; its players join it when it plays its first match.
+  const createAndAdd = useMutation({
+    mutationFn: async () => {
+      const team = await createTeam(tournament.workspaceId, {
+        name: newTeam.trim(),
+        sportKeys: [tournament.sport],
+      });
+      return addEntries(tournament.id, { entries: [{ teamId: team.id }] });
+    },
+    onSuccess: (detail) => {
+      set(detail);
+      setNewTeam('');
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : t('errors.generic')),
   });
@@ -90,26 +109,56 @@ function EntriesCard({ tournament, canEdit }: { tournament: TournamentDetail; ca
         </ol>
         {canEdit && tournament.status === 'draft' && (
           <>
-            <div className="flex gap-2">
-              <select
-                aria-label={teamSport ? t('tournaments.pickTeam') : t('tournaments.pickPlayer')}
-                className="h-11 min-w-0 flex-1 rounded-lg border bg-background px-3 text-sm"
-                value={pick}
-                onChange={(e) => setPick(e.target.value)}
-              >
-                <option value="">
-                  {teamSport ? t('tournaments.pickTeam') : t('tournaments.pickPlayer')}
-                </option>
-                {options.map((o) => (
-                  <option key={o.id} value={o.id}>
-                    {o.name}
+            {options.length > 0 ? (
+              <div className="flex gap-2">
+                <select
+                  aria-label={teamSport ? t('tournaments.pickTeam') : t('tournaments.pickPlayer')}
+                  className="h-11 min-w-0 flex-1 rounded-lg border bg-background px-3 text-sm"
+                  value={pick}
+                  onChange={(e) => setPick(e.target.value)}
+                >
+                  <option value="">
+                    {teamSport ? t('tournaments.pickTeam') : t('tournaments.pickPlayer')}
                   </option>
-                ))}
-              </select>
-              <Button disabled={!pick || add.isPending} onClick={() => add.mutate()}>
-                {t('tournaments.addEntry')}
-              </Button>
-            </div>
+                  {options.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.name}
+                    </option>
+                  ))}
+                </select>
+                <Button disabled={!pick || add.isPending} onClick={() => add.mutate()}>
+                  {t('tournaments.addEntry')}
+                </Button>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                {teamSport ? t('tournaments.noTeamsLeft') : t('tournaments.noPlayersLeft')}
+              </p>
+            )}
+            {teamSport && (
+              <div className="space-y-1">
+                <Label htmlFor="tournament-new-team">{t('tournaments.newTeam')}</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="tournament-new-team"
+                    className="h-11 min-w-0 flex-1"
+                    maxLength={80}
+                    autoCapitalize="words"
+                    placeholder={t('tournaments.newTeamPlaceholder')}
+                    value={newTeam}
+                    onChange={(e) => setNewTeam(e.target.value)}
+                  />
+                  <Button
+                    variant="outline"
+                    disabled={!newTeam.trim() || createAndAdd.isPending}
+                    onClick={() => createAndAdd.mutate()}
+                  >
+                    {t('tournaments.createAndAdd')}
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">{t('tournaments.newTeamHint')}</p>
+              </div>
+            )}
             <p className="text-xs text-muted-foreground">{t('tournaments.seedingHint')}</p>
             <Button
               className="w-full"

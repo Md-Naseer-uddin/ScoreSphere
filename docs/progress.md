@@ -338,6 +338,10 @@ After that, if the pilot asks for them, the follow-ups noted under each mileston
 - **Team names.** They start empty and are required; the old "Team A"/"Team B" defaults were
   easy to leave in. Scorers and above can rename a match's teams afterwards from the match
   page (`PATCH /matches/:id/sides`). Names live outside the ledger, so scores don't change.
+- **Tournament teams.** A tournament's entries card can create a team and enter it in one step;
+  before, its picker was empty until teams were made under Teams. Players who score a match
+  for a saved team (a fixture, or a team picked in setup) join that team, so its next match
+  starts with them filled in.
 - **Theme.** The default is a high-contrast light theme for sunlight: text and buttons reach
   WCAG AAA (7:1), and inputs and cards have visible edges. Dark, or following the phone, is a
   choice under Profile → Appearance, saved per device. Previously the app followed the phone,

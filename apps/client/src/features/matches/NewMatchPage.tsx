@@ -28,7 +28,7 @@ import type { SportSetup, SportUi } from '@/sports/types';
 import { createLocalMatch } from './local-store';
 import { PlayerNameField, SavedPlayersSheet } from './PlayerPicker';
 import { type KnownPlayer, normalizeName, resolveSlot, type Slot } from './players';
-import { savePlayers } from './save-players';
+import { addPlayersToTeam, savePlayers } from './save-players';
 
 interface SideDraft {
   name: string;
@@ -255,6 +255,13 @@ export function NewMatchPage() {
         participants,
       };
     });
+    if (canSaveToRoster) {
+      for (const side of snapshot) {
+        if (!side.teamId) continue;
+        const ids = side.participants.flatMap((p) => (p.rosterMemberId ? [p.rosterMemberId] : []));
+        void addPlayersToTeam(workspace.id, side.teamId, ids).catch(() => undefined);
+      }
+    }
     const created = await createLocalMatch({
       ownerUserId: userId,
       workspaceId: workspace.id,

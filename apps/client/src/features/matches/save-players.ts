@@ -1,5 +1,5 @@
 import { newId, type RosterMember } from '@scoresphere/contracts';
-import { createRosterMembers } from '@/features/teams/teams-api';
+import { addTeamMembers, createRosterMembers } from '@/features/teams/teams-api';
 import { db } from '@/lib/db';
 import { type KnownPlayer, normalizeName } from './players';
 
@@ -67,4 +67,20 @@ export async function savePlayers(input: {
     }));
   if (guests.length) await db.quickGuests.bulkAdd(guests);
   return saved;
+}
+
+/**
+ * Players who play for a saved team join it, so its next match (a tournament's next round,
+ * say) starts with them filled in. Best effort, online only; the match never waits on it.
+ */
+export async function addPlayersToTeam(
+  workspaceId: string,
+  teamId: string,
+  rosterMemberIds: string[],
+): Promise<void> {
+  if (!navigator.onLine || rosterMemberIds.length === 0) return;
+  const members = await db.teamMembers.where('teamId').equals(teamId).toArray();
+  const current = new Set(members.map((m) => m.rosterMemberId));
+  const missing = [...new Set(rosterMemberIds)].filter((id) => !current.has(id));
+  if (missing.length) await addTeamMembers(workspaceId, teamId, missing);
 }
