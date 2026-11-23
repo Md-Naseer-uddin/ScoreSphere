@@ -7,6 +7,9 @@ import '../i18n';
 // findBy* waits 1 s by default; async form validation can take longer when CI is busy.
 configure({ asyncUtilTimeout: 5_000 });
 
+// jsdom has no layout; screens scroll to the top on navigation, which is a no-op here.
+window.scrollTo = (() => undefined) as typeof window.scrollTo;
+
 afterEach(() => {
   cleanup();
 });

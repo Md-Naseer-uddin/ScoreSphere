@@ -1,4 +1,4 @@
-import { Navigate, type RouteObject } from 'react-router';
+import { Navigate, Outlet, type RouteObject, ScrollRestoration } from 'react-router';
 import { AuthLayout } from '@/features/auth/AuthLayout';
 import { ForgotPasswordPage } from '@/features/auth/ForgotPasswordPage';
 import { LoginPage } from '@/features/auth/LoginPage';
@@ -31,62 +31,77 @@ import { AppShell } from './AppShell';
 import { RouteError } from './RouteError';
 import { SignedInRoot } from './SignedInRoot';
 
+/** Every screen opens at the top; going back returns to where you were. */
+function RootLayout() {
+  return (
+    <>
+      <ScrollRestoration />
+      <Outlet />
+    </>
+  );
+}
+
 /** Route table, kept separate from the router instance so tests can mount it in memory. */
 export const routes: RouteObject[] = [
-  { path: '/', element: <Navigate to="/app" replace /> },
   {
-    path: '/auth',
-    element: <AuthLayout />,
-    errorElement: <RouteError />,
+    element: <RootLayout />,
     children: [
-      { index: true, element: <Navigate to="/auth/login" replace /> },
-      { path: 'login', element: <LoginPage /> },
-      { path: 'register', element: <RegisterPage /> },
-      { path: 'forgot-password', element: <ForgotPasswordPage /> },
-      { path: 'recovery-code', element: <RecoveryCodePage /> },
-    ],
-  },
-  { path: '/join', element: <JoinPage />, errorElement: <RouteError /> },
-  { path: '/live', element: <LivePage />, errorElement: <RouteError /> },
-  { path: '/privacy', element: <PrivacyPage /> },
-  { path: '/terms', element: <TermsPage /> },
-  { path: '/download', element: <DownloadPage /> },
-  {
-    path: '/app',
-    element: (
-      <RequireAuth>
-        <SignedInRoot />
-      </RequireAuth>
-    ),
-    errorElement: <RouteError />,
-    children: [
+      { path: '/', element: <Navigate to="/app" replace /> },
       {
-        element: <AppShell />,
+        path: '/auth',
+        element: <AuthLayout />,
+        errorElement: <RouteError />,
         children: [
-          { index: true, element: <HomePage /> },
-          { path: 'sports', element: <SportsPage /> },
-          { path: 'sports/:sportKey', element: <SportPage /> },
-          { path: 'matches', element: <MatchesPage /> },
-          { path: 'matches/new', element: <NewMatchPage /> },
-          { path: 'matches/:matchId', element: <MatchPage /> },
-          { path: 'tournaments', element: <TournamentsPage /> },
-          { path: 'tournaments/new', element: <NewTournamentPage /> },
-          { path: 'tournaments/:tournamentId', element: <TournamentPage /> },
-          { path: 'rulesets', element: <RulesetsPage /> },
-          { path: 'rulesets/new', element: <RulesetEditorPage /> },
-          { path: 'rulesets/:rulesetId', element: <RulesetEditorPage /> },
-          { path: 'players/:rosterMemberId', element: <PlayerPage /> },
-          { path: 'teams', element: <TeamsPage /> },
-          { path: 'teams/roster', element: <RosterPage /> },
-          { path: 'teams/:teamId', element: <TeamDetailPage /> },
-          { path: 'profile', element: <ProfilePage /> },
-          { path: 'workspaces/new', element: <CreateOrganizationPage /> },
-          { path: 'workspaces/:workspaceId', element: <WorkspaceSettingsPage /> },
+          { index: true, element: <Navigate to="/auth/login" replace /> },
+          { path: 'login', element: <LoginPage /> },
+          { path: 'register', element: <RegisterPage /> },
+          { path: 'forgot-password', element: <ForgotPasswordPage /> },
+          { path: 'recovery-code', element: <RecoveryCodePage /> },
         ],
       },
-      // Scoring uses a focused layout without the tab bar (spec frontend §3).
-      { path: 'matches/:matchId/score', element: <ScoreMatchPage /> },
+      { path: '/join', element: <JoinPage />, errorElement: <RouteError /> },
+      { path: '/live', element: <LivePage />, errorElement: <RouteError /> },
+      { path: '/privacy', element: <PrivacyPage /> },
+      { path: '/terms', element: <TermsPage /> },
+      { path: '/download', element: <DownloadPage /> },
+      {
+        path: '/app',
+        element: (
+          <RequireAuth>
+            <SignedInRoot />
+          </RequireAuth>
+        ),
+        errorElement: <RouteError />,
+        children: [
+          {
+            element: <AppShell />,
+            children: [
+              { index: true, element: <HomePage /> },
+              { path: 'sports', element: <SportsPage /> },
+              { path: 'sports/:sportKey', element: <SportPage /> },
+              { path: 'matches', element: <MatchesPage /> },
+              { path: 'matches/new', element: <NewMatchPage /> },
+              { path: 'matches/:matchId', element: <MatchPage /> },
+              { path: 'tournaments', element: <TournamentsPage /> },
+              { path: 'tournaments/new', element: <NewTournamentPage /> },
+              { path: 'tournaments/:tournamentId', element: <TournamentPage /> },
+              { path: 'rulesets', element: <RulesetsPage /> },
+              { path: 'rulesets/new', element: <RulesetEditorPage /> },
+              { path: 'rulesets/:rulesetId', element: <RulesetEditorPage /> },
+              { path: 'players/:rosterMemberId', element: <PlayerPage /> },
+              { path: 'teams', element: <TeamsPage /> },
+              { path: 'teams/roster', element: <RosterPage /> },
+              { path: 'teams/:teamId', element: <TeamDetailPage /> },
+              { path: 'profile', element: <ProfilePage /> },
+              { path: 'workspaces/new', element: <CreateOrganizationPage /> },
+              { path: 'workspaces/:workspaceId', element: <WorkspaceSettingsPage /> },
+            ],
+          },
+          // Scoring uses a focused layout without the tab bar (spec frontend §3).
+          { path: 'matches/:matchId/score', element: <ScoreMatchPage /> },
+        ],
+      },
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
-  { path: '*', element: <NotFoundPage /> },
 ];
